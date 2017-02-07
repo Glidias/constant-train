@@ -41,8 +41,8 @@ class TestGame implements IRules
 	}
 	
 	function buildDeck():Void {
-		deck.addCards( Deck.getCards(Deck.MASK_SET_ALL, Deck.OP_ADD | Deck.OP_SUBTRACT , 0, 1) );
-		deck.addCards( Deck.getCards(Deck.NUM_2, Deck.OP_MULTIPLY | Deck.OP_DIVIDE , 0, 1) );
+		deck.addCards( Deck.getCards(Deck.SET_NUMBERS, Deck.OP_ADD | Deck.OP_SUBTRACT, 0, 1) );
+		deck.addCards( Deck.getCards(Deck.SET_NUMBERS, Deck.OP_MULTIPLY | Deck.OP_DIVIDE ,  Deck.NUM_2, 1) );
 
 		deck.addCards( Deck.getCards(Deck.SET_VARIABLE, Deck.OP_ADD, 0, 3) );
 		deck.addCards( Deck.getCards(Deck.SET_VARIABLE, Deck.OP_SUBTRACT, 0, 4) );

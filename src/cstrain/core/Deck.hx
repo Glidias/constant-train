@@ -69,6 +69,7 @@ class Deck
 	public static inline var NUM_9:Int = (1 << 8);
 	public static inline var NUM_10:Int = (1 << 9);
 	public static inline var MASK_NUMBER_ALL:Int = 1023;
+	public static inline var MASK_NUMBER_ALL_EXCEPT_1:Int = MASK_NUMBER_ALL & ~NUM_1;
 	public static inline var MASK_NUMBER_EVEN:Int = NUM_2 | NUM_4 | NUM_6 | NUM_8 | NUM_10;
 	public static inline var MASK_NUMBER_ODD:Int = NUM_1 | NUM_3 | NUM_5 | NUM_7 | NUM_9;
 	
