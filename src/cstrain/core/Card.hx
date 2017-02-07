@@ -15,7 +15,7 @@ class Card
 	
 	
 	public static inline function isIncreasingMagnitude(op:Int):Bool {
-		return   (op & 1) != 0;
+		return (op & 1) == 0;
 	}
 	public static inline function canOperate(op:Int):Bool {
 		return  op <= 3;
