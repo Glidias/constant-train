@@ -12,8 +12,10 @@ class GameModule extends VModule<GameState, NoneT>
 {
 	var rules:IRules;
 
-	@:mutator public var mutator:GameMutator;
-	@:action public var action:GameActions;
+	@:mutator static var mutator:GameMutator;
+	@:action static var action:GameActions;
+	
+	@:getter public var gameGetters(default,null):GameGetters;
 
 	public function new(rules:IRules) 
 	{

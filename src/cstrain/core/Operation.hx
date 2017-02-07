@@ -10,4 +10,6 @@ enum Operation
 	SUBTRACT(val:Float, varSuffix:Bool);
 	MULTIPLY(val:Float, varSuffix:Bool);
 	DIVIDE(val:Float, varSuffix:Bool);
+	
+	EQUAL(val:Float, varSuffix:Bool);
 }

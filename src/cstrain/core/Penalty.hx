@@ -5,5 +5,7 @@ package cstrain.core;
  */
 typedef Penalty =
 {
-		
+	@:optional var delayNow:Float;
+
+	var desc:PenaltyDesc;
 }

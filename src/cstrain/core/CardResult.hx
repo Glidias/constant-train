@@ -7,6 +7,7 @@ enum CardResult
 {
 	OK;
 	PENALIZE(penalty:Penalty);
-	GUESS_CONSTANT(choice1:Float, choice2:Float);
+	GUESS_CONSTANT(card:Card, wildGuess:Bool);
 	NOTHING;
+	GAMEOVER_OUTTA_CARDS;
 }

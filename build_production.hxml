@@ -1,0 +1,7 @@
+# production build
+
+-cp src
+-js bin/ConstantTrain.js
+-D vue_global
+-D production
+-main Main
