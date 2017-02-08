@@ -1,4 +1,5 @@
 package;
+import cstrain.core.Polynomial;
 import cstrain.rules.TestGame;
 import cstrain.vuex.components.GameView;
 import cstrain.vuex.store.GameStore;
@@ -17,11 +18,20 @@ class Main
 		var gs = new GameStore(new TestGame()) ;
 	
 		var store = boot.startStore( gs) ;
-		
-		
+	
 		boot.startVueWithRootComponent( "#app", new GameView());
 		VxBoot.notifyStarted();
 		
+		
+		/*
+			var polyI =  Polynomial.fromCoefs([2, 4, 3, 7]);
+		polyI = polyI.add( Polynomial.createDeg1x());
+		var polyV = polyI.evalValueFloat(5);
+		trace(polyV);
+		
+		var poly =  polyI.divisionWithRemainder( Polynomial.createDeg1x() );
+		trace(poly[0].add(poly[1]).evalValueFloat(5) );
+		*/
 	}
 	
 }

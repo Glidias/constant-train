@@ -163,7 +163,7 @@ class TestGame implements IRules
 		return polynomial.constantInteger;
 	}
 	inline function getPolynomialValue(varValue:Int):Int {
-		return polynomial.calculateValueInt(varValue);
+		return polynomial.evalValueInt(varValue);
 	}
 	
 		
