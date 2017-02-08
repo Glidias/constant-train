@@ -362,7 +362,8 @@ class Polynomial
 			case Operation.DIVIDE(value, isVar):
 				if (value == 0) throw "Divide by zero error detected!";
 				if (isVar) 	{
-					// TODO
+					// would a quotient divide suffice?  woudlnt remainder or negative exponents need to be saved to allow reverting back
+					copyFrom( div( Polynomial.createDeg1x() ) );
 				}
 				else {	
 					for ( i in 0...coefs.length) {

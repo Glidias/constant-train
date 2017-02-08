@@ -41,12 +41,13 @@ class TestGame implements IRules
 	}
 	
 	function buildDeck():Void {
-		deck.addCards( Deck.getCards(Deck.SET_NUMBERS, Deck.OP_ADD | Deck.OP_SUBTRACT, 0, 1) );
-		deck.addCards( Deck.getCards(Deck.SET_NUMBERS, Deck.OP_MULTIPLY | Deck.OP_DIVIDE ,  Deck.NUM_2, 1) );
+		var baseMult:Int   = 8;
+		deck.addCards( Deck.getCards(Deck.SET_NUMBERS, Deck.OP_ADD | Deck.OP_SUBTRACT, 0, 1*baseMult) );
+		deck.addCards( Deck.getCards(Deck.SET_NUMBERS, Deck.OP_MULTIPLY | Deck.OP_DIVIDE ,  Deck.NUM_2, 1*baseMult) );
 
-		deck.addCards( Deck.getCards(Deck.SET_VARIABLE, Deck.OP_ADD, 0, 3) );
-		deck.addCards( Deck.getCards(Deck.SET_VARIABLE, Deck.OP_SUBTRACT, 0, 4) );
-		deck.addCards( Deck.getCards(Deck.SET_VARIABLE, Deck.OP_MULTIPLY | Deck.OP_DIVIDE, 0, 2) );
+		deck.addCards( Deck.getCards(Deck.SET_VARIABLE, Deck.OP_ADD, 0, 8*baseMult - 1) );
+		deck.addCards( Deck.getCards(Deck.SET_VARIABLE, Deck.OP_SUBTRACT, 0, 8*baseMult) );
+		deck.addCards( Deck.getCards(Deck.SET_VARIABLE, Deck.OP_MULTIPLY | Deck.OP_DIVIDE, 0, 4*baseMult) );
 
 		deck.shuffle();
 		

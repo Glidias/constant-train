@@ -454,8 +454,7 @@ cstrain_core_Polynomial.prototype = {
 			var isVar3 = op[3];
 			var value3 = op[2];
 			if(value3 == 0) throw new js__$Boot_HaxeError("Divide by zero error detected!");
-			if(isVar3) {
-			} else {
+			if(isVar3) this.copyFrom(this.div(cstrain_core_Polynomial.createDeg1x())); else {
 				var _g11 = 0;
 				var _g2 = this.coefs.length;
 				while(_g11 < _g2) {
@@ -485,11 +484,12 @@ cstrain_rules_TestGame.prototype = {
 		if(this.polynomialValueCached) return this.polynomialValue; else return this.polynomialValue = this.polynomial.evalValueInt(this.secretVarValue);
 	}
 	,buildDeck: function() {
-		this.deck.addCards(cstrain_core_Deck.getCards(1,3,0,1));
-		this.deck.addCards(cstrain_core_Deck.getCards(1,12,2,1));
-		this.deck.addCards(cstrain_core_Deck.getCards(2,1,0,3));
-		this.deck.addCards(cstrain_core_Deck.getCards(2,2,0,4));
-		this.deck.addCards(cstrain_core_Deck.getCards(2,12,0,2));
+		var baseMult = 8;
+		this.deck.addCards(cstrain_core_Deck.getCards(1,3,0,baseMult));
+		this.deck.addCards(cstrain_core_Deck.getCards(1,12,2,baseMult));
+		this.deck.addCards(cstrain_core_Deck.getCards(2,1,0,8 * baseMult - 1));
+		this.deck.addCards(cstrain_core_Deck.getCards(2,2,0,8 * baseMult));
+		this.deck.addCards(cstrain_core_Deck.getCards(2,12,0,4 * baseMult));
 		this.deck.shuffle();
 		this.curDeck = this.deck;
 		this.curDeckIndex = this.curDeck.cards.length - 1;
@@ -728,7 +728,7 @@ cstrain_vuex_components_GameView.prototype = $extend(haxevx_vuex_core_VxComponen
 		this.$store.commit("cstrain_vuex_game_GameMutator|showOrHideExpression");
 	}
 	,Template: function() {
-		return "\r\n\t\t\t<div class=\"gameview\">\r\n\t\t\t\tThe Constant Train :: Polynomial Express\r\n\t\t\t\t<hr/>\r\n\t\t\t\t<" + "CardView" + " :currentCard=\"currentCard\"></" + "CardView" + ">\r\n\t\t\t\t<div class=\"traceResult\" v-if=\"cardResult\">\r\n\t\t\t\t\t<p>{{ cardResult }}</p>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"xpression\" style=\"font-style:italic\" v-html=\"polyexpression\"></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<button class=\"cheat\" v-on:click=\"toggleExpression()\">{{ toggleExprLabel }} expression</button>\r\n\t\t\t</div>\r\n\t\t";
+		return "\r\n\t\t\t<div class=\"gameview\">\r\n\t\t\t\tThe Constant Train :: Polynomial Express\r\n\t\t\t\t<hr/>\r\n\t\t\t\t<p>Swipe right to infer result as constant to stop the train!<br/>Swipe left to infer result as variable and to move along!</b>\r\n\t\t\t\t<" + "CardView" + " :currentCard=\"currentCard\"></" + "CardView" + ">\r\n\t\t\t\t<div class=\"traceResult\" v-if=\"cardResult\">\r\n\t\t\t\t\t<p>{{ cardResult }}</p>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"xpression\" style=\"font-style:italic\" v-html=\"polyexpression\"></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<button class=\"cheat\" v-on:click=\"toggleExpression()\">{{ toggleExprLabel }} expression</button>\r\n\t\t\t</div>\r\n\t\t";
 	}
 	,get_currentCard: function() {
 		return this.$store.state.game.topCard;
