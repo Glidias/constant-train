@@ -4,4 +4,5 @@
 -js bin/ConstantTrain.js
 -D vue_global
 -D production
+-dce full
 -main Main

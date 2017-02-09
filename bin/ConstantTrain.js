@@ -57,19 +57,12 @@ Std["int"] = function(x) {
 };
 var cstrain_core_Card = function(op,value,isVar,virtualRight) {
 	if(isVar == null) isVar = false;
-	this.varValues = null;
 	this.operator = op;
 	this.value = value;
 	this.isVar = isVar;
 	this.virtualRight = virtualRight;
 };
 cstrain_core_Card.__name__ = true;
-cstrain_core_Card.isIncreasingMagnitude = function(op) {
-	return op <= 3 && (op & 1) == 0;
-};
-cstrain_core_Card.canOperate = function(op) {
-	return op <= 3;
-};
 cstrain_core_Card.stringifyOp = function(op) {
 	if(op == 0) return "+"; else if(op == 1) return "-"; else if(op == 2) return "*"; else if(op == 3) return "/"; else if(op == 4) return "="; else return "?";
 };
@@ -91,14 +84,8 @@ cstrain_core_Card.toOperation = function(card) {
 		return null;
 	}
 };
-cstrain_core_Card.getRegularVarCard = function(operator) {
-	return new cstrain_core_Card(operator,1,true);
-};
 cstrain_core_Card.getRegularGuessConstantCard = function(value,value2) {
 	return new cstrain_core_Card(4,value,false,new cstrain_core_Card(4,value2,false));
-};
-cstrain_core_Card.getRegularStartingVarCard = function() {
-	return new cstrain_core_Card(0,1,true);
 };
 var cstrain_core_CardResult = { __ename__ : true, __constructs__ : ["OK","PENALIZE","GUESS_CONSTANT","NOTHING","GAMEOVER_OUTTA_CARDS"] };
 cstrain_core_CardResult.OK = ["OK",0];
@@ -169,19 +156,6 @@ cstrain_core_Deck.prototype = {
 	shuffle: function() {
 		cstrain_core_Deck.arrayShuffleFisherYates(this.cards);
 	}
-	,aimRandomCard: function() {
-		return this.cards[Std["int"](Math.random() * this.cards.length)];
-	}
-	,popCard: function() {
-		return this.cards.pop();
-	}
-	,addCard: function(card) {
-		this.cards.push(card);
-	}
-	,addCardUnderneath: function(card) {
-		this.cards.unshift(card);
-		return;
-	}
 	,addCards: function(cards,placeOnTop) {
 		if(placeOnTop == null) placeOnTop = true;
 		if(placeOnTop) this.cards = this.cards.concat(cards); else this.cards = cards.concat(this.cards);
@@ -211,40 +185,6 @@ var cstrain_core_Polynomial = function() {
 	this.coefs = [0];
 };
 cstrain_core_Polynomial.__name__ = true;
-cstrain_core_Polynomial.fromCoefs = function(arr) {
-	var d = new cstrain_core_Polynomial();
-	d.coefs = arr;
-	return d;
-};
-cstrain_core_Polynomial.gcd = function(x,y) {
-	var z = 1;
-	x = Math.abs(x | 0);
-	y = Math.abs(y | 0);
-	while(z != 0) {
-		z = x % y | 0;
-		x = y;
-		y = z;
-	}
-	return x;
-};
-cstrain_core_Polynomial.gcd_mult = function(ref) {
-	var d = ref[ref.length - 1];
-	var i = ref.length - 1;
-	while(--i > -1) if((ref[i] | 0) != 0) d = cstrain_core_Polynomial.gcd(d,ref[i]);
-	return d;
-};
-cstrain_core_Polynomial.isWholeNum = function(num) {
-	return num % 1 == 0;
-};
-cstrain_core_Polynomial.divisible = function(a,d) {
-	return a % d == 0;
-};
-cstrain_core_Polynomial.evaluateDivisionRemAsFloat = function(quotRem,varValue) {
-	return quotRem[0].evalValueFloat(varValue) + quotRem[1].evalValueFloat(varValue) / varValue;
-};
-cstrain_core_Polynomial.evaluateDivisionsAsFloat = function(basePoly,remPoly,varValue) {
-	return basePoly.evalValueFloat(varValue) + remPoly.evalValueFloat(varValue) / varValue;
-};
 cstrain_core_Polynomial.createDeg1x = function() {
 	var poly = new cstrain_core_Polynomial();
 	poly.coefs.push(1);
@@ -269,9 +209,6 @@ cstrain_core_Polynomial.getSign = function(co) {
 cstrain_core_Polynomial.getRepresentation = function(co,level,varLabel,isHTML) {
 	if(co != 0) return (co != 1 || level < 1?cstrain_core_Polynomial.floatToStringPrecision(co,2) + "":"") + (level >= 1?varLabel:"") + (level >= 2?isHTML?"<sup>" + level + "</sup>":"^" + level:""); else return "";
 };
-cstrain_core_Polynomial.precision = function(co) {
-	return cstrain_core_Polynomial.floatToStringPrecision(co,2);
-};
 cstrain_core_Polynomial.PrintOut = function(poly,varLabel,isHTML) {
 	var arr = [cstrain_core_Polynomial.getSign(poly.coefs[0]) + cstrain_core_Polynomial.getRepresentation(poly.coefs[0],0,varLabel,isHTML)];
 	var _g1 = 1;
@@ -290,112 +227,7 @@ cstrain_core_Polynomial.Copy = function(poly) {
 	return me;
 };
 cstrain_core_Polynomial.prototype = {
-	isRootFor: function(x) {
-		return this.coefs.length > 1 && this.evalValueFloat(x) == 0;
-	}
-	,findRoot: function() {
-		if(this.isRootFor(0)) return 0;
-		if(!(this.coefs[0] % 1 == 0) || !(this.coefs[this.coefs.length - 1] % 1 == 0)) return null;
-		var last = Std["int"](Math.abs(this.coefs[0]));
-		var first = Std["int"](Math.abs(this.coefs[this.coefs.length - 1]));
-		var _g1 = 1;
-		var _g = last + 1;
-		while(_g1 < _g) {
-			var l = _g1++;
-			if(last % l != 0) continue;
-			var _g3 = 1;
-			var _g2 = first + 1;
-			while(_g3 < _g2) {
-				var f = _g3++;
-				if(first % f != 0) continue;
-				var r = l / f;
-				if(this.isRootFor(r)) return r;
-				if(this.isRootFor(-r)) return -r;
-			}
-		}
-		return null;
-	}
-	,reduceByRoot: function(r) {
-		var new_p = [];
-		var carry = .0;
-		var down = 9999;
-		var gotDown = false;
-		var i = this.coefs.length;
-		while(--i > -1) {
-			var coef = this.coefs[i];
-			down = coef + carry;
-			gotDown = true;
-			carry = down * r;
-			new_p.unshift(down);
-		}
-		if(gotDown && down == 0) {
-			new_p.shift();
-			this.coefs = new_p;
-			return true;
-		} else return false;
-	}
-	,isWhole: function() {
-		var _g1 = 0;
-		var _g = this.coefs.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			if(!(this.coefs[i] % 1 == 0)) return false;
-		}
-		return true;
-	}
-	,findCommonFactor: function() {
-		if(this.isWhole() && this.coefs.length > 1) return cstrain_core_Polynomial.gcd_mult(this.coefs); else return 1;
-	}
-	,factorisation: function() {
-		var factors = [];
-		var root = this.findRoot();
-		if(root != null) {
-			factors.push(cstrain_core_Polynomial.fromCoefs([-root,1]));
-			var p = cstrain_core_Polynomial.Copy(this);
-			p.reduceByRoot(root);
-			this.addToArray(factors,p.factorisation());
-		} else {
-			var p1 = cstrain_core_Polynomial.Copy(this);
-			var cf = p1.findCommonFactor();
-			if(cf != 1) {
-				var _g1 = 0;
-				var _g = this.coefs.length;
-				while(_g1 < _g) {
-					var i = _g1++;
-					this.coefs[i] /= cf;
-				}
-				factors.push(cstrain_core_Polynomial.fromCoefs([cf]));
-			}
-			factors.push(p1);
-		}
-		return factors;
-	}
-	,toString: function() {
-		return "[Polynomial: " + cstrain_core_Polynomial.PrintOut(this,"x",false) + "]";
-	}
-	,addToArray: function(a,ref) {
-		var _g1 = 0;
-		var _g = ref.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			a.push(ref[i]);
-		}
-	}
-	,differentiate: function() {
-		var deriv = new cstrain_core_Polynomial();
-		if(this.coefs.length - 1 == 0) return deriv;
-		var _g1 = 0;
-		var _g = this.coefs.length - 1;
-		while(_g1 < _g) {
-			var i = _g1++;
-			deriv.coefs[i] = this.coefs[i + 1] * (i + 1);
-		}
-		return deriv;
-	}
-	,deg: function() {
-		return this.coefs.length - 1;
-	}
-	,getCoef: function(i) {
+	getCoef: function(i) {
 		if(this.coefs.length - 1 < i) return null; else return this.coefs[i];
 	}
 	,isZero: function() {
@@ -468,9 +300,6 @@ cstrain_core_Polynomial.prototype = {
 	,div: function(b) {
 		return this.divisionWithRemainder(b)[0];
 	}
-	,rem: function(b) {
-		return this.divisionWithRemainder(b)[1];
-	}
 	,mul: function(b) {
 		var result = new cstrain_core_Polynomial();
 		var degA = this.coefs.length - 1;
@@ -504,18 +333,6 @@ cstrain_core_Polynomial.prototype = {
 		cstrain_core_Polynomial.trim(result);
 		return result;
 	}
-	,clone: function() {
-		return cstrain_core_Polynomial.Copy(this);
-	}
-	,get_isUnknown: function() {
-		return this.coefs.length > 1;
-	}
-	,get_constantInteger: function() {
-		return this.coefs[0] | 0;
-	}
-	,get_constantValue: function() {
-		return this.coefs[0];
-	}
 	,evalValueInt: function(varValue) {
 		var sum = 0;
 		var _g1 = 0;
@@ -525,16 +342,6 @@ cstrain_core_Polynomial.prototype = {
 			sum += this.coefs[i] * Math.pow(varValue,i);
 		}
 		return sum | 0;
-	}
-	,evalValueFloat: function(varValue) {
-		var sum = 0;
-		var _g1 = 0;
-		var _g = this.coefs.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			sum += this.coefs[i] * Math.pow(varValue,i);
-		}
-		return sum;
 	}
 	,cleanupPolynomial: function() {
 		var i = this.coefs.length;
@@ -591,14 +398,7 @@ var cstrain_rules_TestGame = function() {
 cstrain_rules_TestGame.__name__ = true;
 cstrain_rules_TestGame.__interfaces__ = [cstrain_core_IRules];
 cstrain_rules_TestGame.prototype = {
-	recreateSecret: function() {
-		this.secretVarValue = Std["int"](Math.ceil(Math.random() * 10));
-		this.polynomialValueCached = false;
-	}
-	,getSecretValue: function() {
-		if(this.polynomialValueCached) return this.polynomialValue; else return this.polynomialValue = this.polynomial.evalValueInt(this.secretVarValue);
-	}
-	,buildDeck: function() {
+	buildDeck: function() {
 		var baseMult = 8;
 		this.deck.addCards(cstrain_core_Deck.getCards(1,3,0,baseMult));
 		this.deck.addCards(cstrain_core_Deck.getCards(1,12,2,baseMult));
@@ -659,15 +459,6 @@ cstrain_rules_TestGame.prototype = {
 		console.log("Exception CardResult.NOTHING detected. Should not happen!");
 		return cstrain_core_CardResult.NOTHING;
 	}
-	,getConstant: function() {
-		return this.polynomial.coefs[0] | 0;
-	}
-	,getPolynomialValue: function(varValue) {
-		return this.polynomial.evalValueInt(varValue);
-	}
-	,isConstant: function() {
-		return !(this.polynomial.coefs.length > 1);
-	}
 	,restart: function() {
 		this.deck = new cstrain_core_Deck();
 		this.thePopupCard = null;
@@ -714,19 +505,8 @@ cstrain_rules_TestGame.prototype = {
 		}
 		return result;
 	}
-	,getTopCard: function() {
-		if(this.curDeckIndex >= 0) return this.curDeck.cards[this.curDeckIndex]; else return null;
-	}
-	,getBelowCardCard: function() {
-		if(this.curDeckIndex >= 1) return this.curDeck.cards[this.curDeckIndex - 1]; else return null;
-	}
 	,getTopmostCard: function() {
 		if(this.thePopupCard != null) return this.thePopupCard; else if(this.curDeckIndex >= 0) return this.curDeck.cards[this.curDeckIndex]; else return null;
-	}
-	,getNextCardBelow: function() {
-		if(this.thePopupCard != null) {
-			if(this.curDeckIndex >= 0) return this.curDeck.cards[this.curDeckIndex]; else return null;
-		} else if(this.curDeckIndex >= 1) return this.curDeck.cards[this.curDeckIndex - 1]; else return null;
 	}
 	,getPolynomial: function() {
 		return this.polynomial;
@@ -740,56 +520,6 @@ haxevx_vuex_core_VComponent.__super__ = Object;
 haxevx_vuex_core_VComponent.prototype = $extend(Object.prototype,{
 	_Init: function() {
 	}
-	,get__props: function() {
-		return this;
-	}
-	,get__vData: function() {
-		return this.$data;
-	}
-	,PropsData: function() {
-		return null;
-	}
-	,Data: function() {
-		return null;
-	}
-	,Created: function() {
-	}
-	,BeforeCreate: function() {
-	}
-	,BeforeDestroy: function() {
-	}
-	,Destroy: function() {
-	}
-	,BeforeMount: function() {
-	}
-	,Mounted: function() {
-	}
-	,BeforeUpdate: function() {
-	}
-	,Updated: function() {
-	}
-	,Activated: function() {
-	}
-	,Deactivated: function() {
-	}
-	,El: function() {
-		return null;
-	}
-	,Render: function(c) {
-		return null;
-	}
-	,Template: function() {
-		return null;
-	}
-	,Components: function() {
-		return null;
-	}
-	,GetDefaultPropSettings: function() {
-		return null;
-	}
-	,GetDefaultPropValues: function() {
-		return null;
-	}
 });
 var haxevx_vuex_core_VxComponent = function() {
 	haxevx_vuex_core_VComponent.call(this);
@@ -797,9 +527,6 @@ var haxevx_vuex_core_VxComponent = function() {
 haxevx_vuex_core_VxComponent.__name__ = true;
 haxevx_vuex_core_VxComponent.__super__ = haxevx_vuex_core_VComponent;
 haxevx_vuex_core_VxComponent.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
-	get_store: function() {
-		return this.$store;
-	}
 });
 var cstrain_vuex_components_CardView = function() {
 	haxevx_vuex_core_VxComponent.call(this);
@@ -867,8 +594,6 @@ cstrain_vuex_components_GameView.prototype = $extend(haxevx_vuex_core_VxComponen
 		this.methods = { toggleExpression : clsP.toggleExpression, get_currentCard : clsP.get_currentCard, get_cardResult : clsP.get_cardResult, get_toggleExprLabel : clsP.get_toggleExprLabel, get_polyexpression : clsP.get_polyexpression};
 	}
 });
-var haxevx_vuex_core_IAction = function() { };
-haxevx_vuex_core_IAction.__name__ = true;
 var cstrain_vuex_game_GameActions = function() {
 	null;
 };
@@ -902,8 +627,6 @@ cstrain_vuex_game_GameActions.prototype = {
 		d[ns + "cstrain_vuex_game_GameActions|swipe"] = clsP.swipe;
 	}
 };
-var haxevx_vuex_core_IGetters = function() { };
-haxevx_vuex_core_IGetters.__name__ = true;
 var cstrain_vuex_game_GameGetters = function() {
 };
 cstrain_vuex_game_GameGetters.__name__ = true;
@@ -968,8 +691,6 @@ cstrain_vuex_game_GameModule.prototype = $extend(haxevx_vuex_core_VModule.protot
 		new cstrain_vuex_game_GameActions()._SetInto(d,"");
 	}
 });
-var haxevx_vuex_core_IMutator = function() { };
-haxevx_vuex_core_IMutator.__name__ = true;
 var cstrain_vuex_game_GameMutator = function() {
 	null;
 };
@@ -1025,10 +746,7 @@ var haxevx_vuex_core_IVxContext = function() { };
 haxevx_vuex_core_IVxContext.__name__ = true;
 var haxevx_vuex_core_IVxContext1 = function() { };
 haxevx_vuex_core_IVxContext1.__name__ = true;
-var haxevx_vuex_core_IVxStoreContext = function() { };
-haxevx_vuex_core_IVxStoreContext.__name__ = true;
 var haxevx_vuex_core_VxStore = function() {
-	this.strict = false;
 };
 haxevx_vuex_core_VxStore.__name__ = true;
 haxevx_vuex_core_VxStore.prototype = {
@@ -1070,21 +788,8 @@ cstrain_vuex_store_GameStore.prototype = $extend(haxevx_vuex_core_VxStore.protot
 var cstrain_vuex_store_GameStoreState = function() {
 };
 cstrain_vuex_store_GameStoreState.__name__ = true;
-var haxevx_vuex_core_IPayload = function() { };
-haxevx_vuex_core_IPayload.__name__ = true;
-var haxevx_vuex_core_IVxContext2 = function() { };
-haxevx_vuex_core_IVxContext2.__name__ = true;
-var haxevx_vuex_core_IVxContext3 = function() { };
-haxevx_vuex_core_IVxContext3.__name__ = true;
-var haxevx_vuex_core_IVxContext4 = function() { };
-haxevx_vuex_core_IVxContext4.__name__ = true;
 var haxevx_vuex_core_NoneT = function() { };
 haxevx_vuex_core_NoneT.__name__ = true;
-haxevx_vuex_core_NoneT.prototype = {
-	toString: function() {
-		return "NoneT";
-	}
-};
 var haxevx_vuex_core_VxBoot = function() {
 };
 haxevx_vuex_core_VxBoot.__name__ = true;
@@ -1134,8 +839,6 @@ haxevx_vuex_core_VxBoot.prototype = {
 };
 var haxevx_vuex_core_ModuleStack = function() { };
 haxevx_vuex_core_ModuleStack.__name__ = true;
-var haxevx_vuex_native_ActionContext = function() { };
-haxevx_vuex_native_ActionContext.__name__ = true;
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
 	this.val = val;
@@ -1218,33 +921,6 @@ js_Boot.__string_rec = function(o,s) {
 };
 String.__name__ = true;
 Array.__name__ = true;
-cstrain_core_Card.OPERATOR_ADD = 0;
-cstrain_core_Card.OPERATOR_SUBTRACT = 1;
-cstrain_core_Card.OPERATOR_MULTIPLY = 2;
-cstrain_core_Card.OPERATOR_DIVIDE = 3;
-cstrain_core_Card.OPERATION_EQUAL = 4;
-cstrain_core_Deck.SET_NUMBERS = 1;
-cstrain_core_Deck.SET_VARIABLE = 2;
-cstrain_core_Deck.MASK_SET_ALL = 3;
-cstrain_core_Deck.NUM_1 = 1;
-cstrain_core_Deck.NUM_2 = 2;
-cstrain_core_Deck.NUM_3 = 4;
-cstrain_core_Deck.NUM_4 = 8;
-cstrain_core_Deck.NUM_5 = 16;
-cstrain_core_Deck.NUM_6 = 32;
-cstrain_core_Deck.NUM_7 = 64;
-cstrain_core_Deck.NUM_8 = 128;
-cstrain_core_Deck.NUM_9 = 256;
-cstrain_core_Deck.NUM_10 = 512;
-cstrain_core_Deck.MASK_NUMBER_ALL = 1023;
-cstrain_core_Deck.MASK_NUMBER_ALL_EXCEPT_1 = 1022;
-cstrain_core_Deck.MASK_NUMBER_EVEN = 682;
-cstrain_core_Deck.MASK_NUMBER_ODD = 341;
-cstrain_core_Deck.OP_ADD = 1;
-cstrain_core_Deck.OP_SUBTRACT = 2;
-cstrain_core_Deck.OP_MULTIPLY = 4;
-cstrain_core_Deck.OP_DIVIDE = 8;
-cstrain_core_Deck.MASK_OPERATOR_ALL = 15;
 cstrain_vuex_components_GameView.Comp_CardView = "CardView";
 haxevx_vuex_core_ModuleStack.stack = [];
 Main.main();
