@@ -23,25 +23,7 @@ class Main
 		VxBoot.notifyStarted();
 		
 		
-		///*
-			var polyI =  Polynomial.fromCoefs([11, 4, 3, 7]);
-		polyI = polyI.add( Polynomial.createDeg1x());
-		
-		
-		trace(Polynomial.fromCoefs([1,0,0,0,1]).factorisation());
-		trace(Polynomial.fromCoefs([-20,24,1,-6,1]).factorisation());
-		
-		trace("End factorisation");
-		var polyV = polyI.evalValueFloat(5);
-		trace(polyI.coefs);
-		trace(polyV);
-		
-		
-		
-		var poly =  polyI.divisionWithRemainder( Polynomial.createDeg1x() );
-		trace(poly[0].coefs + " > "+poly[1].coefs);
-		trace( poly[0].evalValueFloat(5) + " , "+ Polynomial.evaluateDivisionRemAsFloat(poly, 5) );
-	//	*/
+
 	}
 	
 }

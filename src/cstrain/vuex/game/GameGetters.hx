@@ -13,7 +13,7 @@ class GameGetters implements IGetters<GameState, NoneT>
 		
 	}
 	public static function Get_polynomialExpr(state:GameState):String {
-		return state.showExpression ? state.polynomial != null ? Polynomial.PrintOut( state.polynomial, "n") : ".." : "";
+		return state.showExpression ? state.polynomial != null ? Polynomial.PrintOut( state.polynomial, "n", true) : ".." : "";
 	}
 	
 }
