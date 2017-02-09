@@ -22,6 +22,114 @@ class Polynomial
 		return d;
 	}
 	
+	public function isRootFor(x:Float):Bool {
+		return coefs.length > 1 && evalValueFloat(x) == 0;
+	}
+	
+	public function findRoot():Float {
+		if (isRootFor(0)) return 0;
+		if (  !isWholeNum(coefs[0]) || !isWholeNum(coefs[coefs.length - 1]) ) {
+			trace("Invalid not whole number coeffs!");
+			return null;
+		}
+		
+		var first:Int = Std.int( Math.abs( coefs[0] ) );
+		var last:Int  = Std.int( Math.abs( coefs[coefs.length -1] ) );
+		for ( l in 1...last+1) {
+			if ( !divisible(last, l)) continue;
+			for ( f in 1...first+1) {
+				if ( !divisible(first, f)) continue;
+				var r = l / f;
+				if ( isRootFor(r) ) {
+					return r;
+				}
+				if ( isRootFor( -r) ) {
+					return -r;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	public function reduceByRoot(r:Float):Bool {
+		var new_p:Array<Float> = [];
+		var carry = .0;
+		var down:Float = 9999;
+		var gotDown:Bool = false;
+		for (i in 0...this.coefs.length) {
+			var coef = this.coefs[i];		    // coefficient
+			var deg  = this.coefs.length - i - 1;   // degree
+			down = coef + carry; gotDown = true;
+			carry = down * r;
+			new_p.push(down);
+		}
+		if (gotDown && down ==0) {
+			new_p.pop();
+			this.coefs = new_p;
+			return true;
+			} else {
+			return false;
+			}
+	
+	}
+	
+	public function factorisation():Array<Polynomial> {
+		
+		 var factors:Array<Polynomial> = [];
+
+		var root = findRoot();
+			
+		if (root != null) {
+		
+			factors.push( Polynomial.fromCoefs([1, -root]) );
+			var p:Polynomial = clone();
+				
+			p.reduceByRoot(root);
+		
+			addToArray(factors, p.factorisation() );
+		}
+		
+		return factors;
+	}
+	
+
+	
+	static function gcd(x:Float, y:Float):Float {
+		var z:Int = 1;
+		 x = Math.abs(Std.int(x));
+		 y = Math.abs(Std.int(y));
+		while (z!=0) {
+			z = Std.int(x % y);
+			x = y;
+			y = z;
+		}
+		return x;
+	}
+
+	static function gcd_mult(ref:Array<Float>):Float  {
+		var d:Float = ref[0];
+		for ( i in 1...ref.length) {
+		if (Std.int(ref[i]) != 0)
+			d = gcd(d, ref[i]);
+		}
+		return d;
+	}
+	
+	public function addToArray<T>(a:Array<T>, ref:Array<T>) { 
+		for (i in 0...ref.length) {
+			a.push(ref[i]);
+		}
+	}
+	
+	static inline function isWholeNum(num:Float):Bool {
+		return (num % 1) == 0;
+	}
+	
+	static inline function divisible(a:Float, d:Float):Bool {
+		return a % d == 0;
+	}
+	
 	/**
 	 * @return	A new polynomial which is a differentiation from the current one
 	 */
@@ -270,6 +378,7 @@ class Polynomial
 		return floatToStringPrecision(co, 2);
 	}
 	
+
 	public static  function PrintOut(poly:Polynomial, varLabel:String):String {
 		
 		var arr:Array<String> = [getSign(poly.coefs[0]) + getRepresentation(poly.coefs[0], 0, varLabel) ];
@@ -290,7 +399,7 @@ class Polynomial
 		me.coefs = poly.coefs.concat([]);
 		return me;
 	}
-	public function clone():Polynomial {
+	public inline function clone():Polynomial {
 		return Copy(this);
 	}
 	
