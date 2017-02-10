@@ -36,6 +36,8 @@ class GameActions implements IAction<GameState, NoneT>
 			case CardResult.OK:
 					// play OK sound, close any popups, etc.
 					mutator._resume(context);
+			case CardResult.NOT_YET_AVAILABLE(timeLeft, penaltyTime):
+				trace("Not yet available to swipe!:"+[timeLeft, penaltyTime]);
 					
 			default:
 				trace("Uncaught case: " + result);
@@ -44,6 +46,8 @@ class GameActions implements IAction<GameState, NoneT>
 		mutator._traceCardResult(context, result);
 	
 	}
+	
+	
 	
 	
 	

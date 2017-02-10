@@ -17,4 +17,6 @@ interface IRules
 	function getAllCards():Array<Card>;	// reflects play deck along train path of +-/* operations
 	
 	function getPolynomial():Polynomial;  // gets polynomial expression
+	
+	function getPlayerStats():PlayerStats;
 }

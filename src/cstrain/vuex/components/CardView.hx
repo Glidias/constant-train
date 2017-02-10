@@ -43,8 +43,14 @@ class CardView extends VxComponent<GameStore, NoneT, CardViewProps>
 	
 	function get_cardCopy():String 
 	{
-		return Card.stringifyOp(currentCard.operator) + ( currentCard.isVar ? "n" : currentCard.value+"");
+		return Card.canOperate(this.currentCard.operator) ?  getCardCopy(this.currentCard) : getCardCopy(this.currentCard) + " :: " + getCardCopy(this.currentCard.virtualRight);
 	}
+	
+	static inline function getCardCopy(card:Card):String {
+		return Card.stringifyOp(card.operator) + ( card.isVar ? "n" : card.value+"" ) ;
+	}
+	
+	
 	
 }
 

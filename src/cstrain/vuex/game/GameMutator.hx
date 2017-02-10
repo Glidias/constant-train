@@ -39,7 +39,11 @@ class GameMutator implements IMutator<GameState>
 	function resume(state:GameState):Void {
 
 		state.topCard = state._rules.getTopmostCard();
+		updateExpression(state);
 		
+	}
+	
+	inline function updateExpression(state:GameState):Void {
 		state.polynomial = Polynomial.Copy( state._rules.getPolynomial() );
 	}
 	

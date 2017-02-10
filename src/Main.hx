@@ -21,7 +21,7 @@ class Main
 	
 		boot.startVueWithRootComponent( "#app", new GameView());
 		VxBoot.notifyStarted();
-		
+	
 		
 
 	}
