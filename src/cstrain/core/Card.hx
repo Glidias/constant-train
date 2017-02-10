@@ -45,7 +45,8 @@ class Card
 	public var value:Int;
 	public var isVar:Bool;	
 	// to hold an alternate card value representation, (by convention, for swiping right..)
-	public var virtualRight:Card;	
+	public var virtualRight:Card;
+	public var varValues:Array<Int>=null; // mainly for holding polynormial variable coeffecient values (if any) from degree 1 onwards
 
 	public function new(op:Int, value:Int, isVar:Bool=false, virtualRight:Card=null ) 
 	{

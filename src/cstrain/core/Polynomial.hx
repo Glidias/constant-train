@@ -27,19 +27,29 @@ class Polynomial
 	}
 	
 	public function findRoot():Float {
-		if (isRootFor(0)) return 0;
+		//trace("Finding root:" + this.coefs);
+		if (isRootFor(0)) {
+			//trace("Zero reached");
+			return 0;
+		}
 		if (  !isWholeNum(coefs[0]) || !isWholeNum(coefs[coefs.length - 1]) ) {
-			trace("Invalid not whole number coeffs!");
+			//trace("Invalid not whole number coeffs!");
 			return null;
 		}
 		
-		var first:Int = Std.int( Math.abs( coefs[0] ) );
-		var last:Int  = Std.int( Math.abs( coefs[coefs.length -1] ) );
+		var last:Int = Std.int( Math.abs( coefs[0] ) );
+		var first:Int  = Std.int( Math.abs( coefs[coefs.length -1] ) );
 		for ( l in 1...last+1) {
-			if ( !divisible(last, l)) continue;
+			//if ( !divisible(last, l)) continue;
+			
+			if ( (last % l) != 0) continue;
+			
 			for ( f in 1...first+1) {
-				if ( !divisible(first, f)) continue;
+				//if ( !divisible(first, f)) continue;
+				
+				if ( ( first % f) != 0) continue;
 				var r = l / f;
+				//trace("trying for " + l + "/" + f);
 				if ( isRootFor(r) ) {
 					return r;
 				}
@@ -57,21 +67,41 @@ class Polynomial
 		var carry = .0;
 		var down:Float = 9999;
 		var gotDown:Bool = false;
-		for (i in 0...this.coefs.length) {
+		var i:Int = this.coefs.length;
+	
+		while(--i > -1)  {
 			var coef = this.coefs[i];		    // coefficient
-			var deg  = this.coefs.length - i - 1;   // degree
+			//var deg  = this.coefs.length - i - 1;   // degree
 			down = coef + carry; gotDown = true;
 			carry = down * r;
-			new_p.push(down);
+			new_p.unshift(down);
 		}
 		if (gotDown && down ==0) {
-			new_p.pop();
+			new_p.shift();
 			this.coefs = new_p;
 			return true;
 			} else {
 			return false;
 			}
 	
+	}
+	
+	public function isWhole():Bool {
+		for (i in 0...coefs.length) {
+			if (!isWholeNum(coefs[i])) return false;
+		}
+		return true;
+	}
+
+	
+	public function findCommonFactor() {
+	
+		if (isWhole() && coefs.length > 1) {
+			return gcd_mult(coefs);
+		} else {
+			return 1;
+		}
+
 	}
 	
 	public function factorisation():Array<Polynomial> {
@@ -81,16 +111,33 @@ class Polynomial
 		var root = findRoot();
 			
 		if (root != null) {
-		
-			factors.push( Polynomial.fromCoefs([1, -root]) );
+			//trace("Found root:" + root);
+			factors.push( Polynomial.fromCoefs([ -root, 1]) );
 			var p:Polynomial = clone();
 				
 			p.reduceByRoot(root);
 		
 			addToArray(factors, p.factorisation() );
 		}
+		else {
+			//trace("getting common factor");
+			
+			var p:Polynomial = clone();
+			var cf = p.findCommonFactor();
+			if (cf != 1) {
+				 for (i in 0...coefs.length) {
+					coefs[i] /= cf;
+				}
+				factors.push( Polynomial.fromCoefs([cf]));
+			}
+			factors.push(p);
+		}
 		
 		return factors;
+	}
+	
+	public function toString():String {
+		return "[Polynomial: "+PrintOut(this, "x", false) + "]";
 	}
 	
 
@@ -108,10 +155,12 @@ class Polynomial
 	}
 
 	static function gcd_mult(ref:Array<Float>):Float  {
-		var d:Float = ref[0];
-		for ( i in 1...ref.length) {
-		if (Std.int(ref[i]) != 0)
-			d = gcd(d, ref[i]);
+		var d:Float = ref[ref.length - 1];
+		var i:Int = ref.length - 1;
+		while (--i > -1) {
+			if (Std.int(ref[i]) != 0) {
+				d = gcd(d, ref[i]);
+			}
 		}
 		return d;
 	}
@@ -371,19 +420,19 @@ class Polynomial
 	public static inline function getSign(co:Float):String {
 		return co!= 0 ? co < 0 ? "" : "+" : "";
 	}
-	public static inline function getRepresentation(co:Float, level:Int, varLabel:String):String {
-		return co!= 0 ? (  co != 1 || level < 1 ? floatToStringPrecision(co, 2) + "" : "" ) + (level >= 1 ? varLabel : "") + (level >= 2 ? "<sup>"+level+"</sup>" : "") : "";
+	public static inline function getRepresentation(co:Float, level:Int, varLabel:String, isHTML:Bool):String {
+		return co!= 0 ? (  co != 1 || level < 1 ? floatToStringPrecision(co, 2) + "" : "" ) + (level >= 1 ? varLabel : "") + (level >= 2 ? isHTML ? "<sup>"+level+"</sup>" : "^"+level : "") : "";
 	}
 	public static inline function precision(co:Float):String {
 		return floatToStringPrecision(co, 2);
 	}
 	
 
-	public static  function PrintOut(poly:Polynomial, varLabel:String):String {
+	public static  function PrintOut(poly:Polynomial, varLabel:String, isHTML:Bool):String {
 		
-		var arr:Array<String> = [getSign(poly.coefs[0]) + getRepresentation(poly.coefs[0], 0, varLabel) ];
+		var arr:Array<String> = [getSign(poly.coefs[0]) + getRepresentation(poly.coefs[0], 0, varLabel, isHTML) ];
 		for (i in 1...poly.coefs.length) {
-			arr.push ( getSign(poly.coefs[i]) + getRepresentation(poly.coefs[i], i, varLabel)  );
+			arr.push ( getSign(poly.coefs[i]) + getRepresentation(poly.coefs[i], i, varLabel, isHTML)  );
 		}
 		arr.reverse();
 		
@@ -471,7 +520,9 @@ class Polynomial
 			case Operation.DIVIDE(value, isVar):
 				if (value == 0) throw "Divide by zero error detected!";
 				if (isVar) 	{
-					// would a quotient divide suffice?  woudlnt remainder or negative exponents need to be saved to allow reverting back
+					// would a quotient divide suffice?  woudlnt remainder or negative exponents need to be saved to allow reverting back?
+					
+					// consider alternate factorisation divisor setup for: value.
 					copyFrom( div( Polynomial.createDeg1x() ) );
 				}
 				else {	
