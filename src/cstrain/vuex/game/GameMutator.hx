@@ -1,5 +1,6 @@
 package cstrain.vuex.game;
 import cstrain.core.CardResult;
+import cstrain.core.Penalty;
 import cstrain.core.Polynomial;
 import haxevx.vuex.core.IMutator;
 
@@ -20,10 +21,19 @@ class GameMutator implements IMutator<GameState>
 		GameMutator.Restart(g);
 	}
 	
-	function setPopupCard(state:GameState, isPopup:Bool = true):Void {
-		
-		state.isPopup = isPopup;
-
+	function notifySwipe(state:GameState, swipeState:Int):Void {
+		state.chosenSwipe = swipeState;
+	}
+	
+	function updateProgress(state:GameState):Void {
+		state.curCardIndex = state._rules.getDeckIndex();
+	}
+	
+	function setPenalty(state:GameState, penalty:Penalty):Void {
+		state.curPenalty = penalty;
+	}
+	function setPenaltySwipeCorrect(state:GameState, correct:Bool):Void {
+		state.penaltySwipeCorrect = correct;
 	}
 	
 	function setDelay(state:GameState, delay:Float):Void {
@@ -37,6 +47,11 @@ class GameMutator implements IMutator<GameState>
 	
 	
 	function resume(state:GameState):Void {
+
+		
+		state.penaltySwipeCorrect = true;
+		state.delayTimeLeft  = 0;
+		
 
 		state.topCard = state._rules.getTopmostCard();
 		updateExpression(state);

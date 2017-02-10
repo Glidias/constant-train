@@ -87,7 +87,7 @@ cstrain_core_Card.toOperation = function(card) {
 cstrain_core_Card.getRegularGuessConstantCard = function(value,value2) {
 	return new cstrain_core_Card(4,value,false,new cstrain_core_Card(4,value2,false));
 };
-var cstrain_core_CardResult = { __ename__ : true, __constructs__ : ["OK","PENALIZE","GUESS_CONSTANT","NOTHING","GAMEOVER_OUTTA_CARDS"] };
+var cstrain_core_CardResult = { __ename__ : true, __constructs__ : ["OK","PENALIZE","GUESS_CONSTANT","NOTHING","NOT_YET_AVAILABLE","GAMEOVER_OUTTA_CARDS"] };
 cstrain_core_CardResult.OK = ["OK",0];
 cstrain_core_CardResult.OK.toString = $estr;
 cstrain_core_CardResult.OK.__enum__ = cstrain_core_CardResult;
@@ -96,7 +96,8 @@ cstrain_core_CardResult.GUESS_CONSTANT = function(card,wildGuess) { var $x = ["G
 cstrain_core_CardResult.NOTHING = ["NOTHING",3];
 cstrain_core_CardResult.NOTHING.toString = $estr;
 cstrain_core_CardResult.NOTHING.__enum__ = cstrain_core_CardResult;
-cstrain_core_CardResult.GAMEOVER_OUTTA_CARDS = ["GAMEOVER_OUTTA_CARDS",4];
+cstrain_core_CardResult.NOT_YET_AVAILABLE = function(timeLeft,penaltyTime) { var $x = ["NOT_YET_AVAILABLE",4,timeLeft,penaltyTime]; $x.__enum__ = cstrain_core_CardResult; $x.toString = $estr; return $x; };
+cstrain_core_CardResult.GAMEOVER_OUTTA_CARDS = ["GAMEOVER_OUTTA_CARDS",5];
 cstrain_core_CardResult.GAMEOVER_OUTTA_CARDS.toString = $estr;
 cstrain_core_CardResult.GAMEOVER_OUTTA_CARDS.__enum__ = cstrain_core_CardResult;
 var cstrain_core_Deck = function() {
@@ -161,6 +162,11 @@ cstrain_core_Deck.prototype = {
 		if(placeOnTop) this.cards = this.cards.concat(cards); else this.cards = cards.concat(this.cards);
 	}
 };
+var cstrain_core_GameSettings = function() {
+	this.penaltyDelayMs = 0;
+	this.minTurnTime = 1;
+};
+cstrain_core_GameSettings.__name__ = true;
 var cstrain_core_IRules = function() { };
 cstrain_core_IRules.__name__ = true;
 var cstrain_core_Operation = { __ename__ : true, __constructs__ : ["ADD","SUBTRACT","MULTIPLY","DIVIDE","EQUAL"] };
@@ -181,6 +187,14 @@ cstrain_core_PenaltyDesc.WRONG_CONSTANT.toString = $estr;
 cstrain_core_PenaltyDesc.WRONG_CONSTANT.__enum__ = cstrain_core_PenaltyDesc;
 cstrain_core_PenaltyDesc.FURTHER_GUESS = function(answerHigher) { var $x = ["FURTHER_GUESS",3,answerHigher]; $x.__enum__ = cstrain_core_PenaltyDesc; $x.toString = $estr; return $x; };
 cstrain_core_PenaltyDesc.CLOSER_GUESS = function(answerHigher) { var $x = ["CLOSER_GUESS",4,answerHigher]; $x.__enum__ = cstrain_core_PenaltyDesc; $x.toString = $estr; return $x; };
+var cstrain_core_PlayerStats = function() {
+	this.startTime = 0;
+	this.lastMovedTime = 0;
+	this.lostInTransits = 0;
+	this.reachedStops = 0;
+	this.missedStops = 0;
+};
+cstrain_core_PlayerStats.__name__ = true;
 var cstrain_core_Polynomial = function() {
 	this.coefs = [0];
 };
@@ -392,7 +406,11 @@ cstrain_core_Polynomial.prototype = {
 	}
 };
 var cstrain_rules_TestGame = function() {
+	this._lastReceivedTime = 0;
+	this.commenced = false;
+	this.gameSettings = new cstrain_core_GameSettings();
 	this.polynomialValueCached = false;
+	this.gameSettings.penaltyDelayMs = 3000;
 	this.restart();
 };
 cstrain_rules_TestGame.__name__ = true;
@@ -411,7 +429,9 @@ cstrain_rules_TestGame.prototype = {
 		this.thePopupCard = new cstrain_core_Card(0,1,true);
 	}
 	,getFakeValueOf: function(val) {
-		var magnitudeBase = Math.ceil(val / 20) * 40;
+		var ceilVal = Math.ceil(val / 20);
+		if(ceilVal == 0) ceilVal = 1;
+		var magnitudeBase = ceilVal * 20;
 		var minBase = Std["int"](Math.ceil(magnitudeBase / 8));
 		if(Math.random() >= .5) return Std["int"](val - minBase - Std["int"](magnitudeBase * Math.random())); else return Std["int"](val + minBase + Std["int"](magnitudeBase * Math.random()));
 	}
@@ -421,9 +441,11 @@ cstrain_rules_TestGame.prototype = {
 		return from;
 	}
 	,getFakeValueOfCloserValue: function(val) {
-		var magnitudeBase = Math.ceil(val / 20) * 40;
+		var ceilVal = Math.ceil(val / 20);
+		if(ceilVal == 0) ceilVal = 1;
+		var magnitudeBase = ceilVal * 20;
 		var minBase = Std["int"](Math.ceil(magnitudeBase / 2));
-		if(Math.random() >= .5) return Std["int"](val - minBase - Std["int"](magnitudeBase * Math.random())); else return Std["int"](val + minBase + Std["int"](magnitudeBase * Math.random()));
+		if(Math.random() >= .5) return Std["int"](val - minBase - Std["int"](Math.floor(magnitudeBase * Math.random()))); else return Std["int"](val + minBase + Std["int"](Math.ceil(magnitudeBase * Math.random())));
 	}
 	,getCardResult: function(isSwipeRight) {
 		var curCard;
@@ -432,8 +454,9 @@ cstrain_rules_TestGame.prototype = {
 		this.thePopupCard = null;
 		if(curCard.operator <= 3) {
 			this.polynomial.performOperation(cstrain_core_Card.toOperation(curCard));
+			this.currentPlayerStats.lastMovedTime = new Date().getTime();
 			if(isSwipeRight) {
-				if(!(this.polynomial.coefs.length > 1)) if(Math.random() >= .5) return cstrain_core_CardResult.GUESS_CONSTANT(cstrain_core_Card.getRegularGuessConstantCard(this.polynomial.coefs[0] | 0,this.getFakeValueOf(this.polynomial.coefs[0])),false); else return cstrain_core_CardResult.GUESS_CONSTANT(cstrain_core_Card.getRegularGuessConstantCard(this.getFakeValueOf(this.polynomial.coefs[0]),this.polynomial.coefs[0] | 0),false); else return cstrain_core_CardResult.PENALIZE({ desc : cstrain_core_PenaltyDesc.LOST_IN_TRANSIT, delayNow : 2});
+				if(!(this.polynomial.coefs.length > 1)) if(Math.random() >= .5) return cstrain_core_CardResult.GUESS_CONSTANT(cstrain_core_Card.getRegularGuessConstantCard(this.polynomial.coefs[0] | 0,this.getFakeValueOf(this.polynomial.coefs[0])),false); else return cstrain_core_CardResult.GUESS_CONSTANT(cstrain_core_Card.getRegularGuessConstantCard(this.getFakeValueOf(this.polynomial.coefs[0]),this.polynomial.coefs[0] | 0),false); else return cstrain_core_CardResult.PENALIZE({ desc : cstrain_core_PenaltyDesc.LOST_IN_TRANSIT, delayNow : 1});
 			} else if(!(this.polynomial.coefs.length > 1)) return cstrain_core_CardResult.PENALIZE({ desc : cstrain_core_PenaltyDesc.MISSED_STOP, delayNow : 2}); else return cstrain_core_CardResult.OK;
 			console.log("UNaccounted operation");
 		} else if(curCard.operator == 4) {
@@ -466,12 +489,20 @@ cstrain_rules_TestGame.prototype = {
 		this.wildGuess = false;
 		this.secretVarValue = Std["int"](Math.ceil(Math.random() * 10));
 		this.polynomialValueCached = false;
+		this._lastReceivedTime = 0;
+		this._penaltyTime = 0;
+		this.commenced = false;
+		this.currentPlayerStats = new cstrain_core_PlayerStats();
 		this.buildDeck();
 	}
 	,getAllCards: function() {
 		return this.deck.cards;
 	}
 	,playCard: function(isSwipeRight) {
+		var currentTime = new Date().getTime();
+		var timeCap;
+		if(this._penaltyTime >= this.gameSettings.minTurnTime) timeCap = this._penaltyTime; else timeCap = this.gameSettings.minTurnTime;
+		if(currentTime - this._lastReceivedTime < timeCap) return cstrain_core_CardResult.NOT_YET_AVAILABLE(timeCap - (currentTime - this._lastReceivedTime),this._penaltyTime);
 		var result = this.getCardResult(isSwipeRight);
 		switch(result[1]) {
 		case 2:
@@ -480,36 +511,71 @@ cstrain_rules_TestGame.prototype = {
 			this.wildGuess = wildGuess;
 			var c = this.polynomial.coefs[0] | 0;
 			this.thePopupCard = guessConstantCard;
+			this.currentPlayerStats.reachedStops++;
 			break;
 		case 1:
 			switch(result[2].desc[1]) {
-			case 1:case 0:
+			case 0:
 				this.wildGuess = true;
+				this.currentPlayerStats.lostInTransits++;
+				break;
+			case 1:
+				this.wildGuess = true;
+				var to;
+				if(this.polynomialValueCached) to = this.polynomialValue; else to = this.polynomialValue = this.polynomial.evalValueInt(this.secretVarValue);
+				if(to != (this.polynomial.coefs[0] | 0)) console.log("Assertion failed values mismatched between secret and constant at constant station!:" + Std.string([to,this.polynomial.coefs[0] | 0]));
+				var firstChoice = this.getFakeValueOf(to);
+				var secondChoice = this.getFakeValueOf(to);
+				if(secondChoice == firstChoice) secondChoice = this.getFakeValueOfCloserValue(firstChoice);
+				this.thePopupCard = new cstrain_core_Card(4,firstChoice,false,new cstrain_core_Card(4,secondChoice,false));
+				this.currentPlayerStats.missedStops++;
 				break;
 			case 4:case 3:
 				var v;
 				if(this.wildGuess) {
 					if(this.polynomialValueCached) v = this.polynomialValue; else v = this.polynomialValue = this.polynomial.evalValueInt(this.secretVarValue);
 				} else v = this.polynomial.coefs[0] | 0;
-				var to;
-				if(this.polynomialValueCached) to = this.polynomialValue; else to = this.polynomialValue = this.polynomial.evalValueInt(this.secretVarValue);
-				var firstChoice = this.getCloserValueTo(v,this._valueChosen);
-				var secondChoice = this.getCloserValueTo(v,this._valueChosen);
-				if(secondChoice == firstChoice) secondChoice = this.getFakeValueOfCloserValue(firstChoice);
-				this.thePopupCard = new cstrain_core_Card(4,firstChoice,false,new cstrain_core_Card(4,secondChoice,false));
+				var to1;
+				if(this.polynomialValueCached) to1 = this.polynomialValue; else to1 = this.polynomialValue = this.polynomial.evalValueInt(this.secretVarValue);
+				var firstChoice1 = this.getCloserValueTo(v,this._valueChosen);
+				var secondChoice1 = this.getCloserValueTo(v,this._valueChosen);
+				if(secondChoice1 == firstChoice1) secondChoice1 = this.getFakeValueOfCloserValue(firstChoice1);
+				this.thePopupCard = new cstrain_core_Card(4,firstChoice1,false,new cstrain_core_Card(4,secondChoice1,false));
 				break;
 			default:
 			}
 			break;
 		default:
 		}
+		switch(result[1]) {
+		case 1:
+			var penalty = result[2];
+			if(penalty.delayNow != null) this._penaltyTime = penalty.delayNow * this.gameSettings.penaltyDelayMs;
+			break;
+		default:
+			this._penaltyTime = 0;
+		}
+		this._lastReceivedTime = currentTime;
 		return result;
 	}
+	,getPlayerStats: function() {
+		return this.currentPlayerStats;
+	}
+	,getGameSettings: function() {
+		return this.gameSettings;
+	}
 	,getTopmostCard: function() {
+		if(!this.commenced) {
+			this.commenced = true;
+			this.currentPlayerStats.startTime = new Date().getTime();
+		}
 		if(this.thePopupCard != null) return this.thePopupCard; else if(this.curDeckIndex >= 0) return this.curDeck.cards[this.curDeckIndex]; else return null;
 	}
 	,getPolynomial: function() {
 		return this.polynomial;
+	}
+	,getDeckIndex: function() {
+		return this.curDeck.cards.length - this.curDeckIndex - 1;
 	}
 };
 var haxevx_vuex_core_VComponent = function() {
@@ -532,24 +598,62 @@ var cstrain_vuex_components_CardView = function() {
 	haxevx_vuex_core_VxComponent.call(this);
 };
 cstrain_vuex_components_CardView.__name__ = true;
+cstrain_vuex_components_CardView.getCardCopy = function(card) {
+	return (card.operator <= 3?cstrain_core_Card.stringifyOp(card.operator):"") + (card.isVar?"n":card.value + "");
+};
 cstrain_vuex_components_CardView.__super__ = haxevx_vuex_core_VxComponent;
 cstrain_vuex_components_CardView.prototype = $extend(haxevx_vuex_core_VxComponent.prototype,{
-	swipe: function(isRight) {
-		this.$store.dispatch("cstrain_vuex_game_GameActions|swipe",isRight);
+	tickDown: function() {
+		this.secondsLeft--;
 	}
-	,Template: function() {
-		return "\r\n\t\t\t<div class=\"cardview\">\r\n\t\t\t\t<h3>Swipe</h3>\r\n\t\t\t\t<div class=\"card\" v-if=\"currentCard\">\r\n\t\t\t\t\t{{ cardCopy }} \r\n\t\t\t\t\t<br/>\r\n\t\t\t\t\t\r\n\t\t\t\t</div>\r\n\t\t\t\t<button v-on:click=\"swipe(false)\">Left</button>\r\n\t\t\t\t<button v-on:click=\"swipe(true)\">Right</button>\r\n\t\t\t</div>\r\n\t\t";
+	,Data: function() {
+		return { secondsLeft : 0};
 	}
 	,get_cardCopy: function() {
-		return cstrain_core_Card.stringifyOp(this.currentCard.operator) + (this.currentCard.isVar?"n":this.currentCard.value + "");
+		var delayTimeLeft = this.secondsLeft;
+		var regularCopy;
+		if(this.currentCard.operator <= 3) regularCopy = cstrain_vuex_components_CardView.getCardCopy(this.currentCard); else regularCopy = cstrain_vuex_components_CardView.getCardCopy(this.currentCard) + " :: " + cstrain_vuex_components_CardView.getCardCopy(this.currentCard.virtualRight);
+		var penaltyPhrase = this.$store.game.gameGetters.get_simplePenaltyPhrase() + ": " + this.secondsLeft;
+		if(this.$store.state.game.delayTimeLeft > 0) return penaltyPhrase;
+		return regularCopy;
+	}
+	,get_delayTimeInSec: function() {
+		return Std["int"](Math.ceil(this.$store.state.game.delayTimeLeft / 1000));
+	}
+	,watch_delayTimeInSec: function(val) {
+		this.secondsLeft = val;
+		if(val > 0) {
+			this.$data._timer = new haxe_Timer(1000);
+			this.$data._timer.run = $bind(this,this.tickDown);
+		} else this.$data._timer.stop();
+	}
+	,swipe: function(isRight) {
+		this.$store.dispatch("cstrain_vuex_game_GameActions|swipe",isRight);
+	}
+	,get_tickStr: function() {
+		if(this.$store.game.gameGetters.get_swipedCorrectly()) return "✓"; else return "✗";
+	}
+	,get_penaltiedStr: function() {
+		if(this.$store.game.gameGetters.get_isPenalized()) return "!"; else return "...";
+	}
+	,get_curCardIndex: function() {
+		return this.$store.game.gameGetters.get_curCardIndex();
+	}
+	,get_totalCards: function() {
+		return this.$store.game.gameGetters.get_totalCards();
+	}
+	,Template: function() {
+		return "\r\n\t\t\t<div class=\"cardview\">\r\n\t\t\t\t<h3>Swipe {{ tickStr }} {{ penaltiedStr }} &nbsp; {{ curCardIndex+1}} / {{ totalCards}}</h3>\r\n\t\t\t\t\r\n\t\t\t\t<div class=\"card\" v-if=\"currentCard\">\r\n\t\t\t\t\t{{ cardCopy }} \r\n\t\t\t\t\t<br/>\r\n\t\t\t\t\t\r\n\t\t\t\t</div>\r\n\t\t\t\t<button v-on:click=\"swipe(false)\">Left</button>\r\n\t\t\t\t<button v-on:click=\"swipe(true)\">Right</button>\r\n\t\t\t</div>\r\n\t\t";
 	}
 	,_Init: function() {
 		var cls = cstrain_vuex_components_CardView;
 		var clsP = cls.prototype;
+		this.data = clsP.Data;
 		this.template = this.Template();
-		this.computed = { cardCopy : clsP.get_cardCopy};
-		this.methods = { swipe : clsP.swipe, get_cardCopy : clsP.get_cardCopy};
+		this.computed = { cardCopy : clsP.get_cardCopy, delayTimeInSec : clsP.get_delayTimeInSec, tickStr : clsP.get_tickStr, penaltiedStr : clsP.get_penaltiedStr, curCardIndex : clsP.get_curCardIndex, totalCards : clsP.get_totalCards};
+		this.methods = { tickDown : clsP.tickDown, get_cardCopy : clsP.get_cardCopy, get_delayTimeInSec : clsP.get_delayTimeInSec, watch_delayTimeInSec : clsP.watch_delayTimeInSec, swipe : clsP.swipe, get_tickStr : clsP.get_tickStr, get_penaltiedStr : clsP.get_penaltiedStr, get_curCardIndex : clsP.get_curCardIndex, get_totalCards : clsP.get_totalCards};
 		this.props = { currentCard : { type : Object}};
+		this.watch = { delayTimeInSec : clsP.watch_delayTimeInSec};
 	}
 });
 var cstrain_vuex_components_GameView = function() {
@@ -570,7 +674,7 @@ cstrain_vuex_components_GameView.prototype = $extend(haxevx_vuex_core_VxComponen
 		this.$store.commit("cstrain_vuex_game_GameMutator|showOrHideExpression");
 	}
 	,Template: function() {
-		return "\r\n\t\t\t<div class=\"gameview\">\r\n\t\t\t\tThe Constant Train :: Polynomial Express\r\n\t\t\t\t<hr/>\r\n\t\t\t\t<p>Swipe right to infer result as constant to stop the train!<br/>Swipe left to infer result as variable and to move along!</b>\r\n\t\t\t\t<" + "CardView" + " :currentCard=\"currentCard\"></" + "CardView" + ">\r\n\t\t\t\t<div class=\"traceResult\" v-if=\"cardResult\">\r\n\t\t\t\t\t<p>{{ cardResult }}</p>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"xpression\" style=\"font-style:italic\" v-html=\"polyexpression\"></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<button class=\"cheat\" v-on:click=\"toggleExpression()\">{{ toggleExprLabel }} expression</button>\r\n\t\t\t</div>\r\n\t\t";
+		return "\r\n\t\t\t<div class=\"gameview\">\r\n\t\t\t\tThe Constant Train :: Polynomial Express\r\n\t\t\t\t<hr/>\r\n\t\t\t\t<p>Swipe right to infer result as constant to stop the train!<br/>Swipe left to infer result as variable to move along!</b>\r\n\t\t\t\t<" + "CardView" + " :currentCard=\"currentCard\"></" + "CardView" + ">\r\n\t\t\t\t<div class=\"traceResult\" v-if=\"cardResult\">\r\n\t\t\t\t\t<p>{{ cardResult }}</p>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"xpression\" style=\"font-style:italic\" v-html=\"polyexpression\"></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<button class=\"cheat\" v-on:click=\"toggleExpression()\">{{ toggleExprLabel }} expression</button>\r\n\t\t\t</div>\r\n\t\t";
 	}
 	,get_currentCard: function() {
 		return this.$store.state.game.topCard;
@@ -600,26 +704,52 @@ var cstrain_vuex_game_GameActions = function() {
 cstrain_vuex_game_GameActions.__name__ = true;
 cstrain_vuex_game_GameActions.prototype = {
 	swipe: function(context,isRight) {
+		context.commit("cstrain_vuex_game_GameMutator|notifySwipe",isRight?2:1);
 		var result = context.state._rules.playCard(isRight);
 		switch(result[1]) {
 		case 2:
 			var wildGuessing = result[3];
 			var guessCard = result[2];
-			context.commit("cstrain_vuex_game_GameMutator|setPopupCard");
 			context.commit("cstrain_vuex_game_GameMutator|resume");
 			break;
 		case 1:
 			var penalty = result[2];
-			if(penalty.delayNow != null) context.commit("cstrain_vuex_game_GameMutator|setDelay",penalty.delayNow);
-			context.commit("cstrain_vuex_game_GameMutator|resume");
+			context.commit("cstrain_vuex_game_GameMutator|setPenalty",penalty);
+			if(penalty.delayNow != null) {
+				var calcTime = penalty.delayNow * context.state.settings.penaltyDelayMs;
+				context.commit("cstrain_vuex_game_GameMutator|setDelay",calcTime);
+				if(penalty.delayNow > 0) haxe_Timer.delay(function() {
+					context.commit("cstrain_vuex_game_GameMutator|setDelay",0);
+					context.commit("cstrain_vuex_game_GameMutator|resume");
+				},calcTime | 0); else context.commit("cstrain_vuex_game_GameMutator|resume");
+			}
+			{
+				var _g = penalty.desc;
+				switch(_g[1]) {
+				case 4:
+					context.commit("cstrain_vuex_game_GameMutator|setPenaltySwipeCorrect",true);
+					break;
+				default:
+					context.commit("cstrain_vuex_game_GameMutator|setPenaltySwipeCorrect",false);
+				}
+			}
 			break;
 		case 0:
+			context.commit("cstrain_vuex_game_GameMutator|setPenalty",null);
+			context.commit("cstrain_vuex_game_GameMutator|updateProgress");
 			context.commit("cstrain_vuex_game_GameMutator|resume");
+			break;
+		case 4:
+			var penaltyTime = result[3];
+			var timeLeft = result[2];
+			console.log("Not yet available to swipe!:" + Std.string([timeLeft,penaltyTime]));
+			break;
+		case 5:
+			context.commit("cstrain_vuex_game_GameMutator|traceCardResult",result);
 			break;
 		default:
 			console.log("Uncaught case: " + Std.string(result));
 		}
-		context.commit("cstrain_vuex_game_GameMutator|traceCardResult",result);
 	}
 	,_SetInto: function(d,ns) {
 		var cls = cstrain_vuex_game_GameActions;
@@ -635,15 +765,83 @@ cstrain_vuex_game_GameGetters.Get_polynomialExpr = function(state) {
 		if(state.polynomial != null) return cstrain_core_Polynomial.PrintOut(state.polynomial,"n",true); else return "..";
 	} else return "";
 };
+cstrain_vuex_game_GameGetters.Get_simpleChosenNumber = function(state) {
+	if(state.chosenSwipe == 2) return state.topCard.virtualRight.value; else return state.topCard.value;
+};
+cstrain_vuex_game_GameGetters.Get_notChosenNumber = function(state) {
+	if(state.chosenSwipe == 2) return state.topCard.value; else return state.topCard.virtualRight.value;
+};
+cstrain_vuex_game_GameGetters.Get_isPenalized = function(state) {
+	return state.curPenalty != null;
+};
+cstrain_vuex_game_GameGetters.Get_swipedCorrectly = function(state) {
+	if(state.curPenalty != null) return state.penaltySwipeCorrect; else return true;
+};
+cstrain_vuex_game_GameGetters.Get_totalCards = function(state) {
+	if(state.cards != null) return state.cards.length; else return 0;
+};
+cstrain_vuex_game_GameGetters.Get_curCardIndex = function(state) {
+	return state.curCardIndex;
+};
+cstrain_vuex_game_GameGetters.Get_simplePenaltyPhrase = function(state) {
+	var penalty = state.curPenalty;
+	if(penalty == null) return "Unknown reason delay!";
+	{
+		var _g = penalty.desc;
+		switch(_g[1]) {
+		case 1:
+			return "You missed a stop!";
+		case 0:
+			return "Lost in transit...";
+		case 2:
+			return "Oops, Guessed constant wrongly. The answer is: " + (state.chosenSwipe == 2?state.topCard.value:state.topCard.virtualRight.value);
+		case 4:
+			var answerHigher = _g[2];
+			return "You guessed " + (state.chosenSwipe == 2?state.topCard.virtualRight.value:state.topCard.value) + ", which is a closer answer. Guess " + (answerHigher?"higher":"lower") + "!";
+		case 3:
+			var answerHigher1 = _g[2];
+			return "You guessed " + (state.chosenSwipe == 2?state.topCard.virtualRight.value:state.topCard.value) + ", which is a further answer. Guess " + (answerHigher1?"higher":"lower") + "!";
+		}
+	}
+	return "Unknown penalty reason delay!";
+};
 cstrain_vuex_game_GameGetters.prototype = {
 	get_polynomialExpr: function() {
 		return this._stg[this._ + "polynomialExpr_cstrain_vuex_game_GameGetters"];
+	}
+	,get_simpleChosenNumber: function() {
+		return this._stg[this._ + "simpleChosenNumber_cstrain_vuex_game_GameGetters"];
+	}
+	,get_notChosenNumber: function() {
+		return this._stg[this._ + "notChosenNumber_cstrain_vuex_game_GameGetters"];
+	}
+	,get_isPenalized: function() {
+		return this._stg[this._ + "isPenalized_cstrain_vuex_game_GameGetters"];
+	}
+	,get_swipedCorrectly: function() {
+		return this._stg[this._ + "swipedCorrectly_cstrain_vuex_game_GameGetters"];
+	}
+	,get_totalCards: function() {
+		return this._stg[this._ + "totalCards_cstrain_vuex_game_GameGetters"];
+	}
+	,get_curCardIndex: function() {
+		return this._stg[this._ + "curCardIndex_cstrain_vuex_game_GameGetters"];
+	}
+	,get_simplePenaltyPhrase: function() {
+		return this._stg[this._ + "simplePenaltyPhrase_cstrain_vuex_game_GameGetters"];
 	}
 	,_SetInto: function(d,ns) {
 		this._ = ns;
 		haxevx_vuex_core_ModuleStack.stack.push(this);
 		var cls = cstrain_vuex_game_GameGetters;
 		d[ns + "polynomialExpr_cstrain_vuex_game_GameGetters"] = cls.Get_polynomialExpr;
+		d[ns + "simpleChosenNumber_cstrain_vuex_game_GameGetters"] = cls.Get_simpleChosenNumber;
+		d[ns + "notChosenNumber_cstrain_vuex_game_GameGetters"] = cls.Get_notChosenNumber;
+		d[ns + "isPenalized_cstrain_vuex_game_GameGetters"] = cls.Get_isPenalized;
+		d[ns + "swipedCorrectly_cstrain_vuex_game_GameGetters"] = cls.Get_swipedCorrectly;
+		d[ns + "totalCards_cstrain_vuex_game_GameGetters"] = cls.Get_totalCards;
+		d[ns + "curCardIndex_cstrain_vuex_game_GameGetters"] = cls.Get_curCardIndex;
+		d[ns + "simplePenaltyPhrase_cstrain_vuex_game_GameGetters"] = cls.Get_simplePenaltyPhrase;
 	}
 	,_InjNative: function(g) {
 		this._stg = g;
@@ -703,9 +901,17 @@ cstrain_vuex_game_GameMutator.prototype = {
 	restart: function(g) {
 		cstrain_vuex_game_GameMutator.Restart(g);
 	}
-	,setPopupCard: function(state,isPopup) {
-		if(isPopup == null) isPopup = true;
-		state.isPopup = isPopup;
+	,notifySwipe: function(state,swipeState) {
+		state.chosenSwipe = swipeState;
+	}
+	,updateProgress: function(state) {
+		state.curCardIndex = state._rules.getDeckIndex();
+	}
+	,setPenalty: function(state,penalty) {
+		state.curPenalty = penalty;
+	}
+	,setPenaltySwipeCorrect: function(state,correct) {
+		state.penaltySwipeCorrect = correct;
 	}
 	,setDelay: function(state,delay) {
 		state.delayTimeLeft = delay;
@@ -714,7 +920,12 @@ cstrain_vuex_game_GameMutator.prototype = {
 		state.cardResult = result;
 	}
 	,resume: function(state) {
+		state.penaltySwipeCorrect = true;
+		state.delayTimeLeft = 0;
 		state.topCard = state._rules.getTopmostCard();
+		state.polynomial = cstrain_core_Polynomial.Copy(state._rules.getPolynomial());
+	}
+	,updateExpression: function(state) {
 		state.polynomial = cstrain_core_Polynomial.Copy(state._rules.getPolynomial());
 	}
 	,showOrHideExpression: function(state,showExpression) {
@@ -725,21 +936,30 @@ cstrain_vuex_game_GameMutator.prototype = {
 		var cls = cstrain_vuex_game_GameMutator;
 		var clsP = cls.prototype;
 		d[ns + "cstrain_vuex_game_GameMutator|restart"] = clsP.restart;
-		d[ns + "cstrain_vuex_game_GameMutator|setPopupCard"] = clsP.setPopupCard;
+		d[ns + "cstrain_vuex_game_GameMutator|notifySwipe"] = clsP.notifySwipe;
+		d[ns + "cstrain_vuex_game_GameMutator|updateProgress"] = clsP.updateProgress;
+		d[ns + "cstrain_vuex_game_GameMutator|setPenalty"] = clsP.setPenalty;
+		d[ns + "cstrain_vuex_game_GameMutator|setPenaltySwipeCorrect"] = clsP.setPenaltySwipeCorrect;
 		d[ns + "cstrain_vuex_game_GameMutator|setDelay"] = clsP.setDelay;
 		d[ns + "cstrain_vuex_game_GameMutator|traceCardResult"] = clsP.traceCardResult;
 		d[ns + "cstrain_vuex_game_GameMutator|resume"] = clsP.resume;
+		d[ns + "cstrain_vuex_game_GameMutator|updateExpression"] = clsP.updateExpression;
 		d[ns + "cstrain_vuex_game_GameMutator|showOrHideExpression"] = clsP.showOrHideExpression;
 	}
 };
 var cstrain_vuex_game_GameState = function(rules) {
+	this.chosenSwipe = 0;
+	this.penaltySwipeCorrect = true;
+	this.curPenalty = null;
+	this.delayTimeLeft = 0;
 	this.showExpression = false;
 	this.polynomial = null;
 	this.cardResult = null;
-	this.isPopup = false;
-	this.delayTimeLeft = 0;
 	this.topCard = null;
+	this.curCardIndex = 0;
 	this.cards = rules.getAllCards();
+	this.settings = rules.getGameSettings();
+	this.playerStats = rules.getPlayerStats();
 };
 cstrain_vuex_game_GameState.__name__ = true;
 var haxevx_vuex_core_IVxContext = function() { };
@@ -788,6 +1008,30 @@ cstrain_vuex_store_GameStore.prototype = $extend(haxevx_vuex_core_VxStore.protot
 var cstrain_vuex_store_GameStoreState = function() {
 };
 cstrain_vuex_store_GameStoreState.__name__ = true;
+var haxe_Timer = function(time_ms) {
+	var me = this;
+	this.id = setInterval(function() {
+		me.run();
+	},time_ms);
+};
+haxe_Timer.__name__ = true;
+haxe_Timer.delay = function(f,time_ms) {
+	var t = new haxe_Timer(time_ms);
+	t.run = function() {
+		t.stop();
+		f();
+	};
+	return t;
+};
+haxe_Timer.prototype = {
+	stop: function() {
+		if(this.id == null) return;
+		clearInterval(this.id);
+		this.id = null;
+	}
+	,run: function() {
+	}
+};
 var haxevx_vuex_core_NoneT = function() { };
 haxevx_vuex_core_NoneT.__name__ = true;
 var haxevx_vuex_core_VxBoot = function() {
@@ -919,8 +1163,11 @@ js_Boot.__string_rec = function(o,s) {
 		return String(o);
 	}
 };
+var $_, $fid = 0;
+function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 String.__name__ = true;
 Array.__name__ = true;
+Date.__name__ = ["Date"];
 cstrain_vuex_components_GameView.Comp_CardView = "CardView";
 haxevx_vuex_core_ModuleStack.stack = [];
 Main.main();

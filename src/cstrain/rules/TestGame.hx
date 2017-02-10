@@ -41,6 +41,8 @@ class TestGame implements IRules
 	inline function getSecretValue():Int {
 		return polynomialValueCached ? polynomialValue : (polynomialValue=getPolynomialValue(secretVarValue));
 	}
+	
+	
 
 	public function new() 
 	{
@@ -118,7 +120,7 @@ class TestGame implements IRules
 					// or guess var value result as it currently is, once solved, can continue, must var will be re-scrambled
 					
 					// or force pop quiz of unknown value?
-					return CardResult.PENALIZE({ desc:PenaltyDesc.LOST_IN_TRANSIT, delayNow:2 });
+					return CardResult.PENALIZE({ desc:PenaltyDesc.LOST_IN_TRANSIT, delayNow:1 });
 				}
 			}
 			else {
@@ -309,5 +311,7 @@ class TestGame implements IRules
 		return polynomial;
 	}
 
-	
+	public inline function getDeckIndex():Int {
+		return curDeck.cards.length - curDeckIndex - 1;
+	}
 }

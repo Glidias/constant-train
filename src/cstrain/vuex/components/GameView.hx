@@ -51,7 +51,7 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 			<div class="gameview">
 				The Constant Train :: Polynomial Express
 				<hr/>
-				<p>Swipe right to infer result as constant to stop the train!<br/>Swipe left to infer result as variable and to move along!</b>
+				<p>Swipe right to infer result as constant to stop the train!<br/>Swipe left to infer result as variable to move along!</b>
 				<$Comp_CardView :currentCard="currentCard"></$Comp_CardView>
 				<div class="traceResult" v-if="cardResult">
 					<p>{{ cardResult }}</p>
