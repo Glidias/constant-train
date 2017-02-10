@@ -60,7 +60,9 @@ class TestGame implements IRules
 	}
 	
 	function getFakeValueOf(val:Float):Int {
-		var magnitudeBase:Float = Math.ceil(val / 20) * 40;
+		var ceil:Int = Math.ceil(val / 20);
+		if (ceil == 0) ceil = 1;
+		var magnitudeBase:Float = ceil * 20;
 		var minBase:Int =Std.int(Math.ceil( magnitudeBase/8));
 		return Math.random() >= .5 ? Std.int( val -minBase - Std.int(magnitudeBase*Math.random()) ) : Std.int( val + minBase + Std.int(magnitudeBase*Math.random()) );
 	}
@@ -72,7 +74,9 @@ class TestGame implements IRules
 	}
 	
 	function getFakeValueOfCloserValue(val:Float):Int {
-		var magnitudeBase:Float = Math.ceil(val / 20) * 40;
+		var ceil:Int = Math.ceil(val / 20);
+		if (ceil == 0) ceil = 1;
+		var magnitudeBase:Float = ceil * 20;
 		var minBase:Int = Std.int(Math.ceil( magnitudeBase/2));
 		return Math.random() >= .5 ? Std.int( val -minBase - Std.int(magnitudeBase*Math.random()) ) : Std.int( val + minBase + Std.int(magnitudeBase*Math.random()) );
 	}
@@ -95,8 +99,11 @@ class TestGame implements IRules
 			if (isSwipeRight) {
 				if (isConstant()) {
 					// Ok, good, show pop quiz
-					return Math.random() >= .5 ? CardResult.GUESS_CONSTANT( Card.getRegularGuessConstantCard( polynomial.constantInteger, getFakeValueOf(polynomial.constantValue)), false ) :
-												CardResult.GUESS_CONSTANT( Card.getRegularGuessConstantCard( getFakeValueOf(polynomial.constantValue), polynomial.constantInteger), false );
+					var fakeVal:Int = getFakeValueOf(polynomial.constantInteger);
+					var result:Int = polynomial.constantInteger;
+					trace(fakeVal + ", " + result);
+					return Math.random() >= .5 ? CardResult.GUESS_CONSTANT( Card.getRegularGuessConstantCard(result, fakeVal), false ) :
+												CardResult.GUESS_CONSTANT( Card.getRegularGuessConstantCard(fakeVal, result), false );
 				}
 				else {
 					// penalized, stopped in mdidle of nowhere, are you lost? Delay train.
@@ -201,9 +208,13 @@ class TestGame implements IRules
 				var c = getConstant();
 				thePopupCard = guessConstantCard;
 				
-			case CardResult.PENALIZE({desc:PenaltyDesc.MISSED_STOP}) |  CardResult.PENALIZE({desc:PenaltyDesc.LOST_IN_TRANSIT}):
+			case CardResult.PENALIZE({desc:PenaltyDesc.MISSED_STOP}):
 				wildGuess = true;  // just a convention, whether popup quiz shows up or not
-				
+				var val = getSecretValue();
+				val = getFakeValueOf(val);
+				thePopupCard = Card.getRegularGuessConstantCard( val,  getFakeValueOfCloserValue(val) );
+			case CardResult.PENALIZE({desc:PenaltyDesc.LOST_IN_TRANSIT}):
+				wildGuess = true;
 			case CardResult.PENALIZE({desc:PenaltyDesc.CLOSER_GUESS(_)}) | CardResult.PENALIZE({desc:PenaltyDesc.FURTHER_GUESS(_)}):
 	
 				var v= wildGuess ? getSecretValue() : getConstant();

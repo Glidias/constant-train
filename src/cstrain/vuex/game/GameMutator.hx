@@ -35,11 +35,13 @@ class GameMutator implements IMutator<GameState>
 		state.cardResult = result;
 	}
 	
-	
 	function resume(state:GameState):Void {
-
 		state.topCard = state._rules.getTopmostCard();
-		
+		state._rules.getNextCardBelow();
+		tracePolynomial(state);
+	}
+	
+	inline function tracePolynomial(state:GameState):Void {
 		state.polynomial = Polynomial.Copy( state._rules.getPolynomial() );
 	}
 	

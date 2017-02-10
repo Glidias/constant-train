@@ -10,11 +10,15 @@ interface IRules
 	//public function isConstant():Bool;
 	
 	public function playCard(isSwipeRight:Bool):CardResult;    // executes card play (assumed the topmost card)
-	public function getTopmostCard():Card; // get current card to be played
-	public function getNextCardBelow():Card; 	// get current card underneath current card to be played
+	
+	//  Call the foloowing card getters in sequence (topmost first then nexst card below)
+	// get current card to be played
+	public function getTopmostCard():Card; 
+	// get next card underneath current card to be played (useful for anticipating/triggering any last minute modifications to next card result's display.)
+	public function getNextCardBelow():Card; 	
 	
 	function restart():Void;	// restart game
-	function getAllCards():Array<Card>;	// reflects play deck along train path of +-/* operations
+	function getAllCards():Array<Card>;	// reflects play deck along train path of regular arithmetric/mutating operations
 	
-	function getPolynomial():Polynomial;  // gets polynomial expression
+	function getPolynomial():Polynomial;  // gets current polynomial expression
 }

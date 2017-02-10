@@ -30,7 +30,7 @@ class GameActions implements IAction<GameState, NoneT>
 					mutator._setDelay(context, penalty.delayNow);
 				}
 				
-				// if testing only
+				// if testing only, show next card, by right should show delay countdown first before revealing the card
 				mutator._resume(context);
 		
 			case CardResult.OK:
