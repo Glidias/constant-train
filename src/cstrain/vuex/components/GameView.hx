@@ -45,6 +45,7 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 	
 	var polyexpression(get, never):String;
 	var toggleExprLabel(get, never):String;
+
 	
 	override public function Template():String {
 		return '
@@ -63,7 +64,7 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		';
 	}
 	
-	
+
 	function get_currentCard():Card 
 	{
 		return store.state.game.topCard;

@@ -19,9 +19,17 @@ class GameActions implements IAction<GameState, NoneT>
 	
 	function swipe(context:IVxContext1<GameState>, isRight:Bool):Void {
 		//trace("Swiping: " +(isRight ? "right" : "left") );
-		mutator._notifySwipe(context, isRight ? GameState.SWIPE_RIGHT : GameState.SWIPE_LEFT);
+		
 		
 		var result = context.state._rules.playCard(isRight);
+		switch( result) {
+			case CardResult.NOT_YET_AVAILABLE(_, _) | CardResult.GAMEOVER_OUTTA_CARDS:
+				
+			default:
+				mutator._notifySwipe(context, isRight ? GameState.SWIPE_RIGHT : GameState.SWIPE_LEFT);
+			
+		}
+		
 		switch( result) {
 			case CardResult.GUESS_CONSTANT(guessCard, wildGuessing):
 				// show popup mutation

@@ -28,7 +28,6 @@ class GameState
 	public var showExpression:Bool = false;
 	
 	
-	
 	public var delayTimeLeft:Float = 0;
 	public var curPenalty:Penalty = null;
 	public var penaltySwipeCorrect:Bool = true;
@@ -37,14 +36,10 @@ class GameState
 	public static inline var SWIPE_NONE:Int = 0;
 	public static inline var SWIPE_LEFT:Int = 1;
 	public static inline var SWIPE_RIGHT:Int = 2;
-	
-
-	
-	// internal properties to be injected later to avoid Vuex vuemodel reactivity
+	public var _chosenCard:Card;
 	public var _rules:IRules;
 	
 	
-
 	public function new(rules:IRules) 
 	{
 		this.cards = rules.getAllCards();

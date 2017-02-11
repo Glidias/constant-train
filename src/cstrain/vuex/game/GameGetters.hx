@@ -1,4 +1,5 @@
 package cstrain.vuex.game;
+import cstrain.core.Card;
 import cstrain.core.Penalty;
 import cstrain.core.PenaltyDesc;
 import cstrain.core.Polynomial;
@@ -19,21 +20,27 @@ class GameGetters implements IGetters<GameState, NoneT>
 	}
 	
 	public static inline function Get_simpleChosenNumber(state:GameState):Int {
-		return (state.chosenSwipe == GameState.SWIPE_RIGHT ? state.topCard.virtualRight.value : state.topCard.value );
+		return state._chosenCard != null ?  (state.chosenSwipe == GameState.SWIPE_RIGHT ? state._chosenCard.virtualRight.value : state._chosenCard.value ) : GameState.SWIPE_NONE;
 	}
 	
 	public static inline function Get_notChosenNumber(state:GameState):Int {
-		return (state.chosenSwipe == GameState.SWIPE_RIGHT ? state.topCard.value : state.topCard.virtualRight.value );
+		return state._chosenCard != null ?  (state.chosenSwipe == GameState.SWIPE_RIGHT ? state._chosenCard.value : state._chosenCard.virtualRight.value ) : GameState.SWIPE_NONE;
 	}
 	
 	public static inline function Get_isPenalized(state:GameState):Bool {
 		return state.curPenalty != null;
 	}
 	
+	
+	public static inline function Get_isPopupChoicing(state:GameState):Bool {
+		return state.topCard != null && state.topCard.operator == Card.OPERATION_EQUAL;
+	}
 	public static inline function Get_swipedCorrectly(state:GameState):Bool {
 
 		return state.curPenalty != null ? state.penaltySwipeCorrect : true;
 	}
+	
+	
 	
 	public static inline function Get_totalCards(state:GameState):Int {
 
@@ -53,7 +60,7 @@ class GameGetters implements IGetters<GameState, NoneT>
 			case PenaltyDesc.LOST_IN_TRANSIT:
 				return "Lost in transit...";
 			case PenaltyDesc.WRONG_CONSTANT:
-				return "Oops, Guessed constant wrongly. The answer is: "+Get_notChosenNumber(state);
+				return "Oops, Guessed constant wrongly. The answer is "+Get_notChosenNumber(state) +"!";
 			case PenaltyDesc.CLOSER_GUESS(answerHigher):
 				return "You guessed "+Get_simpleChosenNumber(state)+", which is a closer answer. Guess " + (answerHigher ? "higher" : "lower") + "!";
 			case PenaltyDesc.FURTHER_GUESS(answerHigher):

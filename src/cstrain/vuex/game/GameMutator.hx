@@ -1,4 +1,5 @@
 package cstrain.vuex.game;
+import cstrain.core.Card;
 import cstrain.core.CardResult;
 import cstrain.core.Penalty;
 import cstrain.core.Polynomial;
@@ -21,8 +22,10 @@ class GameMutator implements IMutator<GameState>
 		GameMutator.Restart(g);
 	}
 	
-	function notifySwipe(state:GameState, swipeState:Int):Void {
+	function notifySwipe(state:GameState, swipeState:Int ):Void {
 		state.chosenSwipe = swipeState;
+		if (swipeState != GameState.SWIPE_NONE) state._chosenCard = state.topCard;
+		
 	}
 	
 	function updateProgress(state:GameState):Void {

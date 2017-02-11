@@ -456,7 +456,7 @@ cstrain_rules_TestGame.prototype = {
 			this.polynomial.performOperation(cstrain_core_Card.toOperation(curCard));
 			this.currentPlayerStats.lastMovedTime = new Date().getTime();
 			if(isSwipeRight) {
-				if(!(this.polynomial.coefs.length > 1)) if(Math.random() >= .5) return cstrain_core_CardResult.GUESS_CONSTANT(cstrain_core_Card.getRegularGuessConstantCard(this.polynomial.coefs[0] | 0,this.getFakeValueOf(this.polynomial.coefs[0])),false); else return cstrain_core_CardResult.GUESS_CONSTANT(cstrain_core_Card.getRegularGuessConstantCard(this.getFakeValueOf(this.polynomial.coefs[0]),this.polynomial.coefs[0] | 0),false); else return cstrain_core_CardResult.PENALIZE({ desc : cstrain_core_PenaltyDesc.LOST_IN_TRANSIT, delayNow : 1});
+				if(!(this.polynomial.coefs.length > 1)) if(Math.random() >= .5) return cstrain_core_CardResult.GUESS_CONSTANT(cstrain_core_Card.getRegularGuessConstantCard(this.polynomial.coefs[0] | 0,this.getFakeValueOf(this.polynomial.coefs[0])),false); else return cstrain_core_CardResult.GUESS_CONSTANT(cstrain_core_Card.getRegularGuessConstantCard(this.getFakeValueOf(this.polynomial.coefs[0]),this.polynomial.coefs[0] | 0),false); else return cstrain_core_CardResult.PENALIZE({ desc : cstrain_core_PenaltyDesc.LOST_IN_TRANSIT, delayNow : 0.75});
 			} else if(!(this.polynomial.coefs.length > 1)) return cstrain_core_CardResult.PENALIZE({ desc : cstrain_core_PenaltyDesc.MISSED_STOP, delayNow : 2}); else return cstrain_core_CardResult.OK;
 			console.log("UNaccounted operation");
 		} else if(curCard.operator == 4) {
@@ -618,13 +618,21 @@ cstrain_vuex_components_CardView.prototype = $extend(haxevx_vuex_core_VxComponen
 		return regularCopy;
 	}
 	,get_delayTimeInSec: function() {
-		return Std["int"](Math.ceil(this.$store.state.game.delayTimeLeft / 1000));
+		return this.$store.state.game.delayTimeLeft / 1000;
+	}
+	,startTickDownNow: function() {
+		this.$data._timer = new haxe_Timer(1000);
+		this.$data._timer.run = $bind(this,this.tickDown);
+	}
+	,startTickDown: function() {
+		this.tickDown();
+		this.startTickDownNow();
 	}
 	,watch_delayTimeInSec: function(val) {
-		this.secondsLeft = val;
+		this.secondsLeft = Std["int"](Math.floor(val)) + 1;
 		if(val > 0) {
-			this.$data._timer = new haxe_Timer(1000);
-			this.$data._timer.run = $bind(this,this.tickDown);
+			var f = val - (val | 0);
+			if(f > 0) haxe_Timer.delay($bind(this,this.startTickDown),f * 1000 | 0); else this.startTickDown();
 		} else this.$data._timer.stop();
 	}
 	,swipe: function(isRight) {
@@ -642,16 +650,19 @@ cstrain_vuex_components_CardView.prototype = $extend(haxevx_vuex_core_VxComponen
 	,get_totalCards: function() {
 		return this.$store.game.gameGetters.get_totalCards();
 	}
+	,get_gotDelay: function() {
+		return this.$store.state.game.delayTimeLeft > 0;
+	}
 	,Template: function() {
-		return "\r\n\t\t\t<div class=\"cardview\">\r\n\t\t\t\t<h3>Swipe {{ tickStr }} {{ penaltiedStr }} &nbsp; {{ curCardIndex+1}} / {{ totalCards}}</h3>\r\n\t\t\t\t\r\n\t\t\t\t<div class=\"card\" v-if=\"currentCard\">\r\n\t\t\t\t\t{{ cardCopy }} \r\n\t\t\t\t\t<br/>\r\n\t\t\t\t\t\r\n\t\t\t\t</div>\r\n\t\t\t\t<button v-on:click=\"swipe(false)\">Left</button>\r\n\t\t\t\t<button v-on:click=\"swipe(true)\">Right</button>\r\n\t\t\t</div>\r\n\t\t";
+		return "\r\n\t\t\t<div class=\"cardview\">\r\n\t\t\t\t<h3>Swipe {{ tickStr }} {{ penaltiedStr }} &nbsp; {{ curCardIndex+1}} / {{ totalCards}}</h3>\r\n\t\t\t\t\r\n\t\t\t\t<div class=\"card\" v-if=\"currentCard\">\r\n\t\t\t\t\t{{ cardCopy }} \r\n\t\t\t\t\t<br/>\r\n\t\t\t\t\t\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"btnswipers\" v-show=\"!gotDelay\">\r\n\t\t\t\t\t<button v-on:click=\"swipe(false)\">Left</button>\r\n\t\t\t\t\t<button v-on:click=\"swipe(true)\">Right</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t";
 	}
 	,_Init: function() {
 		var cls = cstrain_vuex_components_CardView;
 		var clsP = cls.prototype;
 		this.data = clsP.Data;
 		this.template = this.Template();
-		this.computed = { cardCopy : clsP.get_cardCopy, delayTimeInSec : clsP.get_delayTimeInSec, tickStr : clsP.get_tickStr, penaltiedStr : clsP.get_penaltiedStr, curCardIndex : clsP.get_curCardIndex, totalCards : clsP.get_totalCards};
-		this.methods = { tickDown : clsP.tickDown, get_cardCopy : clsP.get_cardCopy, get_delayTimeInSec : clsP.get_delayTimeInSec, watch_delayTimeInSec : clsP.watch_delayTimeInSec, swipe : clsP.swipe, get_tickStr : clsP.get_tickStr, get_penaltiedStr : clsP.get_penaltiedStr, get_curCardIndex : clsP.get_curCardIndex, get_totalCards : clsP.get_totalCards};
+		this.computed = { cardCopy : clsP.get_cardCopy, delayTimeInSec : clsP.get_delayTimeInSec, tickStr : clsP.get_tickStr, penaltiedStr : clsP.get_penaltiedStr, curCardIndex : clsP.get_curCardIndex, totalCards : clsP.get_totalCards, gotDelay : clsP.get_gotDelay};
+		this.methods = { tickDown : clsP.tickDown, get_cardCopy : clsP.get_cardCopy, get_delayTimeInSec : clsP.get_delayTimeInSec, startTickDownNow : clsP.startTickDownNow, startTickDown : clsP.startTickDown, watch_delayTimeInSec : clsP.watch_delayTimeInSec, swipe : clsP.swipe, get_tickStr : clsP.get_tickStr, get_penaltiedStr : clsP.get_penaltiedStr, get_curCardIndex : clsP.get_curCardIndex, get_totalCards : clsP.get_totalCards, get_gotDelay : clsP.get_gotDelay};
 		this.props = { currentCard : { type : Object}};
 		this.watch = { delayTimeInSec : clsP.watch_delayTimeInSec};
 	}
@@ -704,8 +715,13 @@ var cstrain_vuex_game_GameActions = function() {
 cstrain_vuex_game_GameActions.__name__ = true;
 cstrain_vuex_game_GameActions.prototype = {
 	swipe: function(context,isRight) {
-		context.commit("cstrain_vuex_game_GameMutator|notifySwipe",isRight?2:1);
 		var result = context.state._rules.playCard(isRight);
+		switch(result[1]) {
+		case 4:case 5:
+			break;
+		default:
+			context.commit("cstrain_vuex_game_GameMutator|notifySwipe",isRight?2:1);
+		}
 		switch(result[1]) {
 		case 2:
 			var wildGuessing = result[3];
@@ -766,13 +782,20 @@ cstrain_vuex_game_GameGetters.Get_polynomialExpr = function(state) {
 	} else return "";
 };
 cstrain_vuex_game_GameGetters.Get_simpleChosenNumber = function(state) {
-	if(state.chosenSwipe == 2) return state.topCard.virtualRight.value; else return state.topCard.value;
+	if(state._chosenCard != null) {
+		if(state.chosenSwipe == 2) return state._chosenCard.virtualRight.value; else return state._chosenCard.value;
+	} else return 0;
 };
 cstrain_vuex_game_GameGetters.Get_notChosenNumber = function(state) {
-	if(state.chosenSwipe == 2) return state.topCard.value; else return state.topCard.virtualRight.value;
+	if(state._chosenCard != null) {
+		if(state.chosenSwipe == 2) return state._chosenCard.value; else return state._chosenCard.virtualRight.value;
+	} else return 0;
 };
 cstrain_vuex_game_GameGetters.Get_isPenalized = function(state) {
 	return state.curPenalty != null;
+};
+cstrain_vuex_game_GameGetters.Get_isPopupChoicing = function(state) {
+	return state.topCard != null && state.topCard.operator == 4;
 };
 cstrain_vuex_game_GameGetters.Get_swipedCorrectly = function(state) {
 	if(state.curPenalty != null) return state.penaltySwipeCorrect; else return true;
@@ -794,13 +817,13 @@ cstrain_vuex_game_GameGetters.Get_simplePenaltyPhrase = function(state) {
 		case 0:
 			return "Lost in transit...";
 		case 2:
-			return "Oops, Guessed constant wrongly. The answer is: " + (state.chosenSwipe == 2?state.topCard.value:state.topCard.virtualRight.value);
+			return "Oops, Guessed constant wrongly. The answer is " + (state._chosenCard != null?state.chosenSwipe == 2?state._chosenCard.value:state._chosenCard.virtualRight.value:0) + "!";
 		case 4:
 			var answerHigher = _g[2];
-			return "You guessed " + (state.chosenSwipe == 2?state.topCard.virtualRight.value:state.topCard.value) + ", which is a closer answer. Guess " + (answerHigher?"higher":"lower") + "!";
+			return "You guessed " + (state._chosenCard != null?state.chosenSwipe == 2?state._chosenCard.virtualRight.value:state._chosenCard.value:0) + ", which is a closer answer. Guess " + (answerHigher?"higher":"lower") + "!";
 		case 3:
 			var answerHigher1 = _g[2];
-			return "You guessed " + (state.chosenSwipe == 2?state.topCard.virtualRight.value:state.topCard.value) + ", which is a further answer. Guess " + (answerHigher1?"higher":"lower") + "!";
+			return "You guessed " + (state._chosenCard != null?state.chosenSwipe == 2?state._chosenCard.virtualRight.value:state._chosenCard.value:0) + ", which is a further answer. Guess " + (answerHigher1?"higher":"lower") + "!";
 		}
 	}
 	return "Unknown penalty reason delay!";
@@ -817,6 +840,9 @@ cstrain_vuex_game_GameGetters.prototype = {
 	}
 	,get_isPenalized: function() {
 		return this._stg[this._ + "isPenalized_cstrain_vuex_game_GameGetters"];
+	}
+	,get_isPopupChoicing: function() {
+		return this._stg[this._ + "isPopupChoicing_cstrain_vuex_game_GameGetters"];
 	}
 	,get_swipedCorrectly: function() {
 		return this._stg[this._ + "swipedCorrectly_cstrain_vuex_game_GameGetters"];
@@ -838,6 +864,7 @@ cstrain_vuex_game_GameGetters.prototype = {
 		d[ns + "simpleChosenNumber_cstrain_vuex_game_GameGetters"] = cls.Get_simpleChosenNumber;
 		d[ns + "notChosenNumber_cstrain_vuex_game_GameGetters"] = cls.Get_notChosenNumber;
 		d[ns + "isPenalized_cstrain_vuex_game_GameGetters"] = cls.Get_isPenalized;
+		d[ns + "isPopupChoicing_cstrain_vuex_game_GameGetters"] = cls.Get_isPopupChoicing;
 		d[ns + "swipedCorrectly_cstrain_vuex_game_GameGetters"] = cls.Get_swipedCorrectly;
 		d[ns + "totalCards_cstrain_vuex_game_GameGetters"] = cls.Get_totalCards;
 		d[ns + "curCardIndex_cstrain_vuex_game_GameGetters"] = cls.Get_curCardIndex;
@@ -903,6 +930,7 @@ cstrain_vuex_game_GameMutator.prototype = {
 	}
 	,notifySwipe: function(state,swipeState) {
 		state.chosenSwipe = swipeState;
+		if(swipeState != 0) state._chosenCard = state.topCard;
 	}
 	,updateProgress: function(state) {
 		state.curCardIndex = state._rules.getDeckIndex();

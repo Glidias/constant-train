@@ -120,7 +120,7 @@ class TestGame implements IRules
 					// or guess var value result as it currently is, once solved, can continue, must var will be re-scrambled
 					
 					// or force pop quiz of unknown value?
-					return CardResult.PENALIZE({ desc:PenaltyDesc.LOST_IN_TRANSIT, delayNow:1 });
+					return CardResult.PENALIZE({ desc:PenaltyDesc.LOST_IN_TRANSIT, delayNow:0.75 });
 				}
 			}
 			else {

@@ -46,19 +46,39 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 	
 	}
 	
-	var delayTimeInSec(get, never):Int;
-	function get_delayTimeInSec():Int 
+	var delayTimeInSec(get, never):Float;
+	function get_delayTimeInSec():Float 
 	{
-		return  Std.int( Math.ceil( store.state.game.delayTimeLeft/1000)  );
+		return store.state.game.delayTimeLeft / 1000;	
 	}
 	
-	@:watch function watch_delayTimeInSec(val:Int):Void {
+	function startTickDownNow():Void {
 		
-		this.secondsLeft = val;
+		//trace("TO START TICKDOWN");
+		_vData._timer = new Timer(1000);
+		_vData._timer.run = tickDown;
+	}
+	
+	function startTickDown():Void {
+		
+		tickDown();
+		startTickDownNow();
+	}
+	
+	@:watch function watch_delayTimeInSec(val:Float):Void {
+		
+		this.secondsLeft = Std.int( Math.floor(val) ) + 1;
+		
 		if (val > 0) {
 			//trace("SETTING VAL:" + val);
-			_vData._timer = new Timer(1000);
-			_vData._timer.run = tickDown;
+			var f:Float = val - Std.int(val);
+			if (f > 0) {
+			//	trace("TO START");
+				Timer.delay( startTickDown, Std.int( f * 1000) );
+			}
+			else {
+				startTickDown();
+			}
 		}
 		else {
 		//	trace("Stopping VAL:" + val);
@@ -91,6 +111,11 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 		return store.game.gameGetters.totalCards;
 	}
 	
+	var gotDelay(get, never):Bool;
+	function get_gotDelay():Bool 
+	{
+		return store.state.game.delayTimeLeft > 0;
+	}
 
 		
 	override public function Template():String {
@@ -103,8 +128,10 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 					<br/>
 					
 				</div>
-				<button v-on:click="swipe(false)">Left</button>
-				<button v-on:click="swipe(true)">Right</button>
+				<div class="btnswipers" v-show="!gotDelay">
+					<button v-on:click="swipe(false)">Left</button>
+					<button v-on:click="swipe(true)">Right</button>
+				</div>
 			</div>
 		';
 	}
