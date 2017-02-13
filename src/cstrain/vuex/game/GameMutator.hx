@@ -57,7 +57,6 @@ class GameMutator implements IMutator<GameState>
 		
 
 		state.topCard = state._rules.getTopmostCard();
-		state._rules.getNextCardBelow();
 		updateExpression(state);
 		
 	}

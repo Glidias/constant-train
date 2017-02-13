@@ -65,6 +65,7 @@ class GameActions implements IAction<GameState, NoneT>
 					//mutator._setPopupCard(context,false);
 					mutator._setPenalty(context, null);
 					mutator._updateProgress(context);
+					state._rules.getNextCardBelow();
 					mutator._resume(context);
 			case CardResult.NOT_YET_AVAILABLE(timeLeft, penaltyTime):
 				// beep
