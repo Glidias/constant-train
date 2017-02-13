@@ -2,8 +2,10 @@ package cstrain.rules;
 import cstrain.core.Card;
 import cstrain.core.CardResult;
 import cstrain.core.Deck;
+import cstrain.core.GameSettings;
 import cstrain.core.IRules;
 import cstrain.core.PenaltyDesc;
+import cstrain.core.PlayerStats;
 import cstrain.core.Polynomial;
 
 /**
@@ -14,6 +16,8 @@ class TestGame implements IRules
 {
 	// value state
 	var polynomial:Polynomial;
+	
+	var currentPlayerStats:PlayerStats;
 	
 	// card state
 	var deck:Deck;
@@ -27,6 +31,9 @@ class TestGame implements IRules
 	var secretVarValue:Int;
 	var polynomialValue:Int;
 	var polynomialValueCached:Bool = false;
+	
+	var gameSettings:GameSettings = new GameSettings();
+	
 	inline function recreateSecret():Void {
 		secretVarValue = Std.int( Math.ceil( Math.random() * 10 ) );
 		polynomialValueCached = false;
@@ -34,9 +41,13 @@ class TestGame implements IRules
 	inline function getSecretValue():Int {
 		return polynomialValueCached ? polynomialValue : (polynomialValue=getPolynomialValue(secretVarValue));
 	}
+	
+	
 
 	public function new() 
 	{
+		gameSettings.penaltyDelayMs =3000;
+		
 		restart();
 	}
 	
@@ -60,9 +71,9 @@ class TestGame implements IRules
 	}
 	
 	function getFakeValueOf(val:Float):Int {
-		var ceil:Int = Math.ceil(val / 20);
-		if (ceil == 0) ceil = 1;
-		var magnitudeBase:Float = ceil * 20;
+		var ceilVal:Int = Math.ceil(val / 20);
+		if (ceilVal == 0) ceilVal = 1;
+		var magnitudeBase:Float =ceilVal  * 20;
 		var minBase:Int =Std.int(Math.ceil( magnitudeBase/8));
 		return Math.random() >= .5 ? Std.int( val -minBase - Std.int(magnitudeBase*Math.random()) ) : Std.int( val + minBase + Std.int(magnitudeBase*Math.random()) );
 	}
@@ -74,11 +85,11 @@ class TestGame implements IRules
 	}
 	
 	function getFakeValueOfCloserValue(val:Float):Int {
-		var ceil:Int = Math.ceil(val / 20);
-		if (ceil == 0) ceil = 1;
-		var magnitudeBase:Float = ceil * 20;
+		var ceilVal:Int = Math.ceil(val / 20);
+		if (ceilVal == 0) ceilVal = 1;
+		var magnitudeBase:Float = ceilVal * 20;
 		var minBase:Int = Std.int(Math.ceil( magnitudeBase/2));
-		return Math.random() >= .5 ? Std.int( val -minBase - Std.int(magnitudeBase*Math.random()) ) : Std.int( val + minBase + Std.int(magnitudeBase*Math.random()) );
+		return Math.random() >= .5 ? Std.int( val -minBase - Std.int(Math.floor((magnitudeBase*Math.random())) ) ) : Std.int( val + minBase + Std.int( Math.ceil(magnitudeBase*Math.random())) );
 	}
 	
 	
@@ -94,23 +105,22 @@ class TestGame implements IRules
 		
 		if (Card.canOperate(curCard.operator)) {  // handle regular operator stuffz
 			
+			
 			polynomial.performOperation( Card.toOperation(curCard) );
-
+			currentPlayerStats.lastMovedTime = Date.now().getTime();
+			
 			if (isSwipeRight) {
 				if (isConstant()) {
 					// Ok, good, show pop quiz
-					var fakeVal:Int = getFakeValueOf(polynomial.constantInteger);
-					var result:Int = polynomial.constantInteger;
-					trace(fakeVal + ", " + result);
-					return Math.random() >= .5 ? CardResult.GUESS_CONSTANT( Card.getRegularGuessConstantCard(result, fakeVal), false ) :
-												CardResult.GUESS_CONSTANT( Card.getRegularGuessConstantCard(fakeVal, result), false );
+					return Math.random() >= .5 ? CardResult.GUESS_CONSTANT( Card.getRegularGuessConstantCard( polynomial.constantInteger, getFakeValueOf(polynomial.constantValue)), false ) :
+												CardResult.GUESS_CONSTANT( Card.getRegularGuessConstantCard( getFakeValueOf(polynomial.constantValue), polynomial.constantInteger), false );
 				}
 				else {
 					// penalized, stopped in mdidle of nowhere, are you lost? Delay train.
 					// or guess var value result as it currently is, once solved, can continue, must var will be re-scrambled
 					
 					// or force pop quiz of unknown value?
-					return CardResult.PENALIZE({ desc:PenaltyDesc.LOST_IN_TRANSIT, delayNow:2 });
+					return CardResult.PENALIZE({ desc:PenaltyDesc.LOST_IN_TRANSIT, delayNow:0.75 });
 				}
 			}
 			else {
@@ -122,6 +132,7 @@ class TestGame implements IRules
 				}
 				else {
 					// ok , continue as per normal
+					
 					return CardResult.OK;
 				}
 			}
@@ -180,6 +191,7 @@ class TestGame implements IRules
 		return !polynomial.isUnknown;
 	}
 	
+	var commenced:Bool = false;
 	/* INTERFACE cstrain.core.IRules */
 	
 	public function restart():Void {
@@ -188,8 +200,12 @@ class TestGame implements IRules
 		polynomial = new Polynomial();
 		wildGuess = false;
 		recreateSecret();
+		_lastReceivedTime = 0;
+		_penaltyTime = 0;
 		
 		
+		commenced = false;
+		currentPlayerStats = new PlayerStats();
 		buildDeck();
 		
 	}
@@ -199,7 +215,16 @@ class TestGame implements IRules
 	}
 
 	
+	var _penaltyTime:Float;
+	
 	public function playCard(isSwipeRight:Bool):CardResult {
+		
+		var currentTime:Float = Date.now().getTime();
+		var timeCap:Float  = ( _penaltyTime >= gameSettings.minTurnTime ? _penaltyTime : gameSettings.minTurnTime );
+		if (currentTime - _lastReceivedTime < timeCap ) return CardResult.NOT_YET_AVAILABLE( timeCap-(currentTime - _lastReceivedTime) , _penaltyTime);
+		
+		
+		// factor this out elsewhere as one hook
 		var result = getCardResult(isSwipeRight);
 		
 		switch( result ) {
@@ -207,14 +232,24 @@ class TestGame implements IRules
 				this.wildGuess = wildGuess;
 				var c = getConstant();
 				thePopupCard = guessConstantCard;
-				
-			case CardResult.PENALIZE({desc:PenaltyDesc.MISSED_STOP}):
-				wildGuess = true;  // just a convention, whether popup quiz shows up or not
-				var val = getSecretValue();
-				val = getFakeValueOf(val);
-				thePopupCard = Card.getRegularGuessConstantCard( val,  getFakeValueOfCloserValue(val) );
+				currentPlayerStats.reachedStops++;
 			case CardResult.PENALIZE({desc:PenaltyDesc.LOST_IN_TRANSIT}):
 				wildGuess = true;
+				currentPlayerStats.lostInTransits++;
+			case CardResult.PENALIZE({desc:PenaltyDesc.MISSED_STOP}):
+				wildGuess = true;  // just a convention, whether popup quiz shows up or not
+				var to = getSecretValue();
+				if (to != polynomial.constantInteger) {
+					trace("Assertion failed values mismatched between secret and constant at constant station!:" + [to, polynomial.constantInteger] );
+				}
+				var firstChoice = getFakeValueOf(to);
+				var secondChoice = getFakeValueOf(to);
+				if (secondChoice == firstChoice) {
+					secondChoice = getFakeValueOfCloserValue(firstChoice);
+				}
+				thePopupCard = Card.getRegularGuessConstantCard(firstChoice, secondChoice); 
+				
+				currentPlayerStats.missedStops++;
 			case CardResult.PENALIZE({desc:PenaltyDesc.CLOSER_GUESS(_)}) | CardResult.PENALIZE({desc:PenaltyDesc.FURTHER_GUESS(_)}):
 	
 				var v= wildGuess ? getSecretValue() : getConstant();
@@ -222,17 +257,28 @@ class TestGame implements IRules
 				var firstChoice = getCloserValueTo(v, _valueChosen );
 				var secondChoice = getCloserValueTo(v, _valueChosen);
 				if (secondChoice == firstChoice) {
-					secondChoice = getFakeValueOfCloserValue(firstChoice);  // whateer, need to look into this latter
+					secondChoice = getFakeValueOfCloserValue(firstChoice);  // whateer, need to look into this latter to further improve guessability
 				}
 				thePopupCard = Card.getRegularGuessConstantCard(firstChoice, secondChoice); 
-
-			//case CardResult.OK:
-			//	wildGuess = false;
 				
 			default:
 		}
+		
+		
+		switch ( result) {
+			case CardResult.PENALIZE(penalty):
+				if (penalty.delayNow != null){
+					_penaltyTime = penalty.delayNow * gameSettings.penaltyDelayMs;
+				}
+			default:
+				_penaltyTime  = 0;
+		}
+		
+		_lastReceivedTime = currentTime;
 		return result;
 	}
+	
+	private var _lastReceivedTime:Float = 0;
 	
 	inline function getTopCard():Card {
 		return curDeckIndex >= 0 ? curDeck.cards[curDeckIndex] : null;
@@ -241,8 +287,18 @@ class TestGame implements IRules
 		return curDeckIndex >= 1 ? curDeck.cards[curDeckIndex-1] : null;
 	}
 
+	public function getPlayerStats():PlayerStats {
+		return currentPlayerStats; //   .clone();
+	}
+	public function getGameSettings():GameSettings {
+		return gameSettings; //   .clone();
+	}
 	public function getTopmostCard():Card 
 	{
+		if (!commenced) {
+			commenced = true;
+			currentPlayerStats.startTime = Date.now().getTime();
+		}
 		return thePopupCard != null ? thePopupCard : getTopCard();
 	}
 	public function getNextCardBelow():Card 
@@ -255,5 +311,7 @@ class TestGame implements IRules
 		return polynomial;
 	}
 
-	
+	public inline function getDeckIndex():Int {
+		return curDeck.cards.length - curDeckIndex - 1;
+	}
 }

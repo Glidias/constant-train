@@ -2,7 +2,6 @@ package cstrain.vuex.game;
 import cstrain.core.IRules;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VModule;
-import haxevx.vuex.core.VxStore;
 
 /**
  * ...
@@ -26,7 +25,7 @@ class GameModule extends VModule<GameState, NoneT>
 	override public function _InjNative(g:Dynamic) {
 		super._InjNative(g);
 		this.state._rules = rules;
-	
+		
 		
 	}
 	
