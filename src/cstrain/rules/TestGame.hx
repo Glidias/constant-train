@@ -301,9 +301,64 @@ class TestGame implements IRules
 		}
 		return thePopupCard != null ? thePopupCard : getTopCard();
 	}
+	
+	private var _lastResultTest:Polynomial;
+	
 	public function getNextCardBelow():Card 
 	{
-		return thePopupCard != null ?  getTopCard() : getBelowCardCard();
+		
+		var result:Card = thePopupCard != null ?  getTopCard() : getBelowCardCard();
+		if ( thePopupCard == null && result.operator == Card.OPERATOR_DIVIDE && result.varValues==null ) {  
+			// check if division is possible and modify card if necessary
+			var topCard:Card = getTopCard();
+			var simulateTopResult:Polynomial;
+			if (Card.canOperate(topCard.operator)) {
+				simulateTopResult = polynomial.performOperationImmutable( Card.toOperation(topCard) );
+				_lastResultTest = simulateTopResult;
+			}
+			else {
+				trace("Unforeseen card expected operatable for getNextCardBelow()");
+				simulateTopResult = polynomial.clone();
+			}
+			
+			if ( result.isVar ) {	// variable x division case
+				// check factorisable
+				if (simulateTopResult.coefs[0] == 0) {	// trivial case no need factorisation
+					return result;
+				}
+				else {
+					var factors = simulateTopResult.factorisation();
+					if (factors.length != 0 ) {
+						// modifiy card to match one of the given factors in order to perform polynomial divisiion
+						// Convention, pick factor of highest length to act as divisor? Or just random with factorisation seed...?
+					}
+					else {
+						// perform alternative for result  (deriative or divide-see-quotient-only)
+					}
+					return result;
+				}
+				
+			}
+			else {	// Non-variable division case
+				var cf:Int = simulateTopResult.findCommonFactor();
+				if (cf != 1) {
+					// adjust division to match hcf (gcd) to be cloest to card value
+					if (cf <= result.value) {
+						return result;
+					}
+					else {
+						// figure out best common factor cloest from..to...gcf, limit to MAX_ITER else use GCF
+						
+					}
+				}
+				else {
+					// perform alternative for result (deriative or divide-see-quotient-only)
+				}
+				return result;
+			}
+			
+		}
+		return result;
 	}
 	
 	public function getPolynomial():Polynomial 

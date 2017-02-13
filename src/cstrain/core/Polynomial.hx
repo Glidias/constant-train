@@ -142,7 +142,7 @@ class Polynomial
 	
 
 	
-	static function gcd(x:Float, y:Float):Float {
+	static function gcd(x:Float, y:Float):Int {
 		var z:Int = 1;
 		 x = Math.abs(Std.int(x));
 		 y = Math.abs(Std.int(y));
@@ -151,10 +151,10 @@ class Polynomial
 			x = y;
 			y = z;
 		}
-		return x;
+		return Std.int(x);
 	}
 
-	static function gcd_mult(ref:Array<Float>):Float  {
+	static function gcd_mult(ref:Array<Float>):Int  {
 		var d:Float = ref[ref.length - 1];
 		var i:Int = ref.length - 1;
 		while (--i > -1) {
@@ -162,7 +162,7 @@ class Polynomial
 				d = gcd(d, ref[i]);
 			}
 		}
-		return d;
+		return Std.int(d);
 	}
 	
 	public function addToArray<T>(a:Array<T>, ref:Array<T>) { 
@@ -489,6 +489,30 @@ class Polynomial
 			if (coefs[i] != 0) break;
 			else coefs.pop();
 		}
+	}
+	
+	public function performOperationImmutable(op:Operation):Polynomial {
+		var result:Polynomial = null;
+		switch( op ) {
+			case Operation.ADD(value, isVar): 
+				result = add(Polynomial.fromCoefs( isVar ? [0, value] : [value] ) );
+			case Operation.SUBTRACT(value, isVar):
+				result = sub( Polynomial.fromCoefs( isVar ? [0, value] : [value]  ));
+			case Operation.MULTIPLY(value, isVar):
+				result = mul( Polynomial.fromCoefs( isVar ? [0, value] : [value]  ) );
+			case Operation.DIVIDE(value, isVar):
+				if (value == 0) throw "Divide by zero error detected!";
+				if (isVar) {
+					result = div( Polynomial.fromCoefs( [0, value] ) );
+				}
+				else {
+					result = mul( Polynomial.fromCoefs( [1/value] ) );
+				}	
+			default:
+				trace("UInaccounted for operation:" + op);
+		}
+		
+		return result;
 	}
 	
 	// game specific simplified operations (mutative)
