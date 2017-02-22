@@ -442,6 +442,8 @@ class Polynomial
 		return arr.join(" ");
 	}
 	
+	
+	
 	public static function Copy(poly:Polynomial):Polynomial {
 		var me:Polynomial = new Polynomial();
 	
@@ -508,6 +510,9 @@ class Polynomial
 				else {
 					result = mul( Polynomial.fromCoefs( [1/value] ) );
 				}	
+			case Operation.DIVIDE_BY_POLYNOMIAL(values):
+				trace("This shouldn't happen DIVIDE_BY_POLYNIMAL for immutable");
+				result =  div( Polynomial.fromCoefs(values) );
 			default:
 				trace("UInaccounted for operation:" + op);
 		}
@@ -554,6 +559,12 @@ class Polynomial
 						coefs[i] /= value;
 					}
 				}
+			case Operation.DIVIDE_BY_POLYNOMIAL(values):
+				trace("Dividing by polynomial:" + values);
+				var resultTest = div( Polynomial.fromCoefs(values) );
+				copyFrom( resultTest );
+				trace( resultTest.coefs + " vs "+coefs);
+				
 			default:
 				trace("UInaccounted for operation:" + op);
 		}

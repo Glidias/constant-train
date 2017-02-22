@@ -1,4 +1,5 @@
 package cstrain.vuex.components;
+import cstrain.core.Polynomial;
 import cstrain.vuex.game.GameActions;
 import cstrain.vuex.store.GameStore;
 import haxe.Timer;
@@ -57,6 +58,7 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 		//trace("TO START TICKDOWN");
 		_vData._timer = new Timer(1000);
 		_vData._timer.run = tickDown;
+		
 	}
 	
 	function startTickDown():Void {
@@ -138,7 +140,7 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 	
 	
 	static  function getCardCopy(card:Card):String {
-		return  ( Card.canOperate(card.operator) ?  Card.stringifyOp(card.operator) : "") + ( card.isVar ? "n" : card.value+"" ) ;
+		return  ( Card.canOperate(card.operator) ?  Card.stringifyOp(card.operator) : "") + ( card.isPolynomialOfVars() ?  "("+Polynomial.PrintOut(card.getPolynomial(), "n", true)+")" :  ( card.isVar ? "n" : card.value+"" )) ;
 	}
 	
 

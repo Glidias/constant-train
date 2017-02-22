@@ -304,11 +304,29 @@ class TestGame implements IRules
 	
 	private var _lastResultTest:Polynomial;
 	
+	private function pickAFactor(factors:Array<Polynomial>):Polynomial {
+		// Convention, pick factor of highest length to act as divisor? Or just random with factorisation seed...?
+		var candidates:Array<Polynomial> = [];
+		for ( i in 0...factors.length) {
+			var f:Polynomial = factors[i];
+			if ( f.coefs.length > 1) {
+					candidates.push(f);
+			}
+		}
+		return candidates.length != 0 ? candidates[Std.int(Math.random() * candidates.length)] : factors[Std.int(Math.random() * factors.length)];
+		
+	}
+	
+	public function arrPolynomialNot1(poly:Polynomial):Bool {
+		return poly.coefs.length  >  1  || Math.abs(poly.coefs[0]) != 1;
+	}
+	
 	public function getNextCardBelow():Card 
 	{
 		
 		var result:Card = thePopupCard != null ?  getTopCard() : getBelowCardCard();
-		if ( thePopupCard == null && result.operator == Card.OPERATOR_DIVIDE && result.varValues==null ) {  
+		if ( thePopupCard == null && result.operator == Card.OPERATOR_DIVIDE && result.varValues == null ) {  
+			trace("To process card to polynomial");
 			// check if division is possible and modify card if necessary
 			var topCard:Card = getTopCard();
 			var simulateTopResult:Polynomial;
@@ -324,16 +342,25 @@ class TestGame implements IRules
 			if ( result.isVar ) {	// variable x division case
 				// check factorisable
 				if (simulateTopResult.coefs[0] == 0) {	// trivial case no need factorisation
+					result.setPolynomial( Polynomial.fromCoefs([0, result.value]));
+					
 					return result;
 				}
 				else {
 					var factors = simulateTopResult.factorisation();
-					if (factors.length != 0 ) {
-						// modifiy card to match one of the given factors in order to perform polynomial divisiion
-						// Convention, pick factor of highest length to act as divisor? Or just random with factorisation seed...?
+					factors = factors.filter(arrPolynomialNot1);
+					if (factors.length > 1 ) {
+						trace("Found a valid polynomial factor!");
+						var vFactor:Polynomial  = pickAFactor(factors);
+						result.setPolynomial(vFactor);
+						
 					}
 					else {
 						// perform alternative for result  (deriative or divide-see-quotient-only)
+						// if no polynomail used for division, then it would be a divide see quotient only operation
+						result.operator = Card.OPERATOR_QUOTIENT;
+						result.setPolynomial(Polynomial.fromCoefs([0, result.value ]) );
+						// else use deriative operation
 					}
 					return result;
 				}
@@ -344,15 +371,25 @@ class TestGame implements IRules
 				if (cf != 1) {
 					// adjust division to match hcf (gcd) to be cloest to card value
 					if (cf <= result.value) {
+						result.value = cf;
+						result.varValues = EMPTY_ARRAY;
 						return result;
 					}
 					else {
 						// figure out best common factor cloest from..to...gcf, limit to MAX_ITER else use GCF
 						
+						result.value = cf;  // (NOTE: lazy..) for now, this would be fine
+						result.varValues = EMPTY_ARRAY;
+						return result; 
 					}
 				}
 				else {
 					// perform alternative for result (deriative or divide-see-quotient-only)
+					result.operator = Card.OPERATOR_QUOTIENT;
+					result.value = cf;  // (NOTE: lazy..) for now, this would be fine
+					result.varValues = EMPTY_ARRAY;
+					// or consider derirative
+					
 				}
 				return result;
 			}
@@ -360,6 +397,8 @@ class TestGame implements IRules
 		}
 		return result;
 	}
+	
+	static var EMPTY_ARRAY:Array<Int> = [];
 	
 	public function getPolynomial():Polynomial 
 	{

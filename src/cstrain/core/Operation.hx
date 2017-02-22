@@ -10,6 +10,6 @@ enum Operation
 	SUBTRACT(val:Float, varSuffix:Bool);
 	MULTIPLY(val:Float, varSuffix:Bool);
 	DIVIDE(val:Float, varSuffix:Bool);
-	
+	DIVIDE_BY_POLYNOMIAL(coefs:Array<Float>);
 	EQUAL(val:Float, varSuffix:Bool);
 }
