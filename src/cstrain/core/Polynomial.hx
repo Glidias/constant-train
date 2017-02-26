@@ -33,7 +33,7 @@ class Polynomial
 			return 0;
 		}
 		if (  !isWholeNum(coefs[0]) || !isWholeNum(coefs[coefs.length - 1]) ) {
-			//trace("Invalid not whole number coeffs!");
+			trace("Invalid not whole number coeffs!");
 			return null;
 		}
 		
@@ -104,14 +104,20 @@ class Polynomial
 
 	}
 	
-	public function factorisation():Array<Polynomial> {
+	/*
+	 toCHECK
+/2=0.5 coef  // does this hapen anymore with allowFloatCoef flag?
+
+	 */
+	
+	public function factorisation(allowFloatCoef:Bool=false):Array<Polynomial> {
 		
 		 var factors:Array<Polynomial> = [];
 
 		var root = findRoot();
+
+		if (root != null && (allowFloatCoef || isWholeNum(root) ) ) { 
 			
-		if (root != null) {
-			//trace("Found root:" + root);
 			factors.push( Polynomial.fromCoefs([ -root, 1]) );
 			var p:Polynomial = clone();
 				
@@ -126,7 +132,7 @@ class Polynomial
 			var cf = p.findCommonFactor();
 			if (cf != 1) {
 				 for (i in 0...coefs.length) {
-					coefs[i] /= cf;
+					p.coefs[i] /= cf;
 				}
 				factors.push( Polynomial.fromCoefs([cf]));
 			}

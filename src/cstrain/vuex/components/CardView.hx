@@ -140,7 +140,10 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 	
 	
 	static  function getCardCopy(card:Card):String {
-		return  ( Card.canOperate(card.operator) ?  Card.stringifyOp(card.operator) : "") + ( card.isPolynomialOfVars() ?  "("+Polynomial.PrintOut(card.getPolynomial(), "n", true)+")" :  ( card.isVar ? "n" : card.value+"" )) ;
+		var isPolynomialOfVars:Bool =  card.isPolynomial();  // required to factor out condition for reactivity!
+	
+		var cardIsVar:Bool = card.isVar;
+		return  ( Card.canOperate(card.operator) ?  Card.stringifyOp(card.operator) : "") + ( isPolynomialOfVars ?  "("+Polynomial.PrintOut(card.getPolynomial(), "n", true)+")" :  ( card.isVar ? "n" : card.value+"" )) ;
 	}
 	
 

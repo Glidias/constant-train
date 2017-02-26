@@ -46,7 +46,7 @@ class TestGame implements IRules
 
 	public function new() 
 	{
-		gameSettings.penaltyDelayMs =3000;
+		gameSettings.penaltyDelayMs =1000;
 		
 		restart();
 	}
@@ -338,6 +338,7 @@ class TestGame implements IRules
 				trace("Unforeseen card expected operatable for getNextCardBelow()");
 				simulateTopResult = polynomial.clone();
 			}
+			trace("Considering simulated result:" + simulateTopResult);
 			
 			if ( result.isVar ) {	// variable x division case
 				// check factorisable
@@ -347,10 +348,12 @@ class TestGame implements IRules
 					return result;
 				}
 				else {
+					
 					var factors = simulateTopResult.factorisation();
 					factors = factors.filter(arrPolynomialNot1);
 					if (factors.length > 1 ) {
 						trace("Found a valid polynomial factor!");
+						trace("among:" + factors);
 						var vFactor:Polynomial  = pickAFactor(factors);
 						result.setPolynomial(vFactor);
 						

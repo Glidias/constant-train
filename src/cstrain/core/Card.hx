@@ -43,7 +43,7 @@ class Card
 			case OPERATOR_ADD: return Operation.ADD(card.value, card.isVar);
 			case OPERATOR_SUBTRACT: return Operation.SUBTRACT(card.value, card.isVar);
 			case OPERATOR_MULTIPLY: return Operation.MULTIPLY(card.value, card.isVar);
-			case OPERATOR_DIVIDE | OPERATOR_QUOTIENT: return card.isPolynomialAny() ? Operation.DIVIDE_BY_POLYNOMIAL( intArrayToFloatArr([card.value].concat(card.varValues) ) ) : Operation.DIVIDE(card.value, card.isVar); 
+			case OPERATOR_DIVIDE | OPERATOR_QUOTIENT: return card.isPolynomial() ? Operation.DIVIDE_BY_POLYNOMIAL( intArrayToFloatArr([card.value].concat(card.varValues) ) ) : Operation.DIVIDE(card.value, card.isVar); 
 	
 			
 			case OPERATION_EQUAL: return Operation.EQUAL(card.value, card.isVar);
@@ -62,20 +62,19 @@ class Card
 	public var varValues:Array<Int> = null; // mainly for holding polynormial variable coeffecient values (if any) from degree 1 onwards. 
 	// If empty array, means an attempt was made to set it to a polynomial, but is ended up being a non-variable.
 	
-	public inline function isPolynomialOfVars():Bool {
-		return varValues != null && varValues.length > 1;
-	}
 
-	public inline function isPolynomialAny():Bool {
+
+	public inline function isPolynomial():Bool {
 		return varValues != null && varValues.length > 0;
 	}
 	
 	public function setPolynomial(polynomial:Polynomial):Void {
 		var values:Array<Float> =  polynomial.coefs.slice(1);
-		varValues  = [];
+		var varValues  = [];
 		for (i in 0...values.length) {
 			varValues[i] =Std.int( values[i]);
 		}
+		this.varValues = varValues;
 		value = Std.int(polynomial.coefs[0]);
 		isVar = varValues.length != 0;
 	}
