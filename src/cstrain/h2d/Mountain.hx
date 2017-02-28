@@ -27,9 +27,8 @@ class Mountain extends Entity
         
         generateHeightMap();
         createShape();
+	
 		
-		width = getBounds().width;
-		//trace("My width:" + width);
     }
 	
 	var width:Float;
@@ -37,14 +36,18 @@ class Mountain extends Entity
     public override function update():Void
     {
         x += speed;
+		//trace(x);
 	
         if (x < -(width - SceneSettings.WIDTH)) {
+			
             var removeSegmentNumber:Int = Std.int(  (width - SceneSettings.WIDTH) / SEGMENT_LENGTH );
             heightMap.splice(0, removeSegmentNumber);
+			
             x += removeSegmentNumber * SEGMENT_LENGTH;
             
             generateHeightMap();
             createShape();
+	
         }
     }
     
@@ -52,7 +55,7 @@ class Mountain extends Entity
     {
         // 再帰で分割していく
         divide(baseHeight, baseHeight, 0, 200);
-        
+        width =  heightMap.length * SEGMENT_LENGTH; // getBounds().width;
         
     }
     
@@ -65,7 +68,9 @@ class Mountain extends Entity
 			divide(half, right, depth + 1, offset / 2);
 		} else {
 			// 十分に分割したら順番に書き出し
+			//if (heightMap.length != 0) trace(Math.abs(left- heightMap[heightMap.length-1] ));
 			heightMap.push(left);
+		
 		}
 	}
 		
@@ -73,7 +78,7 @@ class Mountain extends Entity
     function createShape():Void
     {
         var g:Graphics = graphics;
-        
+      
         g.clear();
         g.beginFill(color);
         g.moveTo(0, SceneSettings.HEIGHT);
@@ -89,5 +94,7 @@ class Mountain extends Entity
         g.lineStyle(1, color);
         g.moveTo(0, heightMap[0]);
         g.lineTo(0, SceneSettings.HEIGHT * 2);
+		
+		
     }
 }

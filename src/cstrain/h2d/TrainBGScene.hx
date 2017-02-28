@@ -2,7 +2,11 @@ package cstrain.h2d;
 import cstrain.util.CSMath;
 import h2d.Sprite;
 import h2d.Graphics;
+import h2d.SpriteBatch;
+import h2d.Tile;
 import h2d.css.Fill;
+import h3d.mat.Data.TextureFlags;
+import h3d.mat.Texture;
 
 import h2d.css.Defs;
 
@@ -29,7 +33,7 @@ class TrainBGScene extends hxd.App
 	
 		s2d.addChild( scene = new Sprite());
 		
-		
+
 
 		var g = new h2d.Graphics(s2d);
 	
@@ -67,7 +71,29 @@ class TrainBGScene extends hxd.App
 		
 		  restoreFilters(debug);
 		  
-		  
+
+		  /*
+		var gTriTest:Graphics = new Graphics(s2d);
+		
+		gTriTest.beginFill(0xFF0000, 1);
+		gTriTest.lineTo(64, 64);
+		gTriTest.lineTo(64, 0);
+		gTriTest.lineTo(0, 0);
+		 gTriTest.endFill();
+		 var tx:h3d.mat.Texture = new Texture(64, 64, [ TextureFlags.Target]);
+		 gTriTest.drawTo( tx);
+		 var tile:Tile =  Tile.fromTexture(tx);
+		 var spriteBatch:SpriteBatch = new SpriteBatch(tile, s2d);
+		 spriteBatch.hasRotationScale = true;
+		 var e;
+		 spriteBatch.add( e=new BatchElement(tile));
+		//  gTriTest.scaleX = 10;
+
+		e.scaleX = -1;// 1 / 64 * 10;
+		//e.scaleY = 1 / 64 * 15;
+		 e.x = 100;
+		  e.y  = 100;
+		  */
 	
 	}
 
