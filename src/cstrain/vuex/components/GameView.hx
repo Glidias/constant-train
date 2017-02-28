@@ -35,7 +35,7 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 	
 	override public function Created():Void {
 		mutator._resume(store);
-		
+
 	}
 	
 	function toggleExpression() {

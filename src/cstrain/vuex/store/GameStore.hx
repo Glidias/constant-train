@@ -22,7 +22,7 @@ class GameStore extends VxStore<GameStoreState>
 		state = new GameStoreState();
 		
 		game = new GameModule(rules);
-
+		
 	}
 	
 	

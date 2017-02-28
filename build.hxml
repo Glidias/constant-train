@@ -2,5 +2,6 @@
 
 -cp src
 -js bin/ConstantTrain.js
+-lib heaps
 -D vue_global
 -main Main

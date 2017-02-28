@@ -46,7 +46,7 @@ class TestGame implements IRules
 
 	public function new() 
 	{
-		gameSettings.penaltyDelayMs =1000;
+		gameSettings.penaltyDelayMs =2000;
 		
 		restart();
 	}
