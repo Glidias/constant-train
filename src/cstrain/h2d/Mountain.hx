@@ -33,9 +33,9 @@ class Mountain extends Entity
 	
 	var width:Float;
     
-    public override function update():Void
+    public override function update(dt:Float):Void
     {
-        x += speed;
+        x += speed * dt;
 		//trace(x);
 	
         if (x < -(width - SceneSettings.WIDTH)) {

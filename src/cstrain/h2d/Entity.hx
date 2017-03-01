@@ -6,6 +6,6 @@ package cstrain.h2d;
  */
 class Entity extends h2d.Sprite
 {
-    public function update():Void { }
+    public function update(dt:Float):Void { }
     public function restoreFilter(debug:Bool):Void { }
 }

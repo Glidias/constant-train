@@ -1,4 +1,5 @@
 package cstrain.h2d;
+import cstrain.core.IBGTrain;
 import cstrain.util.CSMath;
 import h2d.Sprite;
 import h2d.Graphics;
@@ -15,25 +16,105 @@ import h2d.css.Defs;
  * wip.
  * @author Glidias
  */
-class TrainBGScene extends hxd.App
+class TrainBGScene extends AbstractBGScene implements IBGTrain
 {
-	 private var debug:Bool = false;
+	
+	private var entities:Array<Entity> = new Array<Entity>();
+	var scene:Sprite;
+	private var debug:Bool = false;
+	
 
 	public function new() 
 	{
 		super();
 	}
 	
-	private var entities:Array<Entity> = new Array<Entity>();
-	var scene:Sprite;
+
+	// -- The impl for IBGTrain
 	
+
+	var _curLoc:Float = 0;
+	
+	var _targetDest:Float;
+	var _maxSpeed:Float = 1;
+	var _reseting:Bool = true;
+	
+	var _cruisingSpeed:Float = 1;  
+	static inline var PUSH_FORWARD_ERROR:Float = .75;
+	
+	/* INTERFACE cstrain.core.IBGTrain */
+	
+	public function resetTo(index:Int):Void 
+	{
+		_reseting = true;
+		_targetDest = index;
+		
+	}
+	
+	public function travelTo(index:Int):Void 
+	{
+		_targetDest = index;
+	}
+	
+	public function stopAt(index:Int):Void 
+	{
+		_targetDest = index;
+	}
+	
+	public function missStopAt(index:Int):Void 
+	{
+		if ( _curLoc <= index + PUSH_FORWARD_ERROR) {
+			_targetDest =  index + PUSH_FORWARD_ERROR;
+		}
+		else _targetDest = index;
+	}
+	
+	
+	public function setMaxSpeed(maxSpeed:Float):Void 
+	{
+		_maxSpeed = maxSpeed;
+	}
+	
+	public function setCruisingSpeed(speed:Float):Void 
+	{
+		_cruisingSpeed = speed;
+	}
+	
+	// ---
+	
+	
+	// Called each frame
+	override function update(dt:Float) {
+		for ( entity in entities)
+		{
+			entity.update(dt*1);
+		}
+		
+		//emitter.step();
+		
+		//renderedScene.fillRect(renderedScene.rect, 0);
+		//renderedScene.draw(scene);
+		//sun.update();
+		
+		/*
+		if (soundRunChannel && soundRunChannel.position >= 14025)
+		{
+			soundRunChannel.stop();
+			soundRunChannel = soundRun.play(3169);
+			trace(soundRunChannel.position);
+		}
+		*/
+		
+	}
+	
+	// -- The port
+	
+	
+
 	override function init() {
-		SceneSettings.WIDTH = s2d.width;
-		SceneSettings.HEIGHT = s2d.height;
+		super.init();
 	
 		s2d.addChild( scene = new Sprite());
-		
-
 
 		var g = new h2d.Graphics(s2d);
 	
@@ -98,29 +179,7 @@ class TrainBGScene extends hxd.App
 	}
 
 
-	// Called each frame
-	override function update(dt:Float) {
-		for ( entity in entities)
-		{
-			entity.update();
-		}
-		
-		//emitter.step();
-		
-		//renderedScene.fillRect(renderedScene.rect, 0);
-		//renderedScene.draw(scene);
-		//sun.update();
-		
-		/*
-		if (soundRunChannel && soundRunChannel.position >= 14025)
-		{
-			soundRunChannel.stop();
-			soundRunChannel = soundRun.play(3169);
-			trace(soundRunChannel.position);
-		}
-		*/
-		
-	}
+
 	
 	function restoreFilters(debug:Bool):Void
 	{
