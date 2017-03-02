@@ -34,8 +34,6 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	
 
 	// -- The impl for IBGTrain
-	
-
 	var _curLoc:Float = 0;
 	
 	var _targetDest:Float = 0;
@@ -46,7 +44,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	static inline var PUSH_FORWARD_ERROR:Float = .75;
 	
 	
-	var _maxSpeed:Float = 1;
+	var _maxSpeed:Float = 3;
 	var _isStarted:Bool = false;
 	var _startIndex:Int = -1;
 	var _tweenProgress:Float = 0;
@@ -141,7 +139,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	
 	
 		if (Key.isPressed(Key.G)) {
-			travelTo( Std.int(_targetDest + 2) );
+			travelTo( Std.int(_targetDest + 12) );
 		
 		}
 		
@@ -166,33 +164,29 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				tarLoc = CSMath.lerp( _startIndex, _targetDest,  _tweenProgress / _tweenDuration);
 			}
 			else if (_tweenProgress < pickupTimeDur) {
-				trace("PICKUP:" + _curLoc);
-				//_curLoc = (_tweenProgress / pickupTimeDur);
-				//_curLoc = _curLoc * _curLoc * _curLoc;
+				//trace("PICKUP:" + _curLoc);
+
 				tarLoc = (_tweenProgress / unitTimeLength);	
 				tarLoc = tarLoc * tarLoc * tarLoc;
 				
 			}
 			else if ( _tweenProgress >=  _tweenDuration  - pickupTimeDur) {
-				trace("PICKDOWN:" + _curLoc + "/" + _targetDest);
-			//	tarLoc = _tweenProgress - _tweenDuration - pickupTimeDur;
-			//	tarLoc = _tweenProgress / unitTimeLength;
-				//tarLoc = ((_tweenDuration-_tweenProgress) / unitTimeLength);	
-				//trace((_tweenDuration-_tweenProgress));
-				
-				tarLoc = _tweenProgress - _tweenDuration + pickupTimeDur;
+				//trace("PICKDOWN:" + _curLoc + "/" + _targetDest);
+	
+				tarLoc = _tweenProgress - _tweenDuration + unitTimeLength;
 				tarLoc /= unitTimeLength;
-		
+
+				tarLoc--;
+				tarLoc = tarLoc * tarLoc * tarLoc + 1;
 			
-				tarLoc = tarLoc * tarLoc * tarLoc;
-				
-				tarLoc += _targetDest - _pickupTime;
-				//_isStarted = false;
-						
+					
+				tarLoc += _targetDest - 1;
+	
 			}
 			else {
-				tarLoc = CSMath.lerp( _pickupTimeDistCovered, _targetDest - _pickupTime, (_tweenProgress - pickupTimeDur) / (_tweenDuration -pickupTimeDur*2 ) );
-		
+				//trace("CONSTANT:" +_curLoc);
+				tarLoc = CSMath.lerp( _pickupTimeDistCovered, _targetDest - _pickupTimeDistCovered, (_tweenProgress - pickupTimeDur) / (_tweenDuration -pickupTimeDur*2 ) );
+			//trace( (_targetDest - _pickupTimeDistCovered) -_pickupTimeDistCovered + _pickupTimeDistCovered*2); 
 			}
 			
 			var diff = (tarLoc - _curLoc)*unitTimeLength;
@@ -200,7 +194,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				tarLoc = _targetDest;
 				diff = (tarLoc - _curLoc) * unitTimeLength;
 			}
-		//	trace( _tweenProgress / _tweenDuration);
+	
 			for ( entity in entities)
 			{
 				entity.update(diff);

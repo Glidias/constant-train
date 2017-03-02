@@ -10,8 +10,8 @@ interface IBGTrain
 	function stopAt(index:Int):Void; 
 	function missStopAt(index:Int):Void; 
 	
-	// minimum amount of indices the train can move in a single second. 
+	// cruising speed => "comfortable" moving speed. May not be used ingame or as part of gameplay.
 	function setCruisingSpeed(speed:Float):Void;
-	// maximum amount of indices the train can move in a single second.
+	// maximum amount of indices the train can move in a single second. Often used in gameplay.
 	function setMaxSpeed(maxSpeed:Float):Void;
 }
