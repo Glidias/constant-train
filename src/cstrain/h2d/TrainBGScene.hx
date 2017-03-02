@@ -44,7 +44,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	static inline var PUSH_FORWARD_ERROR:Float = .75;
 	
 	
-	var _maxSpeed:Float = 3;
+	var _maxSpeed:Float = 1;
 	var _isStarted:Bool = false;
 	var _startIndex:Int = -1;
 	var _tweenProgress:Float = 0;
@@ -72,7 +72,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	}
 	/* INTERFACE cstrain.core.IBGTrain */
 	
-	var unitTimeLength:Float = hxd.Timer.wantedFPS  / 1;		// total frames for each unitTimeLength
+	var unitTimeLength:Float = hxd.Timer.wantedFPS  / 1;	// how much dt equates to 1 unit world distance
 	
 	public function resetTo(index:Int):Void 
 	{
@@ -90,6 +90,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 		if (!_isStarted) {
 			_isStarted = true;
 			_startIndex = Std.int(_curLoc);
+			trace("START:" + _startIndex);
 			_tweenProgress = 0;
 			_tweenDuration = (index - _startIndex ) * unitTimeLength/_maxSpeed +  _pickupTimeDiff*2 * unitTimeLength;  // consider time difference of both acceleration and de-acceleration 
 			_startIndexTime = haxe.Timer.stamp();
@@ -139,7 +140,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	
 	
 		if (Key.isPressed(Key.G)) {
-			travelTo( Std.int(_targetDest + 12) );
+			travelTo( Std.int(_targetDest + 1 + _maxSpeed) );
 		
 		}
 		
@@ -167,7 +168,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				//trace("PICKUP:" + _curLoc);
 
 				tarLoc = (_tweenProgress / unitTimeLength);	
-				tarLoc = tarLoc * tarLoc * tarLoc;
+				tarLoc = _startIndex + tarLoc * tarLoc * tarLoc;
 				
 			}
 			else if ( _tweenProgress >=  _tweenDuration  - pickupTimeDur) {
@@ -180,12 +181,12 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				tarLoc = tarLoc * tarLoc * tarLoc + 1;
 			
 					
-				tarLoc += _targetDest - 1;
+				tarLoc +=  _targetDest - 1;
 	
 			}
 			else {
 				//trace("CONSTANT:" +_curLoc);
-				tarLoc = CSMath.lerp( _pickupTimeDistCovered, _targetDest - _pickupTimeDistCovered, (_tweenProgress - pickupTimeDur) / (_tweenDuration -pickupTimeDur*2 ) );
+				tarLoc = CSMath.lerp( _startIndex+_pickupTimeDistCovered, _targetDest - _pickupTimeDistCovered, (_tweenProgress - pickupTimeDur) / (_tweenDuration -pickupTimeDur*2 ) );
 			//trace( (_targetDest - _pickupTimeDistCovered) -_pickupTimeDistCovered + _pickupTimeDistCovered*2); 
 			}
 			
