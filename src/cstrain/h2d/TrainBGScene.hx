@@ -44,7 +44,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	static inline var PUSH_FORWARD_ERROR:Float = .75;
 	
 	
-	var _maxSpeed:Float = 3;
+	var _maxSpeed:Float = 1;
 	var _isStarted:Bool = false;
 	var _startIndex:Float = -1;
 	var _tweenProgress:Float = 0;
@@ -146,6 +146,15 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 		
 		}
 		
+		
+		if (_pickupTimeDistCovered * 2 >= ( _targetDest - _startIndex) ) {
+			var y = (_targetDest - _startIndex) / 2;
+		//	trace("old tween duration:" + _tweenDuration);
+			_tweenDuration = Math.pow(y, 1 / 3) * 2 * unitTimeLength;
+			trace("New tween duration for crossover: "+_tweenDuration);
+			
+		}
+		
 		// Does the formula to derive tween duration also apply to crossover pickup/pickdown time cases?
 		/*
 				
@@ -159,7 +168,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 		//trace((_tweenDuration / unitTimeLength) + ", " + _pickupTime + ", " + _pickupTimeDiff + " :: "+_pickupTimeDistCovered);
 		1.666666666666667, 1, 0.6666666666666667 :: 1
 		*/
-		trace((_tweenDuration / unitTimeLength) + ", " + _pickupTime + ", " + _pickupTimeDiff + " :: "+_pickupTimeDistCovered);
+		//trace((_tweenDuration / unitTimeLength) + ", " + _pickupTime + ", " + _pickupTimeDiff + " :: "+_pickupTimeDistCovered);
 		
 	}
 	
@@ -224,29 +233,30 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 			_braking = false;
 			
 			var tarLoc:Float = 0;
-			if (pickupTimeDur * 2 >= _tweenDuration) {
+			var exceed:Bool = _pickupTimeDistCovered * 2 >= ( _targetDest - _startIndex) ;
+			var exceed2:Bool = pickupTimeDur * 2   >= _tweenDuration;
+			if (exceed != exceed2) trace("Error MISMATCH assertion!");
+			if (exceed) {
 				
 				// assume pickup is same as pickdown timing
-				if (_tweenProgress >= _tweenDuration  * .5) {  // pickdown, but early push forward
+				if ( _tweenProgress >= _tweenDuration  * .5) {  // pickdown, but early push forward
 					
-					// todo: this assumption is wrong...
 					_braking = true;
-					tarLoc = _tweenProgress - _tweenDuration  * .5;
+					tarLoc = _tweenProgress - _tweenDuration + unitTimeLength;
 					tarLoc /= unitTimeLength;
-					tarLoc = 1 - tarLoc;
-					
-					trace("Braking...:");
+					trace("Braking..");
 					//trace("PICKDOWN:" + _curLoc+  " : "+tarLoc);
 					tarLoc--;
 					tarLoc = tarLoc * tarLoc * tarLoc + 1;
 				
 						
 					tarLoc +=  _targetDest - 1;  // assumption pickdown span ==1
-					_isStarted = false;
+					
+					
 					
 				}
 				else {  // same as regular pickup
-					
+					trace("Partial pickup...");
 					tarLoc = (_tweenProgress / unitTimeLength);	
 					tarLoc = _startIndex + tarLoc * tarLoc * tarLoc;
 				}
