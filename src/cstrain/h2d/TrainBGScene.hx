@@ -112,7 +112,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 		}
 		else {
 			
-			if (isDeaccelerating()) { // adjust pickup based on current de-accelerate slope
+			if (_braking) { // adjust pickup based on current de-accelerate slope
 				
 				// recalculated projected target location again for deacceleration graph, just in case for better frame accruacy.
 				var tarLoc:Float = _tweenProgress - _tweenDuration + unitTimeLength;
@@ -182,9 +182,9 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	
 	var curTime:Float = 0;
 	
-	inline function isDeaccelerating():Bool {
-		return _isStarted && _tweenProgress >=  _tweenDuration  -  _pickupTime * unitTimeLength;
-	}
+
+	
+	var _braking:Bool = true;
 	
 	override function update(dt:Float) {
 	
@@ -203,30 +203,52 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 		
 		
 		if (_isStarted) {
-	
 			
 			if (_tweenProgress > _tweenDuration) _tweenProgress = _tweenDuration;  // force clammp tween progress to duration
 			
 			var pickupTimeDur:Float = _pickupTime * unitTimeLength;
+			_braking = false;
 			
 			var tarLoc:Float = 0;
 			if (pickupTimeDur * 2 >= _tweenDuration) {
-				//trace("TODO: half pickup/pickdown case!!");
-				tarLoc = CSMath.lerp( _startIndex, _targetDest,  _tweenProgress / _tweenDuration);
+				trace("TODO: half pickup/pickdown case!!");
+				// assume pickup is same as pickdown timing
+				if (_tweenProgress >= _tweenDuration  * .5) {  // pickdown, but early push forward
+					_braking = true;
+					
+					
+					tarLoc = _tweenProgress - _tweenDuration + unitTimeLength;
+					tarLoc /= unitTimeLength;
+					
+			
+					tarLoc--;
+					tarLoc = tarLoc * tarLoc * tarLoc + 1;
+				
+						
+					tarLoc +=  _targetDest - 1;  // assumption pickdown span ==1
+					
+				}
+				else {  // same as regular pickup
+					
+					tarLoc = (_tweenProgress / unitTimeLength);	
+					tarLoc = _startIndex + tarLoc * tarLoc * tarLoc;
+				}
+				
+				
 			}
 			else if (_tweenProgress < pickupTimeDur) {
 				//trace("PICKUP:" + _curLoc);
-
+				
 				tarLoc = (_tweenProgress / unitTimeLength);	
 				tarLoc = _startIndex + tarLoc * tarLoc * tarLoc;
 				
 			}
-			else if ( _tweenProgress >=  _tweenDuration  - pickupTimeDur) {	// isDeaccelerating()
+			else if ( _tweenProgress >=  _tweenDuration  - pickupTimeDur) {
 			
-	
+				_braking = true;
 				tarLoc = _tweenProgress - _tweenDuration + unitTimeLength;
 				tarLoc /= unitTimeLength;
-				trace("Braking...");
+				
 				//trace("PICKDOWN:" + _curLoc+  " : "+tarLoc);
 				tarLoc--;
 				tarLoc = tarLoc * tarLoc * tarLoc + 1;
