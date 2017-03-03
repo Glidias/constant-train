@@ -46,7 +46,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	
 	var _maxSpeed:Float = 1;
 	var _isStarted:Bool = false;
-	var _startIndex:Int = -1;
+	var _startIndex:Float = -1;
 	var _tweenProgress:Float = 0;
 	var _tweenDuration:Float = 0;
 
@@ -57,22 +57,36 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	var _pickupTimeDistCovered:Float;
 	function calcPickupTime():Void {	
 		//    find x _pickupTime  where   ( dy/dx(f(x) == maxSpeed  )   where f(x) is a cubic function of x^3
-		_pickupTime = Math.sqrt(1 / 3 * _maxSpeed);
-		
+		_pickupTime = cubicDeriativeGetX(_maxSpeed);
 
 		// precalculate difference in time compared to linear function of (maxSpeed*x).  (ie. differenceInTime = pickupTime - timeItTakesToCoverPickupDistWithLinearFunction)
 		//  y = pickupTime*pickupTime*pickupTime;   // distance covered by cubic acceleration of speed
-		_pickupTimeDistCovered = _pickupTime * _pickupTime * _pickupTime;
+		_pickupTimeDistCovered = cubicDistCovered(_pickupTime);
 		//  Sub y distance into: y =  _maxSpeed * pickupTime;  and find x  // ie. timeItTakesToCoverPickupDistWithLinearFunction
 		//  pickupTime*pickupTime*pickupTime = _maxSpeed * x
 		//  x = pickupTime*pickupTime*pickupTime/ maxSpeed;
 		// So, compare difference in x as below..
-		_pickupTimeDiff = _pickupTime -  _pickupTimeDistCovered / _maxSpeed;
+		_pickupTimeDiff = _pickupTime -  _pickupTimeDistCovered / _maxSpeed; // assumption made that timespan for both pickup/pickdown is equal
 		//trace(_pickupTime + ", " + _pickupTimeDiff);
 	}
 	/* INTERFACE cstrain.core.IBGTrain */
 	
 	var unitTimeLength:Float = hxd.Timer.wantedFPS  / 1;	// how much dt equates to 1 unit world distance
+	//var pickupTimeSpan:Float = 1;		// for now, we assume timespan is always at 1 atm. Ensure code will factor unitTimeLength for pickup cases when included in
+	//var pickdownTimeSpan:Float = 1;
+	
+	
+	inline function cubicDeriative(x:Float):Float {
+		return 3 * x * x;
+	}
+	
+	inline function cubicDeriativeGetX(speed:Float):Float {
+		return  Math.sqrt( speed  / 3);
+	}
+	
+	inline function cubicDistCovered(t:Float):Float {
+		return  t * t * t;
+	}
 	
 	public function resetTo(index:Int):Void 
 	{
@@ -80,25 +94,58 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 		_targetDest = index;
 		
 	}
-	
-	var _startIndexTime:Float;
+
+	var _forceStop = false;
 	
 	public function travelTo(index:Int):Void 
 	{
-		_targetDest = index;
+		
 		
 		if (!_isStarted) {
+			_targetDest = index;
 			_isStarted = true;
 			_startIndex = Std.int(_curLoc);
 			trace("START:" + _startIndex);
 			_tweenProgress = 0;
-			_tweenDuration = (index - _startIndex ) * unitTimeLength/_maxSpeed +  _pickupTimeDiff*2 * unitTimeLength;  // consider time difference of both acceleration and de-acceleration 
-			_startIndexTime = haxe.Timer.stamp();
-			
-			
+			// assumption made that timespan for both pickup/pickdown is equal
+			_tweenDuration = (index - _startIndex ) * unitTimeLength/_maxSpeed +  _pickupTimeDiff*2 * unitTimeLength; 
 		}
 		else {
-			_tweenDuration = (index - _startIndex) * unitTimeLength/_maxSpeed  + _pickupTimeDiff*2*unitTimeLength;
+			
+			if (isDeaccelerating()) { // adjust pickup based on current de-accelerate slope
+				
+				// recalculated projected target location again for deacceleration graph, just in case for better frame accruacy.
+				var tarLoc:Float = _tweenProgress - _tweenDuration + unitTimeLength;
+				tarLoc /= unitTimeLength;	// find x ratio
+				var xRatio = tarLoc;
+				tarLoc--;
+				tarLoc = tarLoc * tarLoc * tarLoc + 1;
+				
+					
+				tarLoc +=  _targetDest - 1;  // assumption pickdown span ==1
+				_curLoc = tarLoc;
+				
+				// Now setup new tween
+				xRatio = 1 - xRatio;	// complement ratio since easing out..  assumption made that timespan for both pickup/pickdown is equal
+				tarLoc -= cubicDistCovered(xRatio);	// backtrack along clamp distance
+				
+	
+				_startIndex = tarLoc;		
+				_tweenProgress = xRatio * unitTimeLength;	// cheat by simply setting starting tweenProgress further  up to match clamp
+				
+				
+				_targetDest = index;
+				//trace("Picking up from deaccleration:" + xRatio + " from:" + _startIndex + " to "+_targetDest);
+				
+				//	_forceStop = true;
+			}
+			else {
+				_targetDest = index;
+				trace("Extend cruising time");
+			}
+			// assumption made that timespan for both pickup/pickdown is equal
+			_tweenDuration = (index - _startIndex) * unitTimeLength / _maxSpeed  + _pickupTimeDiff * 2 * unitTimeLength;
+		
 		}
 		
 	}
@@ -135,6 +182,9 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	
 	var curTime:Float = 0;
 	
+	inline function isDeaccelerating():Bool {
+		return _isStarted && _tweenProgress >=  _tweenDuration  -  _pickupTime * unitTimeLength;
+	}
 	
 	override function update(dt:Float) {
 	
@@ -161,7 +211,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 			
 			var tarLoc:Float = 0;
 			if (pickupTimeDur * 2 >= _tweenDuration) {
-				trace("TODO: half pickup/pickdown case!!");
+				//trace("TODO: half pickup/pickdown case!!");
 				tarLoc = CSMath.lerp( _startIndex, _targetDest,  _tweenProgress / _tweenDuration);
 			}
 			else if (_tweenProgress < pickupTimeDur) {
@@ -171,17 +221,18 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				tarLoc = _startIndex + tarLoc * tarLoc * tarLoc;
 				
 			}
-			else if ( _tweenProgress >=  _tweenDuration  - pickupTimeDur) {
-				//trace("PICKDOWN:" + _curLoc + "/" + _targetDest);
+			else if ( _tweenProgress >=  _tweenDuration  - pickupTimeDur) {	// isDeaccelerating()
+			
 	
 				tarLoc = _tweenProgress - _tweenDuration + unitTimeLength;
 				tarLoc /= unitTimeLength;
-
+				trace("Braking...");
+				//trace("PICKDOWN:" + _curLoc+  " : "+tarLoc);
 				tarLoc--;
 				tarLoc = tarLoc * tarLoc * tarLoc + 1;
 			
 					
-				tarLoc +=  _targetDest - 1;
+				tarLoc +=  _targetDest - 1;  // assumption pickdown span ==1
 	
 			}
 			else {
@@ -210,6 +261,11 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 			}
 			_tweenProgress += dt;
 			
+		}
+		
+		if (_forceStop) {
+			_forceStop = false;
+			_isStarted = false;
 		}
 		
 	
