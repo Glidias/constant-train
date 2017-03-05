@@ -30,6 +30,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	{
 		super();
 		calcPickupTime();
+		setPickupTimespans(5,2);
 	}
 	
 
@@ -72,9 +73,14 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	/* INTERFACE cstrain.core.IBGTrain */
 	
 	var unitTimeLength:Float = hxd.Timer.wantedFPS  / 1;	// how much dt equates to 1 unit world distance
-	var pickupTimeSpan:Float = 8;		//  assume both are equal
-	var pickdownTimeSpan:Float = 8;
+	var pickupTimeSpan:Float = 1;		
+	var pickdownTimeSpan:Float = 1;
 	var pickupAndDownMidpointRatio:Float = .5;
+	function setPickupTimespans(accelSpan:Float, brakeSpan:Float):Void {
+		pickupTimeSpan = accelSpan;
+		pickdownTimeSpan = brakeSpan;
+		pickupAndDownMidpointRatio = pickupTimeSpan / (pickupTimeSpan + pickdownTimeSpan);
+	}
 	
 	 var pickupUnitTimeLength(get, never):Float;
 	inline function get_pickupUnitTimeLength():Float {
@@ -148,7 +154,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 			if (_braking) { // adjust pickup based on current de-accelerate slope
 				
 				// recalculated projected target location again for deacceleration graph, just in case for better frame accruacy.
-				var tarLoc:Float = _tweenProgress - _tweenDuration + pickupUnitTimeLength;
+				var tarLoc:Float = _tweenProgress - _tweenDuration + pickdownUnitTimeLength;
 				tarLoc /= pickdownUnitTimeLength;	// find x ratio
 				var xRatio = tarLoc;
 				tarLoc--;
@@ -159,12 +165,13 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				_curLoc = tarLoc;
 				
 				// Now setup new tween
-				xRatio = 1 - xRatio;	// complement ratio since easing out..  assumption made that timespan for both pickup/pickdown is equal
+				xRatio = 1 - xRatio;	// complement ratio since easing out..   (todo: does this make assumption of equal balance?)
+				//xRatio *= (1 - pickupAndDownMidpointRatio) / pickupAndDownMidpointRatio;
 				tarLoc -= cubicDistCovered(xRatio)*pickdownTimeSpan;	// backtrack along clamp distance
 				
 	
 				_startIndex = tarLoc;		
-				_tweenProgress = xRatio * pickupUnitTimeLength;	// cheat by simply setting starting tweenProgress further  up to match clamp
+				_tweenProgress = xRatio * pickdownUnitTimeLength;	// cheat by simply setting starting tweenProgress further  up to match clamp
 				
 				
 				_targetDest = index;
@@ -181,10 +188,10 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 		}
 		
 		
-		if ( isBlendAccelBrake() ) {  // assumption made where both pick up and down are of equal weight
-			var y = (_targetDest - _startIndex) / pickupTimeSpan / 2;
+		if ( isBlendAccelBrake() ) { 
+			var y = (_targetDest - _startIndex);
 		//	trace("old tween duration:" + _tweenDuration);
-			_tweenDuration = Math.pow(y, 1 / 3) *  unitTimeLength * pickupTimeSpan * 2;
+			_tweenDuration = Math.pow(y / pickupTimeSpan * pickupAndDownMidpointRatio, 1 / 3) *  unitTimeLength * pickupTimeSpan   + Math.pow(y / pickdownTimeSpan *  (1-pickupAndDownMidpointRatio), 1 / 3) *  unitTimeLength * pickdownTimeSpan;
 			trace("New tween duration for crossover: "+_tweenDuration);
 			
 		}
@@ -232,7 +239,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	
 		if (Key.isPressed(Key.G)) {
 
-			travelTo( Std.int(_targetDest + 3 ) );
+			travelTo( Std.int(_targetDest + 1 ) );
 		
 		}
 		
@@ -258,8 +265,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 			var exceedBreaking:Bool = false;
 			if (exceed) {
 				
-				// assumption made where pickup is same as pickdown timing
-				exceedBreaking = _tweenProgress >= _tweenDuration  * .5;
+				exceedBreaking = _tweenProgress >= _tweenDuration  * pickupAndDownMidpointRatio;
 				
 				//trace("Exceeded brake? " + exceedBreaking);
 			}
@@ -272,14 +278,12 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				tarLoc = tarLoc * tarLoc * tarLoc;
 				tarLoc *= pickupTimeSpan;
 				tarLoc += _startIndex;
-				//tarLoc *= pickupTimeSpan;
-				
 			}
 			else if ( (exceed && exceedBreaking)  ||  (!exceed && _tweenProgress >=  _tweenDuration  - pickupTimeDur) ) {
 			
 				_braking = true;
 				
-				tarLoc = _tweenProgress - _tweenDuration + pickupUnitTimeLength;
+				tarLoc = _tweenProgress - _tweenDuration + pickdownUnitTimeLength;
 				tarLoc /= pickdownUnitTimeLength;
 				trace("Braking..."+(exceed ? ":" : ""));
 				//trace("PICKDOWN:" + _curLoc+  " : "+tarLoc);
