@@ -44,7 +44,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	static inline var PUSH_FORWARD_ERROR:Float = .75;
 	
 	
-	var _maxSpeed:Float = 1;
+	var _maxSpeed:Float = 3;
 	var _isStarted:Bool = false;
 	var _startIndex:Float = -1;
 	var _tweenProgress:Float = 0;
@@ -66,14 +66,50 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 		//  pickupTime*pickupTime*pickupTime = _maxSpeed * x
 		//  x = pickupTime*pickupTime*pickupTime/ maxSpeed;
 		// So, compare difference in x as below..
-		_pickupTimeDiff = _pickupTime -  _pickupTimeDistCovered / _maxSpeed; // assumption made that timespan for both pickup/pickdown is equal
+		_pickupTimeDiff = _pickupTime -  _pickupTimeDistCovered / _maxSpeed; 
 		//trace(_pickupTime + ", " + _pickupTimeDiff);
 	}
 	/* INTERFACE cstrain.core.IBGTrain */
 	
 	var unitTimeLength:Float = hxd.Timer.wantedFPS  / 1;	// how much dt equates to 1 unit world distance
-	//var pickupTimeSpan:Float = 1;		// for now, we assume timespan is always at 1 atm. Ensure code will factor unitTimeLength for pickup cases when included in
-	//var pickdownTimeSpan:Float = 1;
+	var pickupTimeSpan:Float = 8;		//  assume both are equal
+	var pickdownTimeSpan:Float = 8;
+	var pickupAndDownMidpointRatio:Float = .5;
+	
+	 var pickupUnitTimeLength(get, never):Float;
+	inline function get_pickupUnitTimeLength():Float {
+		return pickupTimeSpan * unitTimeLength;
+	}
+	 var pickdownUnitTimeLength(get, never):Float;
+	inline function get_pickdownUnitTimeLength():Float {
+		return pickdownTimeSpan * unitTimeLength;
+	}
+	
+	
+	
+
+	
+	var pickupTimeDur(get, never):Float;
+	inline function get_pickupTimeDur():Float {
+		return _pickupTime * unitTimeLength * pickupTimeSpan;
+	}
+	
+	var pickdownTimeDur(get, never):Float;
+	inline function get_pickdownTimeDur():Float {
+		return _pickupTime * unitTimeLength * pickdownTimeSpan;
+	}
+	
+	var totalPickupAndDownTimeDur(get, never):Float;
+	inline function get_totalPickupAndDownTimeDur():Float {
+		return pickupTimeDur + pickdownTimeDur;
+	}
+	inline public function isBlendAccelBrake():Bool {
+		return _pickupTimeDistCovered *pickupTimeSpan + _pickupTimeDistCovered*pickdownTimeSpan >= ( _targetDest - _startIndex);
+	}
+	//  might depreciate>>> this only applies if 1st case is correct and _tweenDuration is adjusted to fit correctly
+	inline public function isBlendAccelBrake2():Bool { 
+		return  totalPickupAndDownTimeDur   >= _tweenDuration;
+	}
 	
 	
 	inline function cubicDeriative(x:Float):Float {
@@ -105,31 +141,30 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 			_startIndex = Std.int(_curLoc);
 			trace("START:" + _startIndex);
 			_tweenProgress = 0;
-			// assumption made that timespan for both pickup/pickdown is equal
-			_tweenDuration = (index - _startIndex ) * unitTimeLength/_maxSpeed +  _pickupTimeDiff*2 * unitTimeLength; 
+			_tweenDuration = (index - _startIndex ) * unitTimeLength/_maxSpeed +  _pickupTimeDiff*pickupTimeSpan* unitTimeLength +  _pickupTimeDiff*pickdownTimeSpan* unitTimeLength ; 
 		}
 		else {
 			
 			if (_braking) { // adjust pickup based on current de-accelerate slope
 				
 				// recalculated projected target location again for deacceleration graph, just in case for better frame accruacy.
-				var tarLoc:Float = _tweenProgress - _tweenDuration + unitTimeLength;
-				tarLoc /= unitTimeLength;	// find x ratio
+				var tarLoc:Float = _tweenProgress - _tweenDuration + pickupUnitTimeLength;
+				tarLoc /= pickdownUnitTimeLength;	// find x ratio
 				var xRatio = tarLoc;
 				tarLoc--;
 				tarLoc = tarLoc * tarLoc * tarLoc + 1;
-				
+				tarLoc *= pickdownTimeSpan;
 					
-				tarLoc +=  _targetDest - 1;  // assumption pickdown span ==1
+				tarLoc +=  _targetDest - pickdownTimeSpan;
 				_curLoc = tarLoc;
 				
 				// Now setup new tween
 				xRatio = 1 - xRatio;	// complement ratio since easing out..  assumption made that timespan for both pickup/pickdown is equal
-				tarLoc -= cubicDistCovered(xRatio);	// backtrack along clamp distance
+				tarLoc -= cubicDistCovered(xRatio)*pickdownTimeSpan;	// backtrack along clamp distance
 				
 	
 				_startIndex = tarLoc;		
-				_tweenProgress = xRatio * unitTimeLength;	// cheat by simply setting starting tweenProgress further  up to match clamp
+				_tweenProgress = xRatio * pickupUnitTimeLength;	// cheat by simply setting starting tweenProgress further  up to match clamp
 				
 				
 				_targetDest = index;
@@ -141,35 +176,19 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				_targetDest = index;
 				trace("Extend cruising time");
 			}
-			// assumption made that timespan for both pickup/pickdown is equal
-			_tweenDuration = (index - _startIndex) * unitTimeLength / _maxSpeed  + _pickupTimeDiff * 2 * unitTimeLength;
+			_tweenDuration = (index - _startIndex) * unitTimeLength / _maxSpeed  + _pickupTimeDiff*pickupTimeSpan* unitTimeLength +  _pickupTimeDiff*pickdownTimeSpan* unitTimeLength ; 
 		
 		}
 		
 		
-		if (_pickupTimeDistCovered * 2 >= ( _targetDest - _startIndex) ) {
-			var y = (_targetDest - _startIndex) / 2;
+		if ( isBlendAccelBrake() ) {  // assumption made where both pick up and down are of equal weight
+			var y = (_targetDest - _startIndex) / pickupTimeSpan / 2;
 		//	trace("old tween duration:" + _tweenDuration);
-			_tweenDuration = Math.pow(y, 1 / 3) * 2 * unitTimeLength;
+			_tweenDuration = Math.pow(y, 1 / 3) *  unitTimeLength * pickupTimeSpan * 2;
 			trace("New tween duration for crossover: "+_tweenDuration);
 			
 		}
-		
-		// Does the formula to derive tween duration also apply to crossover pickup/pickdown time cases?
-		/*
-				
-		1/3 seconds on linear to cover distance of 1
 
-		<1 second partial pickup time + <1 second partial time
-
-
-		1.3333333333333334
-
-		//trace((_tweenDuration / unitTimeLength) + ", " + _pickupTime + ", " + _pickupTimeDiff + " :: "+_pickupTimeDistCovered);
-		1.666666666666667, 1, 0.6666666666666667 :: 1
-		*/
-		//trace((_tweenDuration / unitTimeLength) + ", " + _pickupTime + ", " + _pickupTimeDiff + " :: "+_pickupTimeDistCovered);
-		
 	}
 	
 	public function stopAt(index:Int):Void 
@@ -213,7 +232,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	
 		if (Key.isPressed(Key.G)) {
 
-			travelTo( Std.int(_targetDest + 1 ) );
+			travelTo( Std.int(_targetDest + 3 ) );
 		
 		}
 		
@@ -229,66 +248,58 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 			
 			if (_tweenProgress > _tweenDuration) _tweenProgress = _tweenDuration;  // force clammp tween progress to duration
 			
-			var pickupTimeDur:Float = _pickupTime * unitTimeLength;
+		
 			_braking = false;
 			
 			var tarLoc:Float = 0;
-			var exceed:Bool = _pickupTimeDistCovered * 2 >= ( _targetDest - _startIndex) ;
-			var exceed2:Bool = pickupTimeDur * 2   >= _tweenDuration;
-			if (exceed != exceed2) trace("Error MISMATCH assertion!");
+			var exceed:Bool = isBlendAccelBrake() ;
+			var exceed2:Bool = isBlendAccelBrake2();
+			if (exceed != exceed2) trace("Error MISMATCH assertion!:"+exceed + " , "+exceed2);
+			var exceedBreaking:Bool = false;
 			if (exceed) {
 				
-				// assume pickup is same as pickdown timing
-				if ( _tweenProgress >= _tweenDuration  * .5) {  // pickdown, but early push forward
-					
-					_braking = true;
-					tarLoc = _tweenProgress - _tweenDuration + unitTimeLength;
-					tarLoc /= unitTimeLength;
-					trace("Braking..");
-					//trace("PICKDOWN:" + _curLoc+  " : "+tarLoc);
-					tarLoc--;
-					tarLoc = tarLoc * tarLoc * tarLoc + 1;
+				// assumption made where pickup is same as pickdown timing
+				exceedBreaking = _tweenProgress >= _tweenDuration  * .5;
 				
-						
-					tarLoc +=  _targetDest - 1;  // assumption pickdown span ==1
-					
-					
-					
-				}
-				else {  // same as regular pickup
-					trace("Partial pickup...");
-					tarLoc = (_tweenProgress / unitTimeLength);	
-					tarLoc = _startIndex + tarLoc * tarLoc * tarLoc;
-				}
-				
-				
+				//trace("Exceeded brake? " + exceedBreaking);
 			}
-			else if (_tweenProgress < pickupTimeDur) {
+			
+			 if ( (exceed && !exceedBreaking) || (!exceed && _tweenProgress < pickupTimeDur) ) {
+				 trace("Accelerating..."+(exceed ? ":" : ""));
 				//trace("PICKUP:" + _curLoc);
 				
-				tarLoc = (_tweenProgress / unitTimeLength);	
-				tarLoc = _startIndex + tarLoc * tarLoc * tarLoc;
+				tarLoc = (_tweenProgress / pickupUnitTimeLength);	
+				tarLoc = tarLoc * tarLoc * tarLoc;
+				tarLoc *= pickupTimeSpan;
+				tarLoc += _startIndex;
+				//tarLoc *= pickupTimeSpan;
 				
 			}
-			else if ( _tweenProgress >=  _tweenDuration  - pickupTimeDur) {
+			else if ( (exceed && exceedBreaking)  ||  (!exceed && _tweenProgress >=  _tweenDuration  - pickupTimeDur) ) {
 			
 				_braking = true;
-				tarLoc = _tweenProgress - _tweenDuration + unitTimeLength;
-				tarLoc /= unitTimeLength;
-				trace("Braking...");
+				
+				tarLoc = _tweenProgress - _tweenDuration + pickupUnitTimeLength;
+				tarLoc /= pickdownUnitTimeLength;
+				trace("Braking..."+(exceed ? ":" : ""));
 				//trace("PICKDOWN:" + _curLoc+  " : "+tarLoc);
 				tarLoc--;
 				tarLoc = tarLoc * tarLoc * tarLoc + 1;
+				tarLoc *= pickdownTimeSpan;
+				
+				tarLoc +=  _targetDest - pickdownTimeSpan;
+			//	trace(tarLoc);
 			
-					
-				tarLoc +=  _targetDest - 1;  // assumption pickdown span ==1
-	
 			}
-			else {
+			else if (!exceed) {
 				trace("Cruising...");
 				//trace("CONSTANT:" +_curLoc);
-				tarLoc = CSMath.lerp( _startIndex+_pickupTimeDistCovered, _targetDest - _pickupTimeDistCovered, (_tweenProgress - pickupTimeDur) / (_tweenDuration -pickupTimeDur*2 ) );
-			//trace( (_targetDest - _pickupTimeDistCovered) -_pickupTimeDistCovered + _pickupTimeDistCovered*2); 
+				tarLoc = CSMath.lerp( _startIndex + _pickupTimeDistCovered*pickupTimeSpan, _targetDest - _pickupTimeDistCovered*pickdownTimeSpan, (_tweenProgress - pickupTimeDur) / (_tweenDuration - totalPickupAndDownTimeDur ) );
+				
+
+			}
+			else {
+				trace("ERROr no resolution!");
 			}
 			
 			var diff = (tarLoc - _curLoc)*unitTimeLength;
@@ -318,10 +329,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 			_isStarted = false;
 		}
 		
-	
-		
-		
-		
+
 		
 		//emitter.step();
 		
