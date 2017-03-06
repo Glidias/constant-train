@@ -14,6 +14,8 @@ class GameSettings
 	
 	//public static inline function getDelayFor(
 	
+	public static inline var SHARED_FPS:Int = 60;
+	
 	static inline function delayInSeconds(ms:Float):Float {
 		return ms / 1000;
 	}

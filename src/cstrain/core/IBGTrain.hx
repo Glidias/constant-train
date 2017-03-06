@@ -23,8 +23,8 @@ interface IBGTrain
 
 	// CLIENT ONLY
 	
-	// Update (client side values)
-	function update(dt:Float):Void;
+	// Update/Refresh (client side values) 
+	function update():Void;	
 	
 	// cruising speed => "comfortable" moving speed. Currently not used ingame or as part of gameplay.
 	function setCruisingSpeed(speed:Float):Void;

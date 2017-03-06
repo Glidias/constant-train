@@ -6,6 +6,7 @@ package cstrain.h2d;
  */
 class AbstractBGScene extends hxd.App 
 {
+	private var _needToRender:Bool = false;	// to track need to re-render scene
 	
 	override function init() {
 		super.init();

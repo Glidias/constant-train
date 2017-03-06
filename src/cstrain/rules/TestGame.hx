@@ -7,6 +7,7 @@ import cstrain.core.IRules;
 import cstrain.core.PenaltyDesc;
 import cstrain.core.PlayerStats;
 import cstrain.core.Polynomial;
+import haxe.Timer;
 
 /**
  * Example game setup
@@ -219,7 +220,7 @@ class TestGame implements IRules
 	
 	public function playCard(isSwipeRight:Bool):CardResult {
 		
-		var currentTime:Float = Date.now().getTime();
+		var currentTime:Float = Timer.stamp() * 1000;// Date.now().getTime();
 		var timeCap:Float  = ( _penaltyTime >= gameSettings.minTurnTime ? _penaltyTime : gameSettings.minTurnTime );
 		if (currentTime - _lastReceivedTime < timeCap ) return CardResult.NOT_YET_AVAILABLE( timeCap-(currentTime - _lastReceivedTime) , _penaltyTime);
 		
@@ -297,7 +298,7 @@ class TestGame implements IRules
 	{
 		if (!commenced) {
 			commenced = true;
-			currentPlayerStats.startTime = Date.now().getTime();
+			currentPlayerStats.startTime = Timer.stamp() * 1000;// Date.now().getTime();
 		}
 		return thePopupCard != null ? thePopupCard : getTopCard();
 	}

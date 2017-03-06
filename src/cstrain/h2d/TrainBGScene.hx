@@ -1,5 +1,6 @@
 package cstrain.h2d;
 import cstrain.core.BGTrainState;
+import cstrain.core.GameSettings;
 import cstrain.core.IBGTrain;
 import cstrain.util.CSMath;
 import cstrain.util.EaseFunctions;
@@ -36,7 +37,9 @@ class TrainBGScene extends AbstractBGScene
 	}
 	
 	var _curLoc:Float = 0;
-	var unitTimeLength:Float = hxd.Timer.wantedFPS  / 1;
+	var unitTimeLength:Float = GameSettings.SHARED_FPS  / 1;
+	
+	// NOTE: Currently, until shader implementation is used over manual uplaod of webGL, pausing/minimising and returning back to screen will yield visual flickerings in re-renderings
 	
 	override function update(dt:Float) {
 	
@@ -46,13 +49,13 @@ class TrainBGScene extends AbstractBGScene
 			model.travelTo( Std.int(model.targetDest + 1 ) );
 		
 		}
-		
-		model.update(dt);
+		model.update();
+	
 
-		
-		if (model.movingState != BGTrainState.STOPPED) {  // perform necessary render updates
+		if (_needToRender || model.movingState != BGTrainState.STOPPED) {  // perform necessary render updates
+			_needToRender = model.movingState != BGTrainState.STOPPED;
 			
-		
+			
 			var tarLoc = model.currentPosition;
 			
 			var diff = (tarLoc - _curLoc)*unitTimeLength;
@@ -80,6 +83,7 @@ class TrainBGScene extends AbstractBGScene
 			
 			_curLoc = tarLoc;
 		}
+		else _needToRender = false;
 		
 
 

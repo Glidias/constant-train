@@ -1,8 +1,10 @@
 package cstrain.rules;
 import cstrain.core.BGTrainState;
+import cstrain.core.GameSettings;
 import cstrain.core.IBGTrain;
 import cstrain.util.CSMath;
 import cstrain.util.EaseFunctions;
+import haxe.Timer;
 
 /**
  * Platform-agnostic scene model logic for actual movement of train with acceleration/deacceleration calculations
@@ -14,7 +16,7 @@ class SceneModel implements IBGTrain
 	public function new() 
 	{
 		calcPickupTime();
-		setPickupTimespans(6,3);
+		setPickupTimespans(3,3);
 	}
 	
 	// -- The impl for IBGTrain
@@ -63,7 +65,7 @@ class SceneModel implements IBGTrain
 	// Acceleration power functions. 
 	var easeFuncs:EaseFunctions = EaseFunctions.create(EaseFunctions.CUBIC);
 	
-	var unitTimeLength:Float = hxd.Timer.wantedFPS  / 1;	// how much dt equates to 1 unit world distance per second
+	static inline var unitTimeLength:Float = GameSettings.SHARED_FPS;	// how much dt equates to 1 unit world distance per second
 	
 	var pickupTimeSpan:Float = 1;		
 	var pickdownTimeSpan:Float = 1;
@@ -121,13 +123,17 @@ class SceneModel implements IBGTrain
 		return _curLoc;
 	}
 	
+	private var _startTime:Float =-1;
 	
 	public function travelTo(index:Int):Void 
 	{
 		if (!_isStarted) {
 			_targetDest = index;
 			_isStarted = true;
-			_startIndex = Std.int(_curLoc);
+			var tarIndex:Float =  Std.int(_curLoc);
+			_startTime = Timer.stamp();
+			_startIndex =tarIndex;
+			
 			trace("START:" + _startIndex);
 			_tweenProgress = 0;
 			_tweenDuration = (index - _startIndex ) * unitTimeLength/_maxSpeed +  _pickupTimeDiff*pickupTimeSpan* unitTimeLength +  _pickupTimeDiff*pickdownTimeSpan* unitTimeLength ; 
@@ -152,10 +158,16 @@ class SceneModel implements IBGTrain
 				//xRatio *= (1 - pickupAndDownMidpointRatio) / pickupAndDownMidpointRatio;
 				tarLoc -= easeFuncs.distCovered(xRatio)*pickupTimeSpan;	// backtrack along clamp distance
 				
-	
+				var tarIndex:Float = tarLoc;
+				
 				_startIndex = tarLoc;		
+				
+				
+			
 				_tweenProgress = xRatio * pickupUnitTimeLength;	// cheat by simply setting starting tweenProgress further  up to match clamp
 				
+				// reflect dummy starttime bounceback
+				 _startTime = Timer.stamp() - _tweenProgress/unitTimeLength;
 				
 				_targetDest = index;
 				//trace("Picking up from deaccleration:" + xRatio + " from:" + _startIndex + " to "+_targetDest);
@@ -177,15 +189,19 @@ class SceneModel implements IBGTrain
 			trace("New tween duration for crossover: "+_tweenDuration);
 			
 		}
+		
+		
+		
 
 	}
 	
-	public function stopAt(index:Int):Void 
+	public function stopAt(index:Int):Void // TODO
 	{
 		_targetDest = index;
+		
 	}
 	
-	public function missStopAt(index:Int):Void 
+	public function missStopAt(index:Int):Void 	// TODO
 	{
 		if ( _curLoc <= index + PUSH_FORWARD_ERROR) {
 			_targetDest =  index + PUSH_FORWARD_ERROR;
@@ -194,7 +210,7 @@ class SceneModel implements IBGTrain
 	}
 	
 	
-	public function setMaxSpeed(maxSpeed:Float):Void 
+	public function setMaxSpeed(maxSpeed:Float):Void 	
 	{
 		_maxSpeed = maxSpeed;
 		calcPickupTime();
@@ -214,9 +230,12 @@ class SceneModel implements IBGTrain
 
 	// Called each frame
 	
-	public function update(dt:Float) {
+	public function update() {
 		
 		if (_isStarted) {
+			
+			//var dt:Float = (Timer.stamp() - _startTime) * GameSettings.SHARED_FPS;
+			_tweenProgress = (Timer.stamp() - _startTime) * GameSettings.SHARED_FPS;
 			
 			if (_tweenProgress > _tweenDuration) _tweenProgress = _tweenDuration;  // force clammp tween progress to duration
 			
@@ -276,13 +295,14 @@ class SceneModel implements IBGTrain
 
 			_curLoc = tarLoc;
 			
-			if (tarLoc >= _targetDest) {
+			if (_tweenProgress >= _tweenDuration) {
+				_tweenProgress = _tweenDuration;
 				_isStarted = false;
 				trace("END:" + tarLoc);
 				movingState = BGTrainState.STOPPED;
 				
 			}
-			_tweenProgress += dt;
+			//_tweenProgress += dt;
 
 			
 		}
@@ -293,6 +313,7 @@ class SceneModel implements IBGTrain
 		if (_forceStop) {
 			_forceStop = false;
 			_isStarted = false;
+			movingState = BGTrainState.STOPPED;
 		}
 
 		
