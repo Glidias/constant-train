@@ -30,7 +30,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	{
 		super();
 		calcPickupTime();
-		setPickupTimespans(5,2);
+		setPickupTimespans(6,3);
 	}
 	
 
@@ -164,20 +164,19 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				tarLoc +=  _targetDest - pickdownTimeSpan;
 				_curLoc = tarLoc;
 				
-				// Now setup new tween
-				xRatio = 1 - xRatio;	// complement ratio since easing out..   (todo: does this make assumption of equal balance?)
+				// Now setup new tween for pickup
+				xRatio = 1 - xRatio;
 				//xRatio *= (1 - pickupAndDownMidpointRatio) / pickupAndDownMidpointRatio;
-				tarLoc -= cubicDistCovered(xRatio)*pickdownTimeSpan;	// backtrack along clamp distance
+				tarLoc -= cubicDistCovered(xRatio)*pickupTimeSpan;	// backtrack along clamp distance
 				
 	
 				_startIndex = tarLoc;		
-				_tweenProgress = xRatio * pickdownUnitTimeLength;	// cheat by simply setting starting tweenProgress further  up to match clamp
+				_tweenProgress = xRatio * pickupUnitTimeLength;	// cheat by simply setting starting tweenProgress further  up to match clamp
 				
 				
 				_targetDest = index;
 				//trace("Picking up from deaccleration:" + xRatio + " from:" + _startIndex + " to "+_targetDest);
-				
-				//	_forceStop = true;
+			
 			}
 			else {
 				_targetDest = index;
@@ -279,7 +278,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				tarLoc *= pickupTimeSpan;
 				tarLoc += _startIndex;
 			}
-			else if ( (exceed && exceedBreaking)  ||  (!exceed && _tweenProgress >=  _tweenDuration  - pickupTimeDur) ) {
+			else if ( (exceed && exceedBreaking)  ||  (!exceed && _tweenProgress >=  _tweenDuration  - pickdownTimeDur) ) {
 			
 				_braking = true;
 				
