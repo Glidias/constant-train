@@ -6,6 +6,7 @@ import cstrain.util.CSMath;
 import cstrain.util.EaseFunctions;
 import haxe.Timer;
 
+
 /**
  * Platform-agnostic scene model logic for actual movement of train with acceleration/deacceleration calculations
  * @author Glidias
@@ -65,12 +66,21 @@ class SceneModel implements IBGTrain
 	// Acceleration power functions. 
 	var easeFuncs:EaseFunctions = EaseFunctions.create(EaseFunctions.CUBIC);
 	
+	public function setupEasingFunctions(powerIndex:Int):Void {
+		this.easeFuncs = EaseFunctions.create(powerIndex);
+		calcPickupTime();
+	}
+	
+	public static function main():Void {
+		
+	}
+	
 	static inline var unitTimeLength:Float = GameSettings.SHARED_FPS;	// how much dt equates to 1 unit world distance per second
 	
 	var pickupTimeSpan:Float = 1;		
 	var pickdownTimeSpan:Float = 1;
 	var pickupAndDownMidpointRatio:Float = .5;
-	function setPickupTimespans(accelSpan:Float, brakeSpan:Float):Void {
+	public function setPickupTimespans(accelSpan:Float, brakeSpan:Float):Void {
 		pickupTimeSpan = accelSpan;
 		pickdownTimeSpan = brakeSpan;
 		pickupAndDownMidpointRatio = pickupTimeSpan / (pickupTimeSpan + pickdownTimeSpan);
@@ -227,6 +237,7 @@ class SceneModel implements IBGTrain
 	
 	
 	var _braking:Bool = true;
+	var _curVelocity:Float;
 
 	// Called each frame
 	
@@ -258,6 +269,7 @@ class SceneModel implements IBGTrain
 				//trace("PICKUP:" + _curLoc);
 				
 				tarLoc = (_tweenProgress / pickupUnitTimeLength);	
+				_curVelocity = easeFuncs.deriative(tarLoc);
 				tarLoc = easeFuncs.distCovered(tarLoc); // tarLoc * tarLoc * tarLoc;
 				tarLoc *= pickupTimeSpan;
 				tarLoc += _startIndex;
@@ -273,6 +285,8 @@ class SceneModel implements IBGTrain
 				//trace("PICKDOWN:" + _curLoc+  " : "+tarLoc);
 	
 				tarLoc = easeFuncs.distCovered_Out(tarLoc);
+				_curVelocity = easeFuncs.deriative(1 - easeFuncs.distCoveredGetX(tarLoc));
+				
 				tarLoc *= pickdownTimeSpan;
 				
 				tarLoc +=  _targetDest - pickdownTimeSpan;
@@ -283,6 +297,7 @@ class SceneModel implements IBGTrain
 			else if (!exceed) {
 				trace("Cruising...");
 				//trace("CONSTANT:" +_curLoc);
+				_curVelocity = _maxSpeed;
 				tarLoc = CSMath.lerp( _startIndex + _pickupTimeDistCovered*pickupTimeSpan, _targetDest - _pickupTimeDistCovered*pickdownTimeSpan, (_tweenProgress - pickupTimeDur) / (_tweenDuration - totalPickupAndDownTimeDur ) );
 				
 				movingState = BGTrainState.SPEEDING;
@@ -298,6 +313,7 @@ class SceneModel implements IBGTrain
 			if (_tweenProgress >= _tweenDuration) {
 				_tweenProgress = _tweenDuration;
 				_isStarted = false;
+				_curVelocity = 0;
 				trace("END:" + tarLoc);
 				movingState = BGTrainState.STOPPED;
 				
