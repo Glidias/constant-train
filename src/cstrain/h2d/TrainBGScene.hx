@@ -1,6 +1,7 @@
 package cstrain.h2d;
 import cstrain.core.IBGTrain;
 import cstrain.util.CSMath;
+import cstrain.util.EaseFunctions;
 import h2d.Sprite;
 import h2d.Graphics;
 import h2d.SpriteBatch;
@@ -52,25 +53,29 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	var _tweenDuration:Float = 0;
 
 	
-	// cubic deriative engine
+	//  deriative engine
 	var _pickupTime:Float;
 	var _pickupTimeDiff:Float; // difference in time with pickup acceleration speed compared to constant speed
 	var _pickupTimeDistCovered:Float;
 	function calcPickupTime():Void {	
-		//    find x _pickupTime  where   ( dy/dx(f(x) == maxSpeed  )   where f(x) is a cubic function of x^3
-		_pickupTime = cubicDeriativeGetX(_maxSpeed);
+		//    find x _pickupTime  where   ( dy/dx(f(x) == maxSpeed  )  
+		_pickupTime = easeFuncs.deriativeGetX(_maxSpeed);
 
 		// precalculate difference in time compared to linear function of (maxSpeed*x).  (ie. differenceInTime = pickupTime - timeItTakesToCoverPickupDistWithLinearFunction)
-		//  y = pickupTime*pickupTime*pickupTime;   // distance covered by cubic acceleration of speed
-		_pickupTimeDistCovered = cubicDistCovered(_pickupTime);
+		//  y = pickupTime*pickupTime*pickupTime;   // eg. cubic
+		_pickupTimeDistCovered = easeFuncs.distCovered(_pickupTime);
 		//  Sub y distance into: y =  _maxSpeed * pickupTime;  and find x  // ie. timeItTakesToCoverPickupDistWithLinearFunction
 		//  pickupTime*pickupTime*pickupTime = _maxSpeed * x
-		//  x = pickupTime*pickupTime*pickupTime/ maxSpeed;
+		//  x = pickupTime*pickupTime*pickupTime/ maxSpeed;	// eg.cubic
 		// So, compare difference in x as below..
-		_pickupTimeDiff = _pickupTime -  _pickupTimeDistCovered / _maxSpeed; 
+		_pickupTimeDiff = _pickupTime -  _pickupTimeDistCovered / _maxSpeed; 	// compared time difference with linear displacement to accelerated displacement.
 		//trace(_pickupTime + ", " + _pickupTimeDiff);
 	}
 	/* INTERFACE cstrain.core.IBGTrain */
+	
+		
+	// Acceleration power functions. 
+	var easeFuncs:EaseFunctions = EaseFunctions.create(EaseFunctions.CUBIC);
 	
 	var unitTimeLength:Float = hxd.Timer.wantedFPS  / 1;	// how much dt equates to 1 unit world distance
 	var pickupTimeSpan:Float = 1;		
@@ -94,7 +99,6 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 	
 	
 
-	
 	var pickupTimeDur(get, never):Float;
 	inline function get_pickupTimeDur():Float {
 		return _pickupTime * unitTimeLength * pickupTimeSpan;
@@ -117,19 +121,8 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 		return  totalPickupAndDownTimeDur   >= _tweenDuration;
 	}
 	
-	
-	inline function cubicDeriative(x:Float):Float {
-		return 3 * x * x;
-	}
-	
-	inline function cubicDeriativeGetX(speed:Float):Float {
-		return  Math.sqrt( speed  / 3);
-	}
-	
-	inline function cubicDistCovered(t:Float):Float {
-		return  t * t * t;
-	}
-	
+
+
 	public function resetTo(index:Int):Void 
 	{
 		_reseting = true;
@@ -157,8 +150,8 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				var tarLoc:Float = _tweenProgress - _tweenDuration + pickdownUnitTimeLength;
 				tarLoc /= pickdownUnitTimeLength;	// find x ratio
 				var xRatio = tarLoc;
-				tarLoc--;
-				tarLoc = tarLoc * tarLoc * tarLoc + 1;
+	
+				tarLoc = easeFuncs.distCovered_Out(tarLoc);
 				tarLoc *= pickdownTimeSpan;
 					
 				tarLoc +=  _targetDest - pickdownTimeSpan;
@@ -167,7 +160,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				// Now setup new tween for pickup
 				xRatio = 1 - xRatio;
 				//xRatio *= (1 - pickupAndDownMidpointRatio) / pickupAndDownMidpointRatio;
-				tarLoc -= cubicDistCovered(xRatio)*pickupTimeSpan;	// backtrack along clamp distance
+				tarLoc -= easeFuncs.distCovered(xRatio)*pickupTimeSpan;	// backtrack along clamp distance
 				
 	
 				_startIndex = tarLoc;		
@@ -190,7 +183,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 		if ( isBlendAccelBrake() ) { 
 			var y = (_targetDest - _startIndex);
 		//	trace("old tween duration:" + _tweenDuration);
-			_tweenDuration = Math.pow(y / pickupTimeSpan * pickupAndDownMidpointRatio, 1 / 3) *  unitTimeLength * pickupTimeSpan   + Math.pow(y / pickdownTimeSpan *  (1-pickupAndDownMidpointRatio), 1 / 3) *  unitTimeLength * pickdownTimeSpan;
+			_tweenDuration = easeFuncs.distCoveredGetX( y / pickupTimeSpan * pickupAndDownMidpointRatio) *  unitTimeLength * pickupTimeSpan   + easeFuncs.distCoveredGetX( y / pickdownTimeSpan *  (1-pickupAndDownMidpointRatio) ) *  unitTimeLength * pickdownTimeSpan;
 			trace("New tween duration for crossover: "+_tweenDuration);
 			
 		}
@@ -274,7 +267,7 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				//trace("PICKUP:" + _curLoc);
 				
 				tarLoc = (_tweenProgress / pickupUnitTimeLength);	
-				tarLoc = tarLoc * tarLoc * tarLoc;
+				tarLoc = easeFuncs.distCovered(tarLoc); // tarLoc * tarLoc * tarLoc;
 				tarLoc *= pickupTimeSpan;
 				tarLoc += _startIndex;
 			}
@@ -286,8 +279,8 @@ class TrainBGScene extends AbstractBGScene implements IBGTrain
 				tarLoc /= pickdownUnitTimeLength;
 				trace("Braking..."+(exceed ? ":" : ""));
 				//trace("PICKDOWN:" + _curLoc+  " : "+tarLoc);
-				tarLoc--;
-				tarLoc = tarLoc * tarLoc * tarLoc + 1;
+	
+				tarLoc = easeFuncs.distCovered_Out(tarLoc);
 				tarLoc *= pickdownTimeSpan;
 				
 				tarLoc +=  _targetDest - pickdownTimeSpan;
