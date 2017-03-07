@@ -1,9 +1,12 @@
 package cstrain.vuex.components;
 import cstrain.core.Polynomial;
+import cstrain.vuex.components.GameView;
 import cstrain.vuex.game.GameActions;
 import cstrain.vuex.store.GameStore;
+import cstrain.vuex.swing.Swing;
 import haxe.Timer;
 import haxevx.vuex.core.NoneT;
+import haxevx.vuex.core.VComponent;
 import haxevx.vuex.core.VxComponent;
 import cstrain.core.Card;
 
@@ -27,9 +30,16 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 		this.secondsLeft--;
 	}
 	
+	override public function Created():Void {
+		
+		_vData._stack = Swing.Stack();
+		
+		
+	}
 	override public function Data():CardViewState {
 		return {
 			secondsLeft:0
+		
 		};
 	}
 	
@@ -118,6 +128,16 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 	{
 		return store.state.game.delayTimeLeft > 0;
 	}
+	
+	static inline var Comp_Card:String = "CardV";
+	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
+		return [
+			Comp_Card => new CardV()
+		];
+	}
+	
+	
+	
 
 		
 	override public function Template():String {
@@ -133,6 +153,9 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 				<div class="btnswipers" v-show="!gotDelay">
 					<button v-on:click="swipe(false)">Left</button>
 					<button v-on:click="swipe(true)">Right</button>
+				</div>
+				<div class="cardstack">
+					<${Comp_Card} v-for="n in 4" :stack="$$data._stack" :key="n">{{n}}</${Comp_Card}>
 				</div>
 			</div>
 		';
@@ -156,5 +179,6 @@ typedef CardViewProps = {
 
 typedef CardViewState = {
 	var secondsLeft:Int;
+	@:optional var _stack:SwingStack;
 	@:optional var _timer:Timer;
 }

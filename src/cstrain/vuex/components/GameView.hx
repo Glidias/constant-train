@@ -20,7 +20,8 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		super();
 	}
 	
-	static inline var Comp_CardView:String = "CardView";
+	public static inline var Comp_CardView:String = "CardView";
+	public static inline var Comp_Card:String = "CardV";
 	
 	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [
@@ -52,8 +53,8 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 			<div class="gameview">
 				The Constant Train :: Polynomial Express
 				<hr/>
-				<p>Swipe right to infer result as constant to stop the train!<br/>Swipe left to infer result as variable to move along!</b>
-				<$Comp_CardView :currentCard="currentCard"></$Comp_CardView>
+				<p>Swipe right to infer result as constant to stop the train!<br/>Swipe left to infer result as variable to move along!</p>
+				<${Comp_CardView} :currentCard="currentCard"></${Comp_CardView}>
 				<div class="traceResult" v-if="cardResult">
 					<p>{{ cardResult }}</p>
 				</div>

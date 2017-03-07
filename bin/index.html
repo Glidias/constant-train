@@ -11,6 +11,7 @@
 		body {
 			padding:0;
 			margin:0;
+			overflow:hidden;
 		}
 		#wrapper {
 			margin:0 auto;
@@ -21,19 +22,41 @@
 		.gameview {
 		
 			position:absolute;
-			top:15px;
-			left:15px;
+			top:0px;
+			left:0px;
+			width:100%;
+			overflow:hidden;
+			height:100%;
+			box-sizing:border-box;
 			color:#bbbbbb;
+			padding:15px;user-select:none;
 			
 		}
 		
+		
+		.cardview {
+			
+			position:relative;
+			width:100%;
+			height:100%;
+		}
+		
+		.cardstack {
+		 width: 200px; height: 300px; background: #ED5D52; position: absolute; top: 50px; left: 50%; margin-left: -100px; border-radius: 10px;
+		}
+		
+		.cardstack .card {
+			 width: 200px; height: 300px; list-style: none; background: #fff; border-radius: 5px; position: absolute; top: 0; left: 0; box-shadow: 0 0 2px rgba(0,0,0,.2), 1px 1px 1px rgba(0,0,0,.2); line-height: 300px; text-align: center; font-size: 100px; border: 10px solid #ECECEC; box-sizing: border-box; cursor: default; select:none;
+		}
+		
 	</style>
+	
 </head>
 <body>
 	<div id="wrapper">
 		<canvas id="webgl" style="width:100%; height:100%;"></canvas>
 		<div id="app"></div>
-		<script src="ConstantTrain.js"></script>
+		<script src="http://localhost:8080/bundle.js"></script>
 	</div>
 </body>
 </html>

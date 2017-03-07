@@ -44,6 +44,9 @@ class EaseFunctions {
 	public static inline function quadraticDeriative(x:Float):Float {
 		return 2 * x;
 	}
+	public static inline function quadraticDeriative_Out(x:Float):Float {
+		return 2 - 2*x;
+	}
 	
 	public static inline function quadraticDeriativeGetX(v:Float):Float {
 		return  v  / 2;
@@ -60,6 +63,7 @@ class EaseFunctions {
 	public static inline function cubicDistCovered_Out(t:Float):Float {
 		return  --t * t * t + 1;
 	}
+
 	
 	public static inline function cubicDistCoveredGetX(offset:Float):Float {
 		return Math.pow(offset, 1 / 3);
@@ -68,6 +72,9 @@ class EaseFunctions {
 	
 	public static inline function cubicDeriative(x:Float):Float {
 		return 3 * x * x;
+	}
+	public static inline function cubicDeriative_Out(x:Float):Float {
+		return 3*x*x - 6*x + 3;
 	}
 	
 	public static inline function cubicDeriativeGetX(v:Float):Float {
@@ -81,6 +88,7 @@ class EaseFunctions {
 	public static inline function quarticDistCovered_Out(t:Float):Float {
 		return  1 - (--t) * t * t * t;
 	}
+
 	
 	public static inline function quarticDistCoveredGetX(offset:Float):Float {
 		return Math.pow(offset, 1 / 4);
@@ -89,6 +97,9 @@ class EaseFunctions {
 	
 	public static inline function quarticDeriative(x:Float):Float {
 		return 4 * x * x * x;
+	}
+	public static inline function quarticDeriative_Out(x:Float):Float {
+		return -4 * x * x * x + 12 * x * x - 12 * x + 4*x; 
 	}
 	
 	public static inline function quarticDeriativeGetX(v:Float):Float {
@@ -104,6 +115,7 @@ class EaseFunctions {
 		return  return 1 + (--t) * t * t * t * t;
 	}
 	
+	
 	public static inline function quinticDistCoveredGetX(offset:Float):Float {
 		return Math.pow(offset, 1/5);
 	}
@@ -111,6 +123,9 @@ class EaseFunctions {
 	
 	public static inline function quinticDeriative(x:Float):Float {
 		return 5 * x * x * x * x;
+	}
+	public static inline function quinticDeriative_Out(x:Float):Float {
+		return 5*x*x*x*x - 20*x*x*x + 30*x*x - 20*x + 5; 
 	}
 	
 	public static inline function quinticDeriativeGetX(v:Float):Float {
@@ -131,7 +146,8 @@ class EaseFunctions {
 	public var distCovered:Float->Float;	// displacement function over time (easeIn)
 	public var distCovered_Out:Float->Float; // displacement function over time (easeOut)
 	public var distCoveredGetX:Float->Float;	// solve for X time, with displacement function, given displacement value
-	public var deriative:Float->Float;	//  the velocity function over time. (which is 1st deriative of the displacement function)
+	public var deriative:Float->Float;	//  the velocity function over time. (easeIn) (which is 1st deriative of the displacement function)
+	public var deriative_Out:Float->Float;	//  the velocity function over time (easeOut)  (which is 1st deriative of the displacement_Out function)
 	public var deriativeGetX:Float->Float;	// solve for X time, with velocity function, given velocity value
 	
 	public static function create(powerIndex:Int):EaseFunctions {
@@ -142,30 +158,35 @@ class EaseFunctions {
 				me.distCovered_Out = linearDistCovered;
 				me.distCoveredGetX = linearDistCoveredGetX;
 				me.deriative = linearDeriative;
+				me.deriative_Out = linearDeriative;
 				me.deriativeGetX = linearDeriativeGetX;
 			case QUADRATIC:
 				me.distCovered = quadraticDistCovered;
 				me.distCovered_Out = quadraticDistCovered_Out;
 				me.distCoveredGetX = quadraticDistCoveredGetX;
 				me.deriative = quadraticDeriative;
+				me.deriative_Out = quadraticDeriative_Out;
 				me.deriativeGetX = quadraticDeriativeGetX;
 			case CUBIC:
 				me.distCovered = cubicDistCovered;
 				me.distCovered_Out = cubicDistCovered_Out;
 				me.distCoveredGetX = cubicDistCoveredGetX;
 				me.deriative = cubicDeriative;
+				me.deriative_Out = cubicDeriative_Out;
 				me.deriativeGetX = cubicDeriativeGetX;
 			case QUARTIC:
 				me.distCovered = quarticDistCovered;
 				me.distCovered_Out = quarticDistCovered_Out;
 				me.distCoveredGetX = quarticDistCoveredGetX;
 				me.deriative = quarticDeriative;
+				me.deriative_Out = quarticDeriative_Out;
 				me.deriativeGetX = quarticDeriativeGetX;
 			case QUINTIC:
 				me.distCovered = quinticDistCovered;
 				me.distCovered_Out = quinticDistCovered_Out;
 				me.distCoveredGetX = quinticDistCoveredGetX;
 				me.deriative = quinticDeriative;
+				me.deriative_Out = quinticDistCovered_Out;
 				me.deriativeGetX = quinticDeriativeGetX;
 			default:
 				if (powerIndex > 0) {

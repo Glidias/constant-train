@@ -2,6 +2,7 @@ package cstrain.rules;
 import cstrain.core.BGTrainState;
 import cstrain.core.GameSettings;
 import cstrain.core.IBGTrain;
+import cstrain.core.Polynomial;
 import cstrain.util.CSMath;
 import cstrain.util.EaseFunctions;
 import haxe.Timer;
@@ -17,7 +18,8 @@ class SceneModel implements IBGTrain
 	public function new() 
 	{
 		calcPickupTime();
-		setPickupTimespans(3,3);
+		setPickupTimespans(3, 3);
+	
 	}
 	
 	// -- The impl for IBGTrain
@@ -283,9 +285,9 @@ class SceneModel implements IBGTrain
 				tarLoc /= pickdownUnitTimeLength;
 				trace("Braking..."+(exceed ? ":" : ""));
 				//trace("PICKDOWN:" + _curLoc+  " : "+tarLoc);
-	
+				_curVelocity = easeFuncs.deriative_Out(tarLoc);
 				tarLoc = easeFuncs.distCovered_Out(tarLoc);
-				_curVelocity = easeFuncs.deriative(1 - easeFuncs.distCoveredGetX(tarLoc));
+			
 				
 				tarLoc *= pickdownTimeSpan;
 				
