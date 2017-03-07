@@ -39,9 +39,10 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 		
 		_vData._stack = Swing.Stack({
 			throwOutConfidence:confidenceHandler
-			,			  maxRotation: 30,
+			,			  maxRotation: 22,
 			//maxThrowOutDistance: 400,
 			//minThrowOutDistance: 400,
+			rotation:rotationHandler
 			
 		});
 		_vData._stack.on("throw", onThrow);
@@ -70,6 +71,14 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 			trace("Capture up and down");
 		}
 		
+	}
+	
+	function rotationHandler(coordinateX:Float, coordinateY:Float, element:HtmlElement, maxRotation:Float):Float {
+		var horizontalOffset = Math.min(Math.max(coordinateX / element.offsetWidth, -1), 1);
+		  var verticalOffset = (coordinateY > 0 ? 1 : -1) * Math.min(Math.abs(coordinateY) / 100, 1);
+		  var rotation = horizontalOffset * verticalOffset * maxRotation;
+
+		  return rotation + 15*horizontalOffset;
 	}
 	
 	
