@@ -154,9 +154,9 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 					<button v-on:click="swipe(false)">Left</button>
 					<button v-on:click="swipe(true)">Right</button>
 				</div>
-				<div class="cardstack">
+				<ul class="cardstack">
 					<${Comp_Card} v-for="n in 4" :stack="$$data._stack" :key="n">{{n}}</${Comp_Card}>
-				</div>
+				</ul>
 			</div>
 		';
 	}
