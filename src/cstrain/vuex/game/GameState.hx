@@ -2,6 +2,7 @@ package cstrain.vuex.game;
 import cstrain.core.Card;
 import cstrain.core.CardResult;
 import cstrain.core.GameSettings;
+import cstrain.core.IBGTrain;
 import cstrain.core.IRules;
 import cstrain.core.Penalty;
 import cstrain.core.PlayerStats;
@@ -21,6 +22,7 @@ class GameState
 	public var settings:GameSettings;
 	
 	public var topCard:Card = null;
+	public var nextCardBelow:Card = null;
 
 	public var isPopup:Bool = false;
 	public var cardResult:CardResult= null;
@@ -38,7 +40,13 @@ class GameState
 	public static inline var SWIPE_RIGHT:Int = 2;
 	public var _chosenCard:Card;
 	public var _rules:IRules;
+	public var _bgTrain:IBGTrain;
 	
+	
+	public var beltSize:Int = 7;
+	
+	
+	public var showInstructions:Bool = false;
 	
 	public function new(rules:IRules) 
 	{

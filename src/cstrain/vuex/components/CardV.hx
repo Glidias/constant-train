@@ -1,4 +1,5 @@
 package cstrain.vuex.components;
+import cstrain.core.Polynomial;
 import gajus.swing.Swing;
 import cstrain.core.Card;
 import gajus.swing.Swing.SwingCard;
@@ -30,25 +31,42 @@ class CardV extends VComponent<SwingCardRef, CardProps>
 		_vData._card = this.stack.createCard(_vEl);
 	}
 	
-	var cardCopy(get, never):String;
-	function get_cardCopy():String {
-		return this.card != null ? CardView.getCardCopy(this.card) : "";
-	}
+
 	
-	function onClickTest(event:Event):Void {
-		
-			//trace("CLICK TO EMIT:"+_props.index);
-		_vEmit("clickTest", _props.index);
-	}
-	
+
 	function testReturn(event:Event):Bool {
 		
 		return false;
 	}
+	
+	var cardCopy(get, never):String;
+	function get_cardCopy():String 
+	{
+		//var delayTimeLeft:Int = this.secondsLeft;
+		var regularCopy:String = this.card != null ?    Card.canOperate(this.card.operator) ?  getCardCopy(this.card) : getCardCopy(this.card) + " :: " + getCardCopy(this.card.virtualRight)    : "?";
+		//var penaltyPhrase:String = store.game.gameGetters.simplePenaltyPhrase + ": "+ this.secondsLeft;
+		
+		/*
+		if (this.store.state.game.delayTimeLeft > 0) {
+			return penaltyPhrase;
+		}
+		*/
+		return regularCopy;
+	
+	}
+	
+	
+	public static  function getCardCopy(card:Card):String {
+		var isPolynomialOfVars:Bool =  card.isPolynomial();  // required to factor out condition for reactivity!
+		
+		var cardIsVar:Bool = card.isVar;
+		return  ( Card.canOperate(card.operator) ?  Card.stringifyOp(card.operator) : "") + ( isPolynomialOfVars ?  "("+Polynomial.PrintOut(card.getPolynomial(), "n", true)+")" :  ( card.isVar ? "n" : card.value+"" )) ;
+	}
+	
 
 	override public function Template():String {
 		return '
-			<li class="card"><slot></slot>:{{card!= null ? "GOt card"+this.card.value : "NONE" }}<a href="javascript:;" v-on:click="onClickTest">+</a></li>
+			<li class="card" :index="index"><span style="font-size:9px; color:#aaaaaa">{{index}}:</span> {{ cardCopy }}</li>
 		';
 	}
 }

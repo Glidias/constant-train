@@ -4,14 +4,18 @@
 	<meta charset="utf-8"/>
 	<title>Constant Train</title>
 	<meta name="description" content="" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=414px;height=736px; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 	<script src="js/vue.js"></script>
 	<script src="js/vuex.js"></script>
 	<style>
+		html {
+			overflow:hidden;
+		}
 		body {
 			padding:0;
 			margin:0;
 			overflow:hidden;
+	
 		}
 		#wrapper {
 			margin:0 auto;
@@ -33,6 +37,21 @@
 			
 		}
 		
+		.helpbtn {
+			display:inline-block;
+			cursor:pointer;
+			color:#222222;
+		}
+		.helpbtn.active {
+			color:#666666;
+			
+		}
+		.helpbtn:after {
+			content: "X";
+		}	
+		.helpbtn.active:after {
+			content: "";
+		}	
 		
 		.cardview {
 			
@@ -41,28 +60,90 @@
 			height:100%;
 		}
 		
+		.cardview h3 {
+			font-size:16px;
+		}
+		
+		.xpression {
+			position:absolute;
+			top:35px;
+			right:15px;
+		
+		}
+		
+		
+		.hud-indicators {
+			position:relative;z-index:4;
+		}
 		.cardstack {
-		 width: 240px; height: 300px;  position: absolute; top: 50px; left: 50%; margin-left: -120px;
+		 width: 240px; height: 300px;  position: absolute; top: 44px; left: 50%; margin-left: -120px;
+		}
+		
+		
+		
+		.popup-cardview {
+			width:100%;
+			background-color:brown;
+			height:57%;
+			top:0;left:0;
+			position:absolute;
+		}
+		.popup-cardview .cardstack {
+			top:93px;
+		}
+		
+		.delay-popup {
+			z-index:10;
+			position:absolute;
+			top:0;
+			left:0;
+			width:100%;
+			height:100%;
+			text-align:center;
+			
+		}
+		.delay-popup .content {
+			position:absolute;
+			bottom:230px;
+			width:100%;
+			text-align:center;
+			font-size:1.2em;
+		}
+		.delay-popup h4 {
+			font-size:1.0em;
+		}
+		
+		.blocker {
+			position:absolute;
+			top:203px;
+			left:0;
+			
+			width:100%;height:100%;
+		}
+		.blocker.showInstruct {
+			background-color:rgba(0,0,0,.5);
 		}
 		
 		.cardstack .card {
 			
-			 width: 240px; height: 300px; list-style: none; background: #fff; border-radius: 5px; position: absolute; top: 0; left: 0; box-shadow: 0 0 2px rgba(0,0,0,.2), 1px 1px 1px rgba(0,0,0,.2); line-height: 300px; text-align: center; font-size: 20px; border: 10px solid #ECECEC; box-sizing: border-box; cursor: default; select:none;
+			 width: 240px; height: 300px; list-style: none; background: #fff; border-radius: 5px; position: absolute; top: 0; left: 0; box-shadow: 0 0 2px rgba(0,0,0,.2), 1px 1px 1px rgba(0,0,0,.2); line-height: 300px; text-align: center; font-size: 2em; border: 10px solid #ECECEC; box-sizing: border-box; cursor: default; select:none; color:black;
 		}
 		
-		.cardstack .card.transiting {
-			transition:transform .05s linear;
-			transform:translate3d(0,0,0) translate(0,0) !important;
-		}
-		
+
 	</style>
+	<script language="javascript">
+
+document.ontouchmove = function(e){ 
+    e.preventDefault(); 
+}
+	</script>
 	
 </head>
 <body>
 	<div id="wrapper">
 		<canvas id="webgl" style="width:100%; height:100%;"></canvas>
 		<div id="app"></div>
-		<script src="http://localhost:8080/bundle.js"></script>
+		<script src="http://192.168.1.19:8080/bundle.js"></script>
 	</div>
 </body>
 </html>

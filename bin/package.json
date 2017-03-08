@@ -8,6 +8,6 @@
   },
   "private": true,
   "scripts": {
-    "start": "webpack-dev-server --entry ./ConstantTrain.js"
+    "start": "webpack-dev-server --port 8080 --host 192.168.1.19 --entry ./ConstantTrain.js"
   }
 }

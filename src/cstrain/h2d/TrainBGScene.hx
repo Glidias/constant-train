@@ -38,6 +38,7 @@ class TrainBGScene extends AbstractBGScene
 	
 	var _curLoc:Float = 0;
 	var unitTimeLength:Float = GameSettings.SHARED_FPS  / 1;
+	var renderCount:Int = 0;
 	
 	// NOTE: Currently, until shader implementation is used over manual uplaod of webGL, pausing/minimising and returning back to screen will yield visual flickerings in re-renderings
 	
@@ -49,9 +50,13 @@ class TrainBGScene extends AbstractBGScene
 			model.travelTo( Std.int(model.targetDest + 1 ) );
 		
 		}
-		model.update();
 	
-
+		model.update();
+		if (renderCount < 60) {
+			_needToRender = true;
+			renderCount++;
+		}
+		
 		if (_needToRender || model.movingState != BGTrainState.STOPPED) {  // perform necessary render updates
 			_needToRender = model.movingState != BGTrainState.STOPPED;
 			
@@ -96,9 +101,8 @@ class TrainBGScene extends AbstractBGScene
 	override function init() {
 		super.init();
 	
-		s2d.addChild( scene = new Sprite());
-
-		var g = new h2d.Graphics(s2d);
+		
+		var g = new h2d.Graphics(scene);
 	
 		var fillGrad:Fill = new Fill(s2d);
 		//var grad:Gradient = { spread:SMPad, interpolate:IMLinearRGB, data:[GradRecord.GRRGB(0, {r:255, g:255, b:0} ), GradRecord.GRRGB(1, {r:255,g:0,b:0} ) ]   };
@@ -106,6 +110,10 @@ class TrainBGScene extends AbstractBGScene
 		//FSLinearGradient(matrix, grad)
 		//fillGrad.fillRect(h2d.css.FillStyle.Gradient(0x51484A,0x51484A,0x96644E,0x96644E), 0, 0, s2d.width, s2d.height);
 		fillGrad.fillRectGradient(0, 0, s2d.width, s2d.height, 0xFF51484A, 0xFF51484A, 0xFF96644E, 0xFF96644E);
+		
+		
+		s2d.addChild( scene = new Sprite());
+		scene.y += s2d.height * .12;
 		
 		var fogR = 0x40;
 		var fogG = 0x35;
@@ -128,7 +136,7 @@ class TrainBGScene extends AbstractBGScene
 			var color:UInt = ( Std.int(_r) << 16) | ( Std.int(_g) << 8) | Std.int(_b);
 			
 			var mountain:Mountain = new Mountain( -Math.pow(i + 1, 2), baseHeight, color);
-			s2d.addChild(mountain);
+			scene.addChild(mountain);
 			entities.push(mountain);
 		}
 		

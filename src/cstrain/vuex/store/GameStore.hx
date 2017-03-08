@@ -1,4 +1,5 @@
 package cstrain.vuex.store;
+import cstrain.core.IBGTrain;
 import cstrain.core.IRules;
 import cstrain.vuex.game.GameActions;
 import cstrain.vuex.game.GameModule;
@@ -17,11 +18,12 @@ class GameStore extends VxStore<GameStoreState>
 	
 	@:module @:manual public var game:GameModule;
 	
-	public function new(rules:IRules) 		
+	public function new(rules:IRules, bgTrain:IBGTrain=null) 		
 	{
 		state = new GameStoreState();
 		
-		game = new GameModule(rules);
+		game = new GameModule(rules, bgTrain);
+		
 		
 	}
 	

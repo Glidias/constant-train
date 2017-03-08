@@ -18,7 +18,7 @@ class SceneModel implements IBGTrain
 	public function new() 
 	{
 		calcPickupTime();
-		setPickupTimespans(3, 3);
+		setPickupTimespans(1, 1);
 	
 	}
 	
@@ -37,7 +37,7 @@ class SceneModel implements IBGTrain
 	static inline var PUSH_FORWARD_ERROR:Float = .75;
 	
 	
-	var _maxSpeed:Float = 3;
+	var _maxSpeed:Float = 4;
 	var _isStarted:Bool = false;
 	var _startIndex:Float = -1;
 	var _tweenProgress:Float = 0;
@@ -146,7 +146,7 @@ class SceneModel implements IBGTrain
 			_startTime = Timer.stamp();
 			_startIndex =tarIndex;
 			
-			trace("START:" + _startIndex);
+			//trace("START:" + _startIndex);
 			_tweenProgress = 0;
 			_tweenDuration = (index - _startIndex ) * unitTimeLength/_maxSpeed +  _pickupTimeDiff*pickupTimeSpan* unitTimeLength +  _pickupTimeDiff*pickdownTimeSpan* unitTimeLength ; 
 		}
@@ -187,7 +187,7 @@ class SceneModel implements IBGTrain
 			}
 			else {
 				_targetDest = index;
-				trace("Extend cruising time");
+			//	trace("Extend cruising time");
 			}
 			_tweenDuration = (index - _startIndex) * unitTimeLength / _maxSpeed  + _pickupTimeDiff*pickupTimeSpan* unitTimeLength +  _pickupTimeDiff*pickdownTimeSpan* unitTimeLength ; 
 		
@@ -198,7 +198,7 @@ class SceneModel implements IBGTrain
 			var y = (_targetDest - _startIndex);
 		//	trace("old tween duration:" + _tweenDuration);
 			_tweenDuration = easeFuncs.distCoveredGetX( y / pickupTimeSpan * pickupAndDownMidpointRatio) *  unitTimeLength * pickupTimeSpan   + easeFuncs.distCoveredGetX( y / pickdownTimeSpan *  (1-pickupAndDownMidpointRatio) ) *  unitTimeLength * pickdownTimeSpan;
-			trace("New tween duration for crossover: "+_tweenDuration);
+			//trace("New tween duration for crossover: "+_tweenDuration);
 			
 		}
 		
@@ -267,7 +267,7 @@ class SceneModel implements IBGTrain
 			}
 			
 			 if ( (exceed && !exceedBreaking) || (!exceed && _tweenProgress < pickupTimeDur) ) {
-				 trace("Accelerating..."+(exceed ? ":" : ""));
+				 //trace("Accelerating..."+(exceed ? ":" : ""));
 				//trace("PICKUP:" + _curLoc);
 				
 				tarLoc = (_tweenProgress / pickupUnitTimeLength);	
@@ -283,7 +283,7 @@ class SceneModel implements IBGTrain
 				
 				tarLoc = _tweenProgress - _tweenDuration + pickdownUnitTimeLength;
 				tarLoc /= pickdownUnitTimeLength;
-				trace("Braking..."+(exceed ? ":" : ""));
+			//	trace("Braking..."+(exceed ? ":" : ""));
 				//trace("PICKDOWN:" + _curLoc+  " : "+tarLoc);
 				_curVelocity = easeFuncs.deriative_Out(tarLoc);
 				tarLoc = easeFuncs.distCovered_Out(tarLoc);
@@ -297,7 +297,7 @@ class SceneModel implements IBGTrain
 			
 			}
 			else if (!exceed) {
-				trace("Cruising...");
+			//	trace("Cruising...");
 				//trace("CONSTANT:" +_curLoc);
 				_curVelocity = _maxSpeed;
 				tarLoc = CSMath.lerp( _startIndex + _pickupTimeDistCovered*pickupTimeSpan, _targetDest - _pickupTimeDistCovered*pickdownTimeSpan, (_tweenProgress - pickupTimeDur) / (_tweenDuration - totalPickupAndDownTimeDur ) );
@@ -316,7 +316,7 @@ class SceneModel implements IBGTrain
 				_tweenProgress = _tweenDuration;
 				_isStarted = false;
 				_curVelocity = 0;
-				trace("END:" + tarLoc);
+				//trace("END:" + tarLoc);
 				movingState = BGTrainState.STOPPED;
 				
 			}

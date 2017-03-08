@@ -1,9 +1,10 @@
 package cstrain.vuex.components;
 import cstrain.core.Polynomial;
+import cstrain.vuex.components.BasicTypes;
 import cstrain.vuex.components.CardV.CardProps;
-import cstrain.vuex.components.CardView.RefCard;
 import cstrain.vuex.components.GameView;
 import cstrain.vuex.game.GameActions;
+import cstrain.vuex.game.GameMutator;
 import cstrain.vuex.store.GameStore;
 import gajus.swing.Swing;
 import haxe.Timer;
@@ -11,13 +12,14 @@ import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.core.VxComponent;
 import cstrain.core.Card;
+
 import js.html.HtmlElement;
 
 /**
  * ...
  * @author Glidias
  */
-class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
+class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 {
 	
 	@:action  static var actions:GameActions;
@@ -27,114 +29,72 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 		super();
 	}
 	
+	inline function myData():CardViewState {
+		return untyped _vData;
+	}
+	
 	function tickDown():Void 
 	{
 	//	trace("TICK");
-		this.secondsLeft--;
+		myData().secondsLeft--;
 	}
 	
 	// Start swing
 	
-	override public function Created():Void {
-		
-		_vData._stack = Swing.Stack({
-			throwOutConfidence:confidenceHandler
-			,			  maxRotation: 22,
-			//maxThrowOutDistance: 400,
-			//minThrowOutDistance: 400,
-			rotation:rotationHandler
-			
-		});
-		_vData._stack.on("throw", onThrow);
-		_vData._stack.on("throwoutend", onThrowOutEnd);
-		_vData._stack.on("throwinend", onThrowInEnd);
-		
-		
 	
-		
-	}
-	override public function Mounted():Void {
-		
-		for (vu in _vChildren) {
-			vu._vOn("clickTest", clickTestHandler);
-		}
-	}
+	override function onThrowOut(e:SwingCardEvent):Void {
 	
-	function clickTestHandler(index:Int):Void {
-	//	trace("CLICK test");
-		refCards[index].card = new Card(Card.OPERATOR_SUBTRACT, Std.int(Math.random() * 10) );
-	
-	}
-	
-	function onThrow(e:SwingCardEvent):Void {
-		if (e.direction == SwingCard.DIRECTION_UP || e.direction == SwingCard.DIRECTION_DOWN ) {
-			trace("Capture up and down");
-		}
-		
-	}
-	
-	function rotationHandler(coordinateX:Float, coordinateY:Float, element:HtmlElement, maxRotation:Float):Float {
-		var horizontalOffset = Math.min(Math.max(coordinateX / element.offsetWidth, -1), 1);
-		  var verticalOffset = (coordinateY > 0 ? 1 : -1) * Math.min(Math.abs(coordinateY) / 100, 1);
-		  var rotation = horizontalOffset * verticalOffset * maxRotation;
+		super.onThrowOut(e);
 
-		  return rotation + 15*horizontalOffset;
-	}
-	
-	
-	function confidenceHandler(xOffset:Float, yOffset:Float, element:HtmlElement):Float {
-		 var xConfidence = Math.min(Math.abs(xOffset) / element.offsetWidth, 1);
-		var yConfidence = Math.min(Math.abs(yOffset) / element.offsetHeight, 1);
+		
 
-		return Math.min(1, Math.max(xConfidence*2, yConfidence*2) );
 	}
+
 	
-	function onThrowOutEnd(e:SwingCardEvent):Void
+	override function onThrowOutEnd(e:SwingCardEvent):Void
 	{
-
-		//this.stack = 
-		var el:HtmlElement = e.target;
-		var par = el.parentNode;
-		par.removeChild(el);
-	
+		super.onThrowOutEnd(e);
 		
-	
-		par.insertBefore(el, par.firstChild);
-		var card = _vData._stack.getCard(el);
-		card.throwIn(0, 0);
+		
+		var index:Int =  Std.parseInt( e.target.getAttribute( "index")   );
+		this._vData.refCards[index].card =  store.state.game.cards[this.nextBeltCardIndex];
 
 	}
 	
 	function onThrowInEnd(e:SwingCardEvent):Void
 	{
 
-		trace("RETURN BACK");
 	}
 	
-	// End swing impl
+	
+	override public function Created():Void {
+		
+		super.Created();
+		_vData._stack.on("throwinend", onThrowInEnd);
+
+		
+	}
 	
 	override public function Data():CardViewState {
+		var storeCards = store.state.game.cards;
+		
 		return {
+			topCardIndex:BELT_AMOUNT-1,
 			secondsLeft:0,
-			refCards: [
-				{card:new Card(Card.OPERATOR_ADD, 1)},{card:null},{card:null},{card:null},{card:null},{card:null},{card:null}
-			]
+			nextBeltCardIndex:BELT_AMOUNT,
+			beltAmount:BELT_AMOUNT,
+			refCards: BaseCardView.getEmptyBelt(BELT_AMOUNT)
 		};
 	}
+	/*
+	 [
+				{card:storeCards[6]},{card:storeCards[5]},{card:storeCards[4]},{card:storeCards[3]},{card:storeCards[2]},{card:storeCards[1]},{card:storeCards[0]}
+			]
+			*/
 	
-	var cardCopy(get, never):String;
-	function get_cardCopy():String 
-	{
-		var delayTimeLeft:Int = this.secondsLeft;
-		var regularCopy:String =  Card.canOperate(this.currentCard.operator) ?  getCardCopy(this.currentCard) : getCardCopy(this.currentCard) + " :: " + getCardCopy(this.currentCard.virtualRight);
-		var penaltyPhrase:String = store.game.gameGetters.simplePenaltyPhrase + ": "+ this.secondsLeft;
-	
-		if (this.store.state.game.delayTimeLeft > 0) {
-			return penaltyPhrase;
-		}
-		return regularCopy;
-	
-	}
+	static inline var BELT_AMOUNT:Int = 7;
+
+
 	
 	var delayTimeInSec(get, never):Float;
 	function get_delayTimeInSec():Float 
@@ -145,8 +105,8 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 	function startTickDownNow():Void {
 		
 		//trace("TO START TICKDOWN");
-		_vData._timer = new Timer(1000);
-		_vData._timer.run = tickDown;
+		myData()._timer = new Timer(1000);
+		myData()._timer.run = tickDown;
 		
 	}
 	
@@ -158,7 +118,7 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 	
 	@:watch function watch_delayTimeInSec(val:Float):Void {
 		
-		this.secondsLeft = Std.int( Math.floor(val) ) + 1;
+		myData().secondsLeft = Std.int( Math.floor(val) ) + 1;
 		
 		if (val > 0) {
 			//trace("SETTING VAL:" + val);
@@ -173,7 +133,7 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 		}
 		else {
 		//	trace("Stopping VAL:" + val);
-			_vData._timer.stop();
+			myData()._timer.stop();
 		}
 	}
 	
@@ -208,59 +168,61 @@ class CardView extends VxComponent<GameStore, CardViewState, CardViewProps>
 		return store.state.game.delayTimeLeft > 0;
 	}
 	
-	static inline var Comp_Card:String = "CardV";
-	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
-		return [
-			Comp_Card => new CardV()
-		];
-	}
+
 	
 
+				
+	function getCardForIndex(i:Int):Card {
+		var top = store.state.game.topCard;
+		var below =  store.state.game.nextCardBelow;
+		var gotDelay:Bool = store.state.game.delayTimeLeft != 0 ;
+		var topCardMatch:Bool =  this.topCardIndex != i;
+		return gotDelay ? null :  topCardMatch ? this.topCardIndex - 1 != i ? null : below  : top;
+	}
 		
+	
+	var penaltyDesc(get, never):String;
+	function get_penaltyDesc():String 
+	{
+
+		return  store.game.gameGetters.simplePenaltyPhrase;
+	
+	}
+	
+	
 	override public function Template():String {
 		return '
 			<div class="cardview">
-				<h3>Swipe {{ tickStr }} {{ penaltiedStr }} &nbsp; {{ curCardIndex+1}} / {{ totalCards}}</h3>
+				<div class="hud-indicators">
+					<h3>{{ tickStr }} {{ penaltiedStr }} &nbsp; {{ curCardIndex+1}} / {{ totalCards}}</h3>
+				</div>
 				
-				<div class="card" v-if="currentCard">
-					{{ cardCopy }} 
-					<br/>
-					
-				</div>
-				<div class="btnswipers" v-show="!gotDelay">
-					<button v-on:click="swipe(false)">Left</button>
-					<button v-on:click="swipe(true)">Right</button>
-				</div>
+				<h4>{{ topCardIndex}}</h4>
 				<ul class="cardstack">
-					<${Comp_Card} v-for="(ref, i) in refCards" :card="ref.card" :stack="$$data._stack" :index="i" :key="i">{{i}}</${Comp_Card}>
+					<${BaseCardView.Comp_Card} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i" v-show="totalCards - curCardIndex > ${BELT_AMOUNT} - i  - 1  ">{{i}}</${BaseCardView.Comp_Card}>
 				</ul>
+				
+				<div class="delay-popup" v-show="gotDelay">
+					<div class="content">
+						<h4 >{{ penaltyDesc }}!</h4>
+						<div class="indicator">{{ secondsLeft }}   seconds left.</div>
+					</div>
+				</div>
 			</div>
 		';
 	}
 	
+
 	
-	public static  function getCardCopy(card:Card):String {
-		var isPolynomialOfVars:Bool =  card.isPolynomial();  // required to factor out condition for reactivity!
 	
-		var cardIsVar:Bool = card.isVar;
-		return  ( Card.canOperate(card.operator) ?  Card.stringifyOp(card.operator) : "") + ( isPolynomialOfVars ?  "("+Polynomial.PrintOut(card.getPolynomial(), "n", true)+")" :  ( card.isVar ? "n" : card.value+"" )) ;
-	}
 	
 
 	
-}
-
-typedef CardViewProps = {
-	var currentCard:Card;
 }
 
 typedef CardViewState = {
+	> SwingStackData,
 	var secondsLeft:Int;
-	var refCards:Array<RefCard>;
-	@:optional var _stack:SwingStack;
 	@:optional var _timer:Timer;
 }
 
-typedef RefCard = {
-	@:optional  var card:Card;
-}

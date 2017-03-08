@@ -28,8 +28,15 @@ class GameMutator implements IMutator<GameState>
 		
 	}
 	
+	
+	function toggleInstructions(state:GameState):Void {
+		state.showInstructions  = !state.showInstructions;
+	}
+	
 	function updateProgress(state:GameState):Void {
 		state.curCardIndex = state._rules.getDeckIndex();
+	
+		if (state._bgTrain != null) state._bgTrain.travelTo(state.curCardIndex);
 	}
 	
 	function setPenalty(state:GameState, penalty:Penalty):Void {
@@ -57,7 +64,10 @@ class GameMutator implements IMutator<GameState>
 		
 
 		state.topCard = state._rules.getTopmostCard();
-		
+		var prevCardBelow:Card = state.nextCardBelow;
+		state.nextCardBelow = state._rules.getNextCardBelow();
+		var nextCardBelow:Card = state.nextCardBelow;
+
 		updateExpression(state);
 		
 	}

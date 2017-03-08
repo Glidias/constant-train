@@ -18,10 +18,12 @@ class Main
 	{
 		// Main App
 		var boot:VxBoot = new VxBoot();
-		var gs = new GameStore(new TestGame()) ;
-	
 		
 		var sm = new SceneModel();
+		var gs = new GameStore(new TestGame(), sm) ;
+	
+		
+		
 		
 		var store = boot.startStore( gs) ;
 	

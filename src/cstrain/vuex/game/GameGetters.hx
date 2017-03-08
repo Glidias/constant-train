@@ -40,7 +40,10 @@ class GameGetters implements IGetters<GameState, NoneT>
 		return state.curPenalty != null ? state.penaltySwipeCorrect : true;
 	}
 	
-	
+	public static inline function Get_showInstructions(state:GameState):Bool {
+
+		return  state.showInstructions;
+	}
 	
 	public static inline function Get_totalCards(state:GameState):Int {
 
@@ -50,6 +53,28 @@ class GameGetters implements IGetters<GameState, NoneT>
 
 		return state.curCardIndex;// : 0;
 	}
+	
+	/*
+	
+	public static  function Get_beltOfMainCards(state:GameState):Array<{card:Card}> {
+		var arr:Array<{card:Card}> = [];
+
+		var topCard:Card =  state.topCard;
+		var belowCard:Card = state.nextCardBelow;
+		var isPopingUp:Bool = Get_isPopupChoicing(state) || Get_isPenalized(state);
+		
+		
+		while (--i > -1) {
+			arr.push({card:state.cards[i]});
+		}
+		return arr;
+	}
+	
+	public static  function Get_beltOfPopupCards(state:GameState):Array<{card:Card}> {
+		
+		return [];
+	}
+	*/
 	
 	public static function Get_simplePenaltyPhrase(state:GameState):String {
 		var penalty:Penalty = state.curPenalty;

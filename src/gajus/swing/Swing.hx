@@ -5,13 +5,13 @@ import js.html.HtmlElement;
  * ...
  * @author Glidias
  */
-@:jsRequire("Swing")
+@:jsRequire("swing")
 extern class Swing
 {
 	public static function Stack(?config:Dynamic):SwingStack;
 }
 
-@:jsRequire("Swing", "Stack")
+@:jsRequire("swing", "Stack")
 extern class SwingStack
 {
 	public function createCard(htmlElement:HtmlElement):SwingCard;
@@ -21,20 +21,25 @@ extern class SwingStack
 	
 }
 
-@:jsRequire("Swing", "Card")
+@:jsRequire("swing", "Card")
 extern class SwingCard
 {
 	public function throwIn(x:Float, y:Float):Void;
 	public function throwOut(x:Float, y:Float):Void;
-	public static var DIRECTION_UP:String;
-	public static var DIRECTION_DOWN:String;
-	public static var DIRECTION_LEFT:String;
-	public static var DIRECTION_RIGHT:String;
+
 }
 
+@:jsRequire("swing", "Direction")
+extern class SwingDirection
+{
+	public static var UP:Dynamic;
+	public static var DOWN:Dynamic;
+	public static var LEFT:Dynamic;
+	public static var RIGHT:Dynamic;
+}
 
 typedef SwingCardEvent = {
 	var target:HtmlElement;
-	var direction:String;
+	var throwDirection:Dynamic;
 	var throwOutConfidence:Float;
 }
