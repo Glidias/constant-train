@@ -1,5 +1,6 @@
 package cstrain.vuex.components;
 import cstrain.core.Card;
+import cstrain.core.CardResult;
 import cstrain.vuex.components.CardView.CardViewState;
 import cstrain.vuex.game.GameActions;
 import cstrain.vuex.store.GameStore;
@@ -9,6 +10,7 @@ import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.core.VxComponent;
 import cstrain.vuex.components.BasicTypes;
+import js.Promise;
 
 /**
  * ...
@@ -25,10 +27,10 @@ class PopupCardView extends BaseCardView
 		super();
 	}
 	
-	override function onThrowOut(e:SwingCardEvent):Void {
+	override function onThrowOut(e:SwingCardEvent):Promise<CardResult> {
 
 		
-		super.onThrowOut(e);
+		return super.onThrowOut(e);
 
 	}
 	
@@ -68,7 +70,7 @@ class PopupCardView extends BaseCardView
 	
 	override public function Template():String {
 		return '
-			<div class="popup-cardview" v-show="isPopupChoicing">
+			<div class="popup-cardview" :class="{shown:isPopupChoicing}">
 				<h4 style="position:absolute;bottom:5px;right:5px">{{ topCardIndex}}</h4>
 				<ul class="cardstack">
 					<${BaseCardView.Comp_Card} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i">{{i}}</${BaseCardView.Comp_Card}>

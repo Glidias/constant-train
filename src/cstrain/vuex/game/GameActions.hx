@@ -47,6 +47,9 @@ class GameActions implements IAction<GameState, NoneT>
 				case CardResult.PENALIZE(penalty):
 					mutator._setPenalty(context, penalty);
 					//penalty.delayNow;
+					if (penalty.desc == PenaltyDesc.MISSED_STOP || penalty.desc == PenaltyDesc.LOST_IN_TRANSIT) {
+						mutator._updateProgress(context);
+					}
 					if (penalty.delayNow != null  ) {
 						var calcTime:Float = penalty.delayNow * context.state.settings.penaltyDelayMs;
 						mutator._setDelay(context,calcTime );
@@ -69,7 +72,7 @@ class GameActions implements IAction<GameState, NoneT>
 							mutator._setPenaltySwipeCorrect(context, false);
 					}
 			
-				case CardResult.OK:
+				case CardResult.OK(_):
 						// play OK sound, close any popups, etc.
 						//mutator._setPopupCard(context,false);
 						mutator._setPenalty(context, null);

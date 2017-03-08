@@ -77,40 +77,45 @@ class BaseCardView extends VxComponent<GameStore, SwingStackData, NoneT>
 		
 		//this.stack = 
 		var el:HtmlElement = e.target;
-
-		if (  el.getAttribute("data-canceled") == "1" ) {
-			return;
-		}
+		var index:Int = Std.parseInt(el.getAttribute("index"));
+		var tarIndexBefore:Int = index < this.beltAmount - 1 ? index + 1 : 0;
 		
-	
+		
 		var par = el.parentNode;
 		par.removeChild(el);
 
+		var child:HtmlElement =  cast par.firstChild;
 		
-		this.nextBeltCardIndex++;
-		 
-		par.insertBefore(el, par.firstChild);
+		while ( Std.parseInt(child.getAttribute("index")) != tarIndexBefore) {
+			child = cast child.nextSibling;
+		}
+
+		// TODO: need not be first child, find complement
+		par.insertBefore(el, child);
 		var card = _vData._stack.getCard(el);
+		
+	
 		card.throwIn(0, 0);
+		//}
 
 	}
 	
 	@:action static var actions:GameActions;
 	
-	function onThrowOut(e:SwingCardEvent):Void {
+	function onThrowOut(e:SwingCardEvent):js.Promise<CardResult> {
 		var stack = _vData._stack;
 	
 	
 		var result;
 		if (e.throwDirection != SwingDirection.RIGHT) {
 			result = actions._swipe(store, false);
-
 		}
 		else {
 			result = actions._swipe(store, true);
 
 		}
-		
+	
+	//	/*
 
 		result.then( function(cardResult) {
 
@@ -120,22 +125,23 @@ class BaseCardView extends VxComponent<GameStore, SwingStackData, NoneT>
 					var card = stack.getCard(e.target);
 					card.throwIn(0, 0);
 
-					e.target.setAttribute("data-canceled", "1");
+					//e.target.setAttribute("data-canceled", "1");
 					//var p = e.target.parentNode;
 					//p.removeChild(e.target);
 					//p.appendChild(e.target);
 				default:
-					// track top card index on belt
 					--this.topCardIndex;
-					e.target.setAttribute("data-canceled", "");
+					//e.target.setAttribute("data-canceled", "");
 					if (this.topCardIndex < 0) this.topCardIndex = this.beltAmount - 1;
+					// track top card index on belt
+					
 					
 			}
 		
 		});
+		//*/
 		
-		
-
+		return result;
 	}
 	
 	///*

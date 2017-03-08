@@ -11,7 +11,8 @@ typedef SwingStackData = {
 	var refCards:Array<RefCard>;
 	var nextBeltCardIndex:Int;
 	var topCardIndex:Int;
-	var beltAmount(default,never):Int;
+	var beltAmount(default, never):Int;
+
 	@:optional var _stack:SwingStack;
 	@:optional var _thrownSuccess:Bool;
 }

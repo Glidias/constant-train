@@ -53,7 +53,7 @@ class TestGame implements IRules
 	}
 	
 	function buildDeck():Void {
-		var baseMult:Int   = 8;
+		var baseMult:Int   = 1;
 		deck.addCards( Deck.getCards(Deck.SET_NUMBERS, Deck.OP_ADD | Deck.OP_SUBTRACT, 0, 1*baseMult) );
 		deck.addCards( Deck.getCards(Deck.SET_NUMBERS, Deck.OP_MULTIPLY | Deck.OP_DIVIDE ,  Deck.NUM_2, 1*baseMult) );
 
@@ -134,7 +134,7 @@ class TestGame implements IRules
 				else {
 					// ok , continue as per normal
 					
-					return CardResult.OK;
+					return CardResult.OK(thePopupCard != null ? 0 :1);
 				}
 			}
 			trace("UNaccounted operation");
@@ -159,7 +159,7 @@ class TestGame implements IRules
 						thePopupCard = Card.getRegularStartingVarCard();
 						recreateSecret();
 						
-						return CardResult.OK;
+						return CardResult.OK(0);
 					}
 				}
 				else {	// gave not so good answer...
@@ -326,6 +326,7 @@ class TestGame implements IRules
 	{
 		
 		var result:Card = thePopupCard != null ?  getTopCard() : getBelowCardCard();
+		if (result == null) return null;
 		if ( thePopupCard == null && result.operator == Card.OPERATOR_DIVIDE && result.varValues == null ) {  
 			trace("To process card to polynomial");
 			// check if division is possible and modify card if necessary

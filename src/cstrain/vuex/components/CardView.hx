@@ -1,4 +1,7 @@
 package cstrain.vuex.components;
+import cstrain.core.CardResult;
+import cstrain.core.Penalty;
+import cstrain.core.PenaltyDesc;
 import cstrain.core.Polynomial;
 import cstrain.vuex.components.BasicTypes;
 import cstrain.vuex.components.CardV.CardProps;
@@ -12,6 +15,7 @@ import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.core.VxComponent;
 import cstrain.core.Card;
+import js.Promise;
 
 import js.html.HtmlElement;
 
@@ -42,22 +46,59 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	// Start swing
 	
 	
-	override function onThrowOut(e:SwingCardEvent):Void {
+	override function onThrowOut(e:SwingCardEvent):Promise<CardResult> {
 	
-		super.onThrowOut(e);
+		var promise = super.onThrowOut(e);
+		var datam = myData();
+		promise.then( function(cardResult) {
 
+			switch(cardResult) {
+				case CardResult.PENALIZE({desc:(PenaltyDesc.LOST_IN_TRANSIT | PenaltyDesc.MISSED_STOP)}):
+					
+						e.target.setAttribute("progressing", "1");
+					
+						datam.nextBeltCardIndex+=1;
+				case CardResult.OK(progress) :
+					if (progress > 0) {
+							e.target.setAttribute("progressing", "1");
+						datam.nextBeltCardIndex+=progress;
+					}
+				default:
+					
+					e.target.setAttribute("progressing", "");
+				
+					
+			}
 		
+		});
+		
+		return promise;
 
 	}
 
 	
 	override function onThrowOutEnd(e:SwingCardEvent):Void
 	{
-		super.onThrowOutEnd(e);
-		
 		
 		var index:Int =  Std.parseInt( e.target.getAttribute( "index")   );
+		if ( noMoreCardsToRegen() ) {
+			//trace("No more visible");
+			
+			return;
+		}
+		
+		if (e.target.getAttribute("progressing") == "1" ) {
+			myData().respawnCount++;
+			
+		}
+		super.onThrowOutEnd(e);
+		
+	
+		
+		/*
+		var index:Int =  Std.parseInt( e.target.getAttribute( "index")   );
 		this._vData.refCards[index].card =  store.state.game.cards[this.nextBeltCardIndex];
+		*/
 
 	}
 	
@@ -81,6 +122,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return {
 			topCardIndex:BELT_AMOUNT-1,
 			secondsLeft:0,
+			respawnCount:0,
 			nextBeltCardIndex:BELT_AMOUNT,
 			beltAmount:BELT_AMOUNT,
 			refCards: BaseCardView.getEmptyBelt(BELT_AMOUNT)
@@ -170,7 +212,6 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	
 
 	
-
 				
 	function getCardForIndex(i:Int):Card {
 		var top = store.state.game.topCard;
@@ -178,6 +219,11 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		var gotDelay:Bool = store.state.game.delayTimeLeft != 0 ;
 		var topCardMatch:Bool =  this.topCardIndex != i;
 		return gotDelay ? null :  topCardMatch ? this.topCardIndex - 1 != i ? null : below  : top;
+	}
+	
+	function noMoreCardsToRegen():Bool {
+		
+		return totalCards - myData().respawnCount < BELT_AMOUNT;
 	}
 		
 	
@@ -194,12 +240,12 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return '
 			<div class="cardview">
 				<div class="hud-indicators">
-					<h3>{{ tickStr }} {{ penaltiedStr }} &nbsp; {{ curCardIndex+1}} / {{ totalCards}}</h3>
+					<h3>{{ tickStr }} {{ penaltiedStr }} &nbsp; {{ curCardIndex}} / {{ totalCards}}</h3>
 				</div>
 				
 				<h4>{{ topCardIndex}}</h4>
 				<ul class="cardstack">
-					<${BaseCardView.Comp_Card} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i" v-show="totalCards - curCardIndex > ${BELT_AMOUNT} - i  - 1  ">{{i}}</${BaseCardView.Comp_Card}>
+					<${BaseCardView.Comp_Card} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i">{{i}}</${BaseCardView.Comp_Card}>
 				</ul>
 				
 				<div class="delay-popup" v-show="gotDelay">
@@ -223,6 +269,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 typedef CardViewState = {
 	> SwingStackData,
 	var secondsLeft:Int;
+	var respawnCount:Int;
 	@:optional var _timer:Timer;
 }
 
