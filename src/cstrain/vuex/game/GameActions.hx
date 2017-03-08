@@ -1,6 +1,7 @@
 package cstrain.vuex.game;
 import cstrain.core.CardResult;
 import cstrain.core.PenaltyDesc;
+import format.abc.Data.Function;
 import haxe.Timer;
 import haxevx.vuex.core.IAction;
 import haxevx.vuex.core.IVxContext;
@@ -18,17 +19,15 @@ class GameActions implements IAction<GameState, NoneT>
 
 	//static inline var DELAY_TIME:Float = 2;
 	@:mutator static var mutator:GameMutator;
-	
+
 	function swipe(context:IVxContext1<GameState>, isRight:Bool):Promise<CardResult> {
-		//trace("Swiping: " +(isRight ? "right" : "left") );
-		
-		var promise = new Promise<CardResult>(function(resolve, reject) {
+
+		return new Promise<CardResult>(function(resolve, reject) {
 		
 			var result = context.state._rules.playCard(isRight);
 			
 			
-			
-			
+
 			switch( result) {
 				case CardResult.NOT_YET_AVAILABLE(_, _) | CardResult.GAMEOVER_OUTTA_CARDS:
 					
@@ -95,10 +94,7 @@ class GameActions implements IAction<GameState, NoneT>
 			
 			resolve(result);
 		});
-		
-		
-		return promise;
-			//mutator._traceCardResult(context, result);
+	
 	
 	}
 
