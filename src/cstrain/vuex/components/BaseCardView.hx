@@ -57,10 +57,10 @@ class BaseCardView extends VxComponent<GameStore, SwingStackData, NoneT>
 		  return rotation + 15*horizontalOffset;
 	}
 	
-	public static inline var Comp_Card:String = "CardV";
+	
 	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [
-			Comp_Card => new CardV()
+			'${CardV.CompName}' => new CardV()
 		];
 	}
 	

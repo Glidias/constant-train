@@ -73,7 +73,7 @@ class PopupCardView extends BaseCardView
 			<div class="popup-cardview" :class="{shown:isPopupChoicing}">
 				<h4 style="position:absolute;bottom:5px;right:5px">{{ topCardIndex}}</h4>
 				<ul class="cardstack">
-					<${BaseCardView.Comp_Card} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i">{{i}}</${BaseCardView.Comp_Card}>
+					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i">{{i}}</${CardV.CompName}>
 				</ul>
 			</div>
 		';

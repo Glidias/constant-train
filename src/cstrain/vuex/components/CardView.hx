@@ -15,6 +15,7 @@ import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.core.VxComponent;
 import cstrain.core.Card;
+import cstrain.vuex.components.BasicTypes;
 import js.Promise;
 
 import js.html.HtmlElement;
@@ -233,6 +234,11 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return gotDelay ? null :  topCardMatch ? this.topCardIndex - 1 != i ? null : below  : top;
 	}
 	
+	function isPolynomialForIndex(i:Int):Bool {
+		var card:Card = getCardForIndex(i);
+		return card != null ?  card.isPolynomial() && card.varValues.length > 1 : null;
+	}
+	
 	function noMoreCardsToRegen():Bool {
 		
 		return totalCards - myData().respawnCount < BELT_AMOUNT;
@@ -255,9 +261,9 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 					<h3>{{ tickStr }} {{ penaltiedStr }} &nbsp; {{ curCardIndex}} / {{ totalCards}}</h3>
 				</div>
 				
-				<h4>{{ topCardIndex}}</h4>
+				<h4 v-show="${BuiltVUtil.isProductionStrNot()}">{{ topCardIndex}}</h4>
 				<ul class="cardstack">
-					<${BaseCardView.Comp_Card} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i">{{i}}</${BaseCardView.Comp_Card}>
+					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :class="${" {'polynomial':isPolynomialForIndex(i)} "}" :stack="$$data._stack" :index="i" :key="i"></${CardV.CompName}>
 				</ul>
 				
 				<div class="delay-popup" v-show="gotDelay">

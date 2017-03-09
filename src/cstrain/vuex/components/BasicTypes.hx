@@ -27,3 +27,29 @@ class TouchVUtil {
 	public static inline var TAG:String = "touch";
 
 }
+
+class BuiltVUtil {
+	public static inline function isProductionStr():String {
+		#if production
+			return "true";
+		#else
+			return "false";
+		#end
+	}
+	
+	public static inline function isProductionStrNot():String{ 
+		#if production
+			return "false";
+		#else
+			return "true";
+		#end
+	}
+	
+	public static inline function isProduction():Bool {
+		#if production
+			return true;
+		#else
+			return false;
+		#end
+	}
+}
