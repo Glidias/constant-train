@@ -50,30 +50,33 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	
 		var promise = super.onThrowOut(e);
 		var datam = myData();
-		promise.then( function(cardResult) {
-
+		
+		promise.then( function(cardResult) {		// sanity check
+			
 			switch(cardResult) {
-				case CardResult.GUESS_CONSTANT(_, false):
+				case CardResult.GUESS_CONSTANT(_, _):
 					
 					e.target.setAttribute("progressing", "1");
 					datam.nextBeltCardIndex+=1;
 					
 					
-				case CardResult.PENALIZE({desc:(PenaltyDesc.LOST_IN_TRANSIT | PenaltyDesc.MISSED_STOP)}):
-					
+				case CardResult.PENALIZE({desc:(PenaltyDesc.LOST_IN_TRANSIT | PenaltyDesc.MISSED_STOP | PenaltyDesc.WRONG_CONSTANT)}):
+						
 						e.target.setAttribute("progressing", "1");
 					
 						datam.nextBeltCardIndex+=1;
 				case CardResult.OK(progress) :
 					if (progress > 0) {
+						
 							e.target.setAttribute("progressing", "1");
 						datam.nextBeltCardIndex+=progress;
 					}
 					else {
+						//trace("No progress:" + cardResult);	
 						e.target.setAttribute("progressing", "");
 					}
 				default:
-					
+					//trace("No progress:" + cardResult);	
 					e.target.setAttribute("progressing", "");
 				
 					

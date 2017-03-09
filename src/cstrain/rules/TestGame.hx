@@ -96,11 +96,12 @@ class TestGame implements IRules
 	
 	
 	function getCardResult(isSwipeRight:Bool):CardResult {
-		var curCard:Card =thePopupCard != null ? thePopupCard :  curDeckIndex >= 0 ? curDeck.cards[curDeckIndex--] : null;
+		var hadPopupCard:Bool   = thePopupCard != null;
+		var curCard:Card = hadPopupCard ? thePopupCard :  curDeckIndex >= 0 ? curDeck.cards[curDeckIndex--] : null;
 		if (curCard == null) {
 			return CardResult.GAMEOVER_OUTTA_CARDS;
 		}
-
+		
 		thePopupCard = null;	// assume for this set of rules, popup card is always cleared
 		
 		
@@ -133,8 +134,7 @@ class TestGame implements IRules
 				}
 				else {
 					// ok , continue as per normal
-					
-					return CardResult.OK(thePopupCard != null ? 0 :1);
+					return CardResult.OK(hadPopupCard  ? 0 :1);
 				}
 			}
 			trace("UNaccounted operation");
