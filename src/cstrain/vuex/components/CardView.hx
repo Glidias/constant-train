@@ -253,6 +253,11 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	
 	}
 	
+	var showStack(get, never):Bool;
+	function get_showStack():Bool {
+		return store.game.gameGetters.cardsLeft > 0;
+	}
+	
 	
 	override public function Template():String {
 		return '
@@ -262,7 +267,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 				</div>
 				
 				<h4 v-show="${BuiltVUtil.isProductionStrNot()}">{{ topCardIndex}}</h4>
-				<ul class="cardstack">
+				<ul class="cardstack" v-show="showStack">
 					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :class="${" {'polynomial':isPolynomialForIndex(i)} "}" :stack="$$data._stack" :index="i" :key="i"></${CardV.CompName}>
 				</ul>
 				
