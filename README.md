@@ -1,18 +1,18 @@
 # constant-train
 
-HaxeVx+Vuex example train racing game.
+HaxeVx+Vuex example train racing game prototype.
 
 Leverages the following technologies under Haxe:
 	
 Cross-platform codebase:
 
 - Plain Haxe platform/framework-agnostic codes (Model/server) `cstrain.core`,  `cstrain.rules`,  `cstrain.util` 
-- Heaps (for background scenery View)  `cstrain.h2d`
+- Heaps (for background scenery View)  `cstrain.h2d` https://github.com/HeapsIO/heaps
 
 For HTML5-specific target (A view implementation for browser/webapps):
 	
-- HaxeVx + Vuex `cstrain.vuex` 
-- Swing JS for card swiping feature (Note, these externs aren't complete/updated.) `gajus.swing` 
+- HaxeVx + Vuex `cstrain.vuex`  https://github.com/Glidias/haxevx
+- Swing JS for card swiping feature (Note, these externs aren't complete/updated.) `gajus.swing` https://github.com/gajus/swing 
 
 To start viewing on browser as a developer, configure `npm start` command at `bin/package.json` location to point to the relavant host/port. A host of `localhost"` would suffice if you need to view it offline. 
 
