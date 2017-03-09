@@ -4,6 +4,7 @@ import cstrain.core.CardResult;
 import cstrain.vuex.game.GameMutator;
 import cstrain.vuex.game.GameState;
 import cstrain.vuex.store.GameStore;
+import haxe.Json;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.core.VxComponent;
@@ -58,6 +59,11 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		mutator._toggleInstructions(store);
 	
 	}
+	
+	var helpBtnShown(get, never):Bool;
+	function get_helpBtnShown():Bool {
+		return store.state.game.delayTimeLeft ==  0;
+	}
 
 	
 	override public function Template():String {
@@ -74,12 +80,12 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 					<hr/>
 					<p>Swipe right to infer result as constant to stop the train!<br/>Swipe left to infer result as variable to move along!</p>
 				</div>
-				<a class="helpbtn" :class="{active:!showInstructions}" v-on:click="toggleInstructions()" >
+				<a class="helpbtn" :class="${" {'active':!showInstructions} "}" :style="${" {'visibility':helpBtnShown ? 'visible' : 'hidden'} "}" v-on:click="toggleInstructions()" >
 					[help]
 				</a>
 				<${Comp_CardView}></${Comp_CardView}>
 				<${Comp_PopupCardView}></${Comp_PopupCardView}>
-				<div class="blocker" v-show="showInstructions" :class="{  showInstruct:showInstructions  }"></div>
+				<div class="blocker" v-show="showInstructions" :class="${" {showInstruct:showInstructions} "}"></div>
 				<div class="traceResult" v-if="cardResult">
 					<p>{{ cardResult }}</p>
 				</div>
