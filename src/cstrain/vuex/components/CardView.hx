@@ -51,12 +51,15 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	
 		var promise = super.onThrowOut(e);
 		var datam = myData();
-		
+
 		promise.then( function(cardResult) {		// sanity check
-			if (!showStack) {
-				e.target.setAttribute("progressing", "");
+	
+	
+			if ( (datam.nextBeltCardIndex  >= totalCards) ) {
+				e.target.setAttribute("canceled", "1");
 				return;
 			}
+			
 			switch(cardResult) {
 				case CardResult.GUESS_CONSTANT(_, _):
 					
@@ -107,6 +110,11 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 			myData().respawnCount++;
 			
 		}
+		if (e.target.getAttribute("canceled") == "1" ) {
+			return;
+			
+		}
+	
 		super.onThrowOutEnd(e);
 		
 	
@@ -211,17 +219,17 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	}
 	
 	var curCardIndex(get, never):Int;
-	function get_curCardIndex():Int {
+	inline function get_curCardIndex():Int {
 		return store.game.gameGetters.curCardIndex;
 	}
 	
 	var totalCards(get, never):Int;
-	function get_totalCards():Int {
+	inline function get_totalCards():Int {
 		return store.game.gameGetters.totalCards;
 	}
 	
 	var gotDelay(get, never):Bool;
-	function get_gotDelay():Bool 
+	inline function get_gotDelay():Bool 
 	{
 		return store.state.game.delayTimeLeft > 0;
 	}
