@@ -63,6 +63,9 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 							e.target.setAttribute("progressing", "1");
 						datam.nextBeltCardIndex+=progress;
 					}
+					else {
+						e.target.setAttribute("progressing", "");
+					}
 				default:
 					
 					e.target.setAttribute("progressing", "");
