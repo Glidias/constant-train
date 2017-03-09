@@ -11,7 +11,8 @@ Cross-platform codebase:
 
 For HTML5-specific target (A view implementation for browser/webapps):
 	
-- HaxeVx + Vuex `cstrain.vuex`  https://github.com/Glidias/haxevx
+- HaxeVx + Vuex (Vue2) `cstrain.vuex`  https://github.com/Glidias/haxevx
+- Vue-touch (`next` branch) (for Vue2 compatibility) https://github.com/vuejs/vue-touch/tree/next
 - Swing JS for card swiping feature `gajus.swing`  (<- NOTE: The externs in this package isn't complete/accruate.) https://github.com/gajus/swing 
 
 To start viewing on browser as a developer, configure `npm start` command at `bin/package.json` location to point to the relavant host/port. A host of `localhost"` would suffice if you need to view it offline. 
