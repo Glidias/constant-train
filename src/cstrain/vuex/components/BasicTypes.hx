@@ -20,3 +20,10 @@ typedef SwingStackData = {
 typedef RefCard = {
 	@:optional  var card:Card;
 }
+
+class TouchVUtil {
+	public static var IS_TOUCH_BASED:Bool = false;
+	
+	public static inline var TAG:String = "touch";
+
+}

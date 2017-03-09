@@ -4,7 +4,7 @@
 	<meta charset="utf-8"/>
 	<title>Constant Train</title>
 	<meta name="description" content="" />
-	<meta name="viewport" content="width=414px;height=736px; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+	<meta name="viewport" content="width=414px;height=736px; initial-scale=1.0;  user-scalable=0;">
 	<script src="js/vue.js"></script>
 	<script src="js/vuex.js"></script>
 	<style>
@@ -79,8 +79,7 @@
 		 width: 240px; height: 300px;  position: absolute; top: 44px; left: 50%; margin-left: -120px;
 		}
 		
-		
-		
+
 		.popup-cardview {
 			width:100%;
 			background-color:brown;
@@ -137,7 +136,9 @@
 
 	</style>
 	<script language="javascript">
-
+document.ontouchstart = function(e){ 
+    e.preventDefault(); 
+}
 document.ontouchmove = function(e){ 
     e.preventDefault(); 
 }
@@ -148,7 +149,18 @@ document.ontouchmove = function(e){
 	<div id="wrapper">
 		<canvas id="webgl" style="width:100%; height:100%;"></canvas>
 		<div id="app"></div>
-		<script src="http://192.168.1.19:8080/bundle.js"></script>
 	</div>
+	<script>
+	(function() {
+		// this should work for any lcoally hosted bundle.js at root of host
+		var head = document.getElementsByTagName('head')[0];
+		var script = document.createElement('script');
+		script.type = 'text/javascript';
+	
+		script.src = window.location.protocol+"//"+window.location.host +"/bundle.js";
+		head.appendChild(script);
+	
+	})();
+	</script>
 </body>
 </html>

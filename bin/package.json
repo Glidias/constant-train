@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "swing": "^4.0.1"
+    "swing": "^4.0.1",
+	"vue-touch": "git://github.com/vuejs/vue-touch.git#next"
   },
   "devDependencies": {
     "webpack": "^1.14.0",

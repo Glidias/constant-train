@@ -1,6 +1,7 @@
 package cstrain.vuex.components;
 import cstrain.core.Card;
 import cstrain.core.CardResult;
+import cstrain.vuex.components.BasicTypes.TouchVUtil;
 import cstrain.vuex.game.GameMutator;
 import cstrain.vuex.game.GameState;
 import cstrain.vuex.store.GameStore;
@@ -64,11 +65,12 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 	function get_helpBtnShown():Bool {
 		return store.state.game.delayTimeLeft ==  0;
 	}
+	
 
 	
 	override public function Template():String {
 		#if !production
-		var cheatBtn:String = '<button class="cheat" v-on:click = "toggleExpression()" style="position:absolute;top:10px;right:0">{{ toggleExprLabel }} expression</button>';
+		var cheatBtn:String = '<${TouchVUtil.TAG} tag="button" class="cheat" v-on:tap="toggleExpression()" style="position:absolute;top:10px;right:0">{{ toggleExprLabel }} expression</${TouchVUtil.TAG}>';
 		#else
 		var cheatBtn:String = '';
 		#end
@@ -76,13 +78,13 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		return '
 			<div class="gameview">
 				<div v-show="showInstructions">
-					The Constant Train :: Polynomial Express
+					The Constant Train :: Polynomial Express <span style="font-size:0.5em">{{ $$store.getters.isTouchBased ? "(T)" : "(D)" }}</span>
 					<hr/>
 					<p>Swipe right to infer result as constant to stop the train!<br/>Swipe left to infer result as variable to move along!</p>
 				</div>
-				<a class="helpbtn" :class="${" {'active':!showInstructions} "}" :style="${" {'visibility':helpBtnShown ? 'visible' : 'hidden'} "}" v-on:click="toggleInstructions()" >
+				<${TouchVUtil.TAG} tag="a" class="helpbtn" :class="${" {'active':!showInstructions} "}" :style="${" {'visibility':helpBtnShown ? 'visible' : 'hidden'} "}" v-on:tap="toggleInstructions()" >
 					[help]
-				</a>
+				</${TouchVUtil.TAG}>
 				<${Comp_CardView}></${Comp_CardView}>
 				<${Comp_PopupCardView}></${Comp_PopupCardView}>
 				<div class="blocker" v-show="showInstructions" :class="${" {showInstruct:showInstructions} "}"></div>
