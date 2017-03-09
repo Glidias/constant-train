@@ -270,6 +270,7 @@ typedef CardViewState = {
 	> SwingStackData,
 	var secondsLeft:Int;
 	var respawnCount:Int;
+	var nextBeltCardIndex:Int;
 	@:optional var _timer:Timer;
 }
 

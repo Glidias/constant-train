@@ -153,7 +153,6 @@ class BaseCardView extends VxComponent<GameStore, SwingStackData, NoneT>
 	public static function getBeltData(capacity:Int):SwingStackData {
 		 return {
 			refCards: BaseCardView.getEmptyBelt(capacity),
-			nextBeltCardIndex:capacity,
 			topCardIndex:capacity - 1,
 			beltAmount:capacity
 		};
