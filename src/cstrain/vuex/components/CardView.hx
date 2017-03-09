@@ -53,7 +53,10 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		var datam = myData();
 		
 		promise.then( function(cardResult) {		// sanity check
-			
+			if (!showStack) {
+				e.target.setAttribute("progressing", "");
+				return;
+			}
 			switch(cardResult) {
 				case CardResult.GUESS_CONSTANT(_, _):
 					
@@ -69,7 +72,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 				case CardResult.OK(progress) :
 					if (progress > 0) {
 						
-							e.target.setAttribute("progressing", "1");
+						e.target.setAttribute("progressing", "1");
 						datam.nextBeltCardIndex+=progress;
 					}
 					else {
@@ -267,7 +270,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 				</div>
 				
 				<h4 v-show="${BuiltVUtil.isProductionStrNot()}">{{ topCardIndex}}</h4>
-				<ul class="cardstack" v-show="showStack">
+				<ul class="cardstack">
 					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :class="${" {'polynomial':isPolynomialForIndex(i)} "}" :stack="$$data._stack" :index="i" :key="i"></${CardV.CompName}>
 				</ul>
 				
