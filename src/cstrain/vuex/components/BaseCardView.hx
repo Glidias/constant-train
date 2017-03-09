@@ -73,9 +73,7 @@ class BaseCardView extends VxComponent<GameStore, SwingStackData, NoneT>
 	
 	function onThrowOutEnd(e:SwingCardEvent):Void
 	{
-		
-		
-		//this.stack = 
+
 		var el:HtmlElement = e.target;
 		var index:Int = Std.parseInt(el.getAttribute("index"));
 		var tarIndexBefore:Int = index < this.beltAmount - 1 ? index + 1 : 0;
@@ -90,14 +88,11 @@ class BaseCardView extends VxComponent<GameStore, SwingStackData, NoneT>
 			child = cast child.nextSibling;
 		}
 
-		// TODO: need not be first child, find complement
 		par.insertBefore(el, child);
 		var card = _vData._stack.getCard(el);
 		
 	
 		card.throwIn(0, 0);
-		//}
-
 	}
 	
 	@:action static var actions:GameActions;
