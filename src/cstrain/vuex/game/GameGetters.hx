@@ -30,7 +30,9 @@ class GameGetters implements IGetters<GameState, NoneT>
 	public static inline function Get_isPenalized(state:GameState):Bool {
 		return state.curPenalty != null;
 	}
-	
+		public static inline function Get_cardsLeft(state:GameState):Int {
+		return Get_totalCards(state) - state.curCardIndex;
+	}
 	
 	public static inline function Get_isPopupChoicing(state:GameState):Bool {
 		return state.topCard != null && state.topCard.operator == Card.OPERATION_EQUAL;

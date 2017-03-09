@@ -66,7 +66,10 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		return store.state.game.delayTimeLeft ==  0;
 	}
 	
-
+	var showGameOver(get, never):Bool;
+	function get_showGameOver():Bool {
+		return store.game.gameGetters.cardsLeft <=0;
+	}
 	
 	override public function Template():String {
 		#if !production
@@ -93,9 +96,11 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 				</div>
 				<div class="xpression" style="font-style:italic" v-html="polyexpression"></div>
 				<br/>
-				
-				'+cheatBtn+'
-				
+				${cheatBtn}
+				<div class="gameover" v-show="showGameOver">
+					<h1>Congratulations!</h1>
+					<h2>${"You've finished the race!"}</h2>
+				</div>
 			</div>
 		';
 	}
