@@ -6,7 +6,7 @@ Leverages the following technologies under Haxe:
 	
 Cross-platform codebase:
 
-- Plain Haxe platform/framework-agnostic codes (Model/server) `cstrain.core`,  `cstrain.rules`,  `cstrain.util` 
+- Plain Haxe cross-platform/framework-agnostic codes (Model/server) `cstrain.core`,  `cstrain.rules`,  `cstrain.util` 
 - Heaps (for background scenery View)  `cstrain.h2d` https://github.com/HeapsIO/heaps
 
 For HTML5-specific target (A view implementation for browser/webapps):
