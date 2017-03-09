@@ -7,6 +7,7 @@ import cstrain.core.IRules;
 import cstrain.core.PenaltyDesc;
 import cstrain.core.PlayerStats;
 import cstrain.core.Polynomial;
+import cstrain.util.FastRNG;
 import haxe.Timer;
 
 /**
@@ -35,6 +36,8 @@ class TestGame implements IRules
 	
 	var gameSettings:GameSettings = new GameSettings();
 	
+	var rng:FastRNG;
+	
 	inline function recreateSecret():Void {
 		secretVarValue = Std.int( Math.ceil( Math.random() * 10 ) );
 		polynomialValueCached = false;
@@ -49,7 +52,7 @@ class TestGame implements IRules
 	{
 		gameSettings.penaltyDelayMs =2000;
 		
-		restart();
+	
 	}
 	
 	function buildDeck():Void {
@@ -61,7 +64,7 @@ class TestGame implements IRules
 		deck.addCards( Deck.getCards(Deck.SET_VARIABLE, Deck.OP_SUBTRACT, 0, 8*baseMult) );
 		deck.addCards( Deck.getCards(Deck.SET_VARIABLE, Deck.OP_MULTIPLY | Deck.OP_DIVIDE, 0, 4*baseMult) );
 
-		deck.shuffle();
+		deck.shuffle(rng);
 		
 		// playdeck reference
 		curDeck = deck;
@@ -97,7 +100,15 @@ class TestGame implements IRules
 	
 	function getCardResult(isSwipeRight:Bool):CardResult {
 		var hadPopupCard:Bool   = thePopupCard != null;
-		var curCard:Card = hadPopupCard ? thePopupCard :  curDeckIndex >= 0 ? curDeck.cards[curDeckIndex--] : null;
+		var curCard:Card = null;
+		if (hadPopupCard) {
+			curCard = thePopupCard;
+		}
+		else {
+			curCard = curDeckIndex >= 0 ? curDeck.cards[curDeckIndex] : null;
+			curDeckIndex--;
+		}
+		
 		if (curCard == null) {
 			return CardResult.GAMEOVER_OUTTA_CARDS;
 		}
@@ -158,12 +169,18 @@ class TestGame implements IRules
 						// Got the answer correct, now, moving out train again!
 						thePopupCard = Card.getRegularStartingVarCard();
 						recreateSecret();
-						
 						return CardResult.OK(0);
 					}
 				}
 				else {	// gave not so good answer...
-					return !wildGuess ? CardResult.PENALIZE({desc:WRONG_CONSTANT, delayNow:1}) :  CardResult.PENALIZE({delayNow:2, desc:PenaltyDesc.FURTHER_GUESS( c>valueChosen)  });
+					if (!wildGuess) {
+						thePopupCard = Card.getRegularStartingVarCard();
+						return  CardResult.PENALIZE({desc:WRONG_CONSTANT, delayNow:1});
+					}
+					else {
+						return CardResult.PENALIZE({delayNow:2, desc:PenaltyDesc.FURTHER_GUESS( c>valueChosen)  });
+					}
+				
 				}
 				
 				
@@ -195,7 +212,13 @@ class TestGame implements IRules
 	var commenced:Bool = false;
 	/* INTERFACE cstrain.core.IRules */
 	
-	public function restart():Void {
+	public function restart(?seed:Int):Void {
+		if (seed == null) seed= Std.int(Math.random() * 999999999); //  367925706;
+		//22110498
+		seed = 763055190;
+		trace(seed);
+		rng = new FastRNG(seed);
+		
 		deck  = new Deck();
 		thePopupCard = null;
 		polynomial = new Polynomial();
@@ -314,9 +337,11 @@ class TestGame implements IRules
 					candidates.push(f);
 			}
 		}
-		return candidates.length != 0 ? candidates[Std.int(Math.random() * candidates.length)] : factors[Std.int(Math.random() * factors.length)];
+		return candidates.length != 0 ? candidates[Std.int(rng.getFloat() * candidates.length)] : factors[Std.int(rng.getFloat() * factors.length)];
 		
 	}
+	
+	
 	
 	public function arrPolynomialNot1(poly:Polynomial):Bool {
 		return poly.coefs.length  >  1  || Math.abs(poly.coefs[0]) != 1;
@@ -354,8 +379,6 @@ class TestGame implements IRules
 					var factors = simulateTopResult.factorisation();
 					factors = factors.filter(arrPolynomialNot1);
 					if (factors.length > 1 ) {
-						trace("Found a valid polynomial factor!");
-						trace("among:" + factors);
 						var vFactor:Polynomial  = pickAFactor(factors);
 						result.setPolynomial(vFactor);
 						
