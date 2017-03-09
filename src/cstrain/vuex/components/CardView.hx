@@ -53,6 +53,12 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		promise.then( function(cardResult) {
 
 			switch(cardResult) {
+				case CardResult.GUESS_CONSTANT(_, false):
+					
+					e.target.setAttribute("progressing", "1");
+					datam.nextBeltCardIndex+=1;
+					
+					
 				case CardResult.PENALIZE({desc:(PenaltyDesc.LOST_IN_TRANSIT | PenaltyDesc.MISSED_STOP)}):
 					
 						e.target.setAttribute("progressing", "1");
