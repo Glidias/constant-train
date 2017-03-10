@@ -56,6 +56,9 @@ class GameMutator implements IMutator<GameState>
 		state.cardResult = result;
 	}
 	
+	function encounterStationStop(state:GameState):Void {
+		state.stopsEncountedSoFar++;
+	}
 	
 	function resume(state:GameState):Void {
 

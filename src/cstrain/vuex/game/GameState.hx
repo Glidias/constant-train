@@ -42,7 +42,7 @@ class GameState
 	public var _rules:IRules;
 	public var _bgTrain:IBGTrain;
 	
-	
+	public var stopsEncountedSoFar:Int = 0;
 	public var beltSize:Int = 7;
 	
 	

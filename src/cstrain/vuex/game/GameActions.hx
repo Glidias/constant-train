@@ -41,12 +41,16 @@ class GameActions implements IAction<GameState, NoneT>
 				case CardResult.GUESS_CONSTANT(guessCard, wildGuessing):
 					// show popup mutation
 					//mutator._setPopupCard(context);  // guessCard already encapcsulted within IRules api topmost card
+					mutator._encounterStationStop(context);
 					mutator._resume(context);
 					
 				case CardResult.PENALIZE(penalty):
 					mutator._setPenalty(context, penalty);
 					//penalty.delayNow;
 					if (penalty.desc == PenaltyDesc.MISSED_STOP || penalty.desc == PenaltyDesc.LOST_IN_TRANSIT) {
+						if (penalty.desc == PenaltyDesc.MISSED_STOP) {
+							mutator._encounterStationStop(context);
+						}
 						mutator._updateProgress(context);
 					}
 					if (penalty.delayNow != null  ) {

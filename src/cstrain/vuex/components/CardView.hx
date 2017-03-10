@@ -54,7 +54,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 
 		promise.then( function(cardResult) {		// sanity check
 	
-	
+			/*
 			if ( (datam.nextBeltCardIndex  >= totalCards) ) {
 				e.target.setAttribute("canceled", "1");
 				return;
@@ -88,6 +88,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 				
 					
 			}
+			*/
 		
 		});
 		
@@ -100,20 +101,16 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	{
 		
 		var index:Int =  Std.parseInt( e.target.getAttribute( "index")   );
+		/*
 		if ( noMoreCardsToRegen() ) {
 			//trace("No more visible");
 			
 			return;
 		}
+		*/
+		// to depreciate
 		
-		if (e.target.getAttribute("progressing") == "1" ) {
-			myData().respawnCount++;
-			
-		}
-		if (e.target.getAttribute("canceled") == "1" ) {
-			return;
-			
-		}
+	
 	
 		super.onThrowOutEnd(e);
 		
@@ -269,6 +266,22 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return store.game.gameGetters.cardsLeft > 0;
 	}
 	
+	inline function getProjectedIndexOffset(i:Int):Int {
+		//this.curCardIndex + i
+		var beltAmt:Int = this.beltAmount;
+		return i >= this.topCardIndex ? i - this.topCardIndex : beltAmt + i - this.topCardIndex; // -(this.topCardIndex - (this.beltAmount - i));
+	}
+	
+	inline function getProjectedCardIndex(i:Int):Int {
+		var gotPopupX:Bool; // todo: need
+		return this.curCardIndex + getProjectedIndexOffset(i);
+	}
+	inline function isVisibleProjected(i:Int):Bool {
+		trace(this.store.state.game.stopsEncountedSoFar);
+		return getProjectedCardIndex(i) < this.store.state.game.stopsEncountedSoFar + this.store.game.gameGetters.totalCards;
+	}
+
+	
 	
 	override public function Template():String {
 		return '
@@ -279,7 +292,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 				
 				<h4 v-show="${BuiltVUtil.isProductionStrNot()}">{{ topCardIndex}}</h4>
 				<ul class="cardstack">
-					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :class="${" {'polynomial':isPolynomialForIndex(i)} "}" :stack="$$data._stack" :index="i" :key="i"></${CardV.CompName}>
+					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :style="${" {'visibility': isVisibleProjected(i) ? 'visible' : 'hidden' } "}" :class="${" {'polynomial':isPolynomialForIndex(i)} "}" :stack="$$data._stack" :index="i" :key="i"></${CardV.CompName}>
 				</ul>
 				
 				<div class="delay-popup" v-show="gotDelay">

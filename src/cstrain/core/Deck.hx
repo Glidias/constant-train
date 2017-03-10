@@ -11,7 +11,7 @@ class Deck
 	
 	public var cards:Array<Card> = [];
 	public function shuffle(?rng:FastRNG):Void {
-		arrayShuffleFisherYates(cards);
+		arrayShuffleFisherYates(cards, rng);
 	}
 	
 	public static function arrayShuffleFisherYates<T>(array:Array<T>, ?rng:FastRNG):Array<T>
