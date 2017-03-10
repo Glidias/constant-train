@@ -213,10 +213,17 @@ class TestGame implements IRules
 	/* INTERFACE cstrain.core.IRules */
 	
 	public function restart(?seed:Int):Void {
-		if (seed == null) seed= Std.int(Math.random() * 999999999); //  367925706;
+		if (seed == null) seed = FastRNG.newSeed(); 
+		
+		// test cases
+		//367925706;
 		//22110498
-		seed = 763055190;
+		//seed = 367925706;
+		
+		#if !production
 		trace(seed);
+		#end
+		
 		rng = new FastRNG(seed);
 		
 		deck  = new Deck();
@@ -235,7 +242,9 @@ class TestGame implements IRules
 	}
 	
 	public function getAllCards():Array<Card> { 
-		return deck.cards;
+		var c =  deck.cards.concat([]);
+		c.reverse();
+		return c;
 	}
 
 	

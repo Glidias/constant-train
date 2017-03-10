@@ -37,6 +37,10 @@ class GameGetters implements IGetters<GameState, NoneT>
 	public static inline function Get_isPopupChoicing(state:GameState):Bool {
 		return state.topCard != null && state.topCard.operator == Card.OPERATION_EQUAL;
 	}
+	public static  function Get_isMainDeckCard(state:GameState):Bool {
+		return state.topCard == (state.curCardIndex <  state.cards.length ? state.cards[state.curCardIndex] : null);
+	}
+	
 	public static inline function Get_swipedCorrectly(state:GameState):Bool {
 
 		return state.curPenalty != null ? state.penaltySwipeCorrect : true;

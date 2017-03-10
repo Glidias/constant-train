@@ -27,28 +27,13 @@ class PopupCardView extends BaseCardView
 		super();
 	}
 	
-	override function onThrowOut(e:SwingCardEvent):Promise<CardResult> {
-
-		
-		return super.onThrowOut(e);
-
-	}
-	
-	/*
-	inline function myData():CardViewState {
-		return untyped _vData;
-	}
-	*/
 	
 	
-	
-	
-	
-	///*
+	static inline var BELT_AMOUNT:Int = 7;
 	override public function Data():SwingStackData {
-		return BaseCardView.getBeltData(7);
+		return BaseCardView.getBeltData(BELT_AMOUNT);
 	}
-	//*/
+
 	
 	
 	function getCardForIndex(i:Int):Card {
@@ -62,18 +47,13 @@ class PopupCardView extends BaseCardView
 		return store.game.gameGetters.isPopupChoicing;
 	}
 	
-	static inline var BELT_AMOUNT:Int = 7;
-	
-	
 
-	
-	
 	override public function Template():String {
 		return '
 			<div class="popup-cardview" :class="{shown:isPopupChoicing}">
 				<h4 v-show="${BuiltVUtil.isProductionStrNot()}" style="position:absolute;bottom:5px;right:5px">{{ topCardIndex}}</h4>
 				<ul class="cardstack">
-					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i">{{i}}</${CardV.CompName}>
+					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i"></${CardV.CompName}>
 				</ul>
 			</div>
 		';

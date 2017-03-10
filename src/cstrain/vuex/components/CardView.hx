@@ -45,98 +45,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	}
 	
 	// Start swing
-	
-	
-	override function onThrowOut(e:SwingCardEvent):Promise<CardResult> {
-	
-		var promise = super.onThrowOut(e);
-		var datam = myData();
 
-		promise.then( function(cardResult) {		// sanity check
-	
-			/*
-			if ( (datam.nextBeltCardIndex  >= totalCards) ) {
-				e.target.setAttribute("canceled", "1");
-				return;
-			}
-			
-			switch(cardResult) {
-				case CardResult.GUESS_CONSTANT(_, _):
-					
-					e.target.setAttribute("progressing", "1");
-					datam.nextBeltCardIndex+=1;
-					
-					
-				case CardResult.PENALIZE({desc:(PenaltyDesc.LOST_IN_TRANSIT | PenaltyDesc.MISSED_STOP | PenaltyDesc.WRONG_CONSTANT)}):
-						
-						e.target.setAttribute("progressing", "1");
-					
-						datam.nextBeltCardIndex+=1;
-				case CardResult.OK(progress) :
-					if (progress > 0) {
-						
-						e.target.setAttribute("progressing", "1");
-						datam.nextBeltCardIndex+=progress;
-					}
-					else {
-						//trace("No progress:" + cardResult);	
-						e.target.setAttribute("progressing", "");
-					}
-				default:
-					//trace("No progress:" + cardResult);	
-					e.target.setAttribute("progressing", "");
-				
-					
-			}
-			*/
-		
-		});
-		
-		return promise;
-
-	}
-
-	
-	override function onThrowOutEnd(e:SwingCardEvent):Void
-	{
-		
-		var index:Int =  Std.parseInt( e.target.getAttribute( "index")   );
-		/*
-		if ( noMoreCardsToRegen() ) {
-			//trace("No more visible");
-			
-			return;
-		}
-		*/
-		// to depreciate
-		
-	
-	
-		super.onThrowOutEnd(e);
-		
-	
-		
-		/*
-		var index:Int =  Std.parseInt( e.target.getAttribute( "index")   );
-		this._vData.refCards[index].card =  store.state.game.cards[this.nextBeltCardIndex];
-		*/
-
-	}
-	
-	function onThrowInEnd(e:SwingCardEvent):Void
-	{
-
-	}
-	
-	
-	override public function Created():Void {
-		
-		super.Created();
-		_vData._stack.on("throwinend", onThrowInEnd);
-
-		
-	}
-	
 	override public function Data():CardViewState {
 		var storeCards = store.state.game.cards;
 		
@@ -266,19 +175,23 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return store.game.gameGetters.cardsLeft > 0;
 	}
 	
-	inline function getProjectedIndexOffset(i:Int):Int {
+	 function getProjectedIndexOffset(i:Int):Int {
 		//this.curCardIndex + i
 		var beltAmt:Int = this.beltAmount;
-		return i >= this.topCardIndex ? i - this.topCardIndex : beltAmt + i - this.topCardIndex; // -(this.topCardIndex - (this.beltAmount - i));
+		return i <= this.topCardIndex ? this.topCardIndex - i : beltAmt - i + this.topCardIndex; // -(this.topCardIndex - (this.beltAmount - i));
 	}
 	
-	inline function getProjectedCardIndex(i:Int):Int {
-		var gotPopupX:Bool; // todo: need
-		return this.curCardIndex + getProjectedIndexOffset(i);
+	 function getProjectedCardIndex(i:Int):Int {
+		var gotPopupX:Bool = !this.store.game.gameGetters.isMainDeckCard; 
+		var ci:Int = this.curCardIndex ;
+		var normalCase:Int = ci + getProjectedIndexOffset(i);
+		
+		return gotPopupX ? ci  == i ? -1 : normalCase - 1  : 
+						    normalCase ;
 	}
 	inline function isVisibleProjected(i:Int):Bool {
-		trace(this.store.state.game.stopsEncountedSoFar);
-		return getProjectedCardIndex(i) < this.store.state.game.stopsEncountedSoFar + this.store.game.gameGetters.totalCards;
+
+		return getProjectedCardIndex(i) <  this.store.game.gameGetters.totalCards;
 	}
 
 	
@@ -292,7 +205,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 				
 				<h4 v-show="${BuiltVUtil.isProductionStrNot()}">{{ topCardIndex}}</h4>
 				<ul class="cardstack">
-					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :style="${" {'visibility': isVisibleProjected(i) ? 'visible' : 'hidden' } "}" :class="${" {'polynomial':isPolynomialForIndex(i)} "}" :stack="$$data._stack" :index="i" :key="i"></${CardV.CompName}>
+					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :style="${" {'visibility': isVisibleProjected(i) ? 'visible' : 'hidden' } "}" :class="${" {'polynomial':isPolynomialForIndex(i)} "}" :stack="$$data._stack" :index="i" :key="i">${#if !production"{{ getProjectedCardIndex(i) }}"#else""#end}</${CardV.CompName}>
 				</ul>
 				
 				<div class="delay-popup" v-show="gotDelay">

@@ -70,7 +70,7 @@ class CardV extends VComponent<SwingCardRef, CardProps>
 
 	override public function Template():String {
 		return '
-			<li class="card" :index="index"><span style="font-size:9px; color:#aaaaaa" v-show="${BuiltVUtil.isProductionStrNot()}">{{index}}:</span>&nbsp;<span v-html="cardCopy"></span></li>
+			<li class="card" :index="index"><span style="font-size:9px; color:#aaaaaa" v-show="${BuiltVUtil.isProductionStrNot()}">{{index}},<slot></slot>:</span>&nbsp;<span v-html="cardCopy"></span></li>
 		';
 	}
 }
