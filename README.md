@@ -17,10 +17,6 @@ For HTML5-specific target (A view implementation for browser/webapps):
 
 To start viewing on browser as a developer, configure `npm start` command at `bin/package.json` location to point to the relavant host/port. A host of `localhost"` would suffice if you need to view it offline. 
 
-	"start": "webpack-dev-server --port 8080 --host 192.168.1.19 --entry ./ConstantTrain.js"
-
-or
-
 	"start": "webpack-dev-server --port 8080 --host localhost --entry ./ConstantTrain.js"`
 	
 Start webpack server on the  command line at the `bin` location with: `npm start`. Remember to also compile the Haxe codebase  using any one of the `.hxml` build files/settings in the repo. Then, jump to your configured host url on your browser to view the example.
