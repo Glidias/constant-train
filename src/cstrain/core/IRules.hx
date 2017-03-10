@@ -15,7 +15,7 @@ interface IRules
 	public function getTopmostCard():Card; // get current card to be played
 	public function getNextCardBelow():Card; 	// get current card underneath current card to be played
 	
-	function restart():Void;	// restart game
+	function restart(?seed:Int):Void;	// restart game
 	function getAllCards():Array<Card>;	// reflects play deck along train path of +-/* operations
 	function getDeckIndex():Int;	// reflects current play deck index starting from zero
 	

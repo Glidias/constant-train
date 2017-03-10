@@ -21,6 +21,7 @@ class GameModule extends VModule<GameState, NoneT>
 	public function new(rules:IRules, bgTrain:IBGTrain) 
 	{
 		this.rules = rules;
+		rules.restart();
 		this.bgTrain = bgTrain;
 		this.state = new GameState(rules);
 	}

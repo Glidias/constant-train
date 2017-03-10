@@ -1,4 +1,5 @@
 package cstrain.core;
+import cstrain.util.FastRNG;
 
 /**
  * Base class and utility for deck building
@@ -9,11 +10,11 @@ class Deck
 	// General
 	
 	public var cards:Array<Card> = [];
-	public function shuffle():Void {
+	public function shuffle(?rng:FastRNG):Void {
 		arrayShuffleFisherYates(cards);
 	}
 	
-	public static function arrayShuffleFisherYates<T>(array:Array<T>):Array<T>
+	public static function arrayShuffleFisherYates<T>(array:Array<T>, ?rng:FastRNG):Array<T>
 	{
 		var m:Int = array.length;
 		var i:Int;
@@ -22,7 +23,7 @@ class Deck
 		// while there are still elements to shuffle
 		while (m != 0)
 		{
-			i = Std.int(Math.random() * m--);
+			i = Std.int( (rng != null ? rng.getFloat() : Math.random()) * m--);
 	 
 			// swap it with the current element
 			temp = array[m];
