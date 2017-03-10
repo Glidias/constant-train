@@ -153,6 +153,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	
 	function isPolynomialForIndex(i:Int):Bool {
 		var card:Card = getCardForIndex(i);
+		
 		return card != null ?  card.isPolynomial() && card.varValues.length > 1 : null;
 	}
 	

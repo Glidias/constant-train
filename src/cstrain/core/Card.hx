@@ -11,10 +11,10 @@ class Card
 	public static inline var OPERATOR_MULTIPLY:Int = 2;
 	public static inline var OPERATOR_DIVIDE:Int = 3;
 	public static inline var OPERATOR_QUOTIENT:Int = 4;
-	static inline var NUM_OPERATORS:Int = 4;
+	public static inline var OPERATOR_DERIVATIVE:Int =5;
+	static inline var NUM_OPERATORS:Int = 5;
 	
-	
-	public static inline var OPERATION_EQUAL:Int = 5;
+	public static inline var OPERATION_EQUAL:Int = 6;
 	
 	
 	public static inline function isIncreasingMagnitude(op:Int):Bool {
@@ -25,7 +25,7 @@ class Card
 	}
 	
 	public static inline function stringifyOp(op:Int):String {
-		return op == OPERATOR_ADD ? "+" : op == OPERATOR_SUBTRACT ? "-" : op  == OPERATOR_MULTIPLY ? "*" : op == OPERATOR_QUOTIENT ? "\\" : op == OPERATOR_DIVIDE ? "/" : op == OPERATION_EQUAL ? "=" : "?";
+		return op == OPERATOR_ADD ? "+" : op == OPERATOR_SUBTRACT ? "-" : op  == OPERATOR_MULTIPLY ? "*" : op == OPERATOR_QUOTIENT ? "\\" : op == OPERATOR_DIVIDE ? "/" : op == OPERATION_EQUAL ? "=" :   op == OPERATOR_DERIVATIVE ? "(d?/dn) " : "?";
 	}
 	
 	static function intArrayToFloatArr(arr:Array<Int>):Array<Float> {
@@ -44,7 +44,7 @@ class Card
 			case OPERATOR_SUBTRACT: return Operation.SUBTRACT(card.value, card.isVar);
 			case OPERATOR_MULTIPLY: return Operation.MULTIPLY(card.value, card.isVar);
 			case OPERATOR_DIVIDE | OPERATOR_QUOTIENT: return card.isPolynomial() ? Operation.DIVIDE_BY_POLYNOMIAL( intArrayToFloatArr([card.value].concat(card.varValues) ) ) : Operation.DIVIDE(card.value, card.isVar); 
-	
+			case OPERATOR_DERIVATIVE: return Operation.DERIVATIVE;
 			
 			case OPERATION_EQUAL: return Operation.EQUAL(card.value, card.isVar);
 			default:

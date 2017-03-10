@@ -519,6 +519,8 @@ class Polynomial
 			case Operation.DIVIDE_BY_POLYNOMIAL(values):
 				trace("This shouldn't happen DIVIDE_BY_POLYNIMAL for immutable");
 				result =  div( Polynomial.fromCoefs(values) );
+			case Operation.DERIVATIVE:
+				result =  differentiate();
 			default:
 				trace("UInaccounted for operation:" + op);
 		}
@@ -566,10 +568,13 @@ class Polynomial
 					}
 				}
 			case Operation.DIVIDE_BY_POLYNOMIAL(values):
-				trace("Dividing by polynomial:" + values);
+				//trace("Dividing by polynomial:" + values);
 				var resultTest = div( Polynomial.fromCoefs(values) );
 				copyFrom( resultTest );
-				trace( resultTest.coefs + " vs "+coefs);
+				//trace( resultTest.coefs + " vs "+coefs);
+			case Operation.DERIVATIVE:
+				var resultTest = differentiate();
+				copyFrom(resultTest);
 				
 			default:
 				trace("UInaccounted for operation:" + op);

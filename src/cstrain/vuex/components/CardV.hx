@@ -63,7 +63,7 @@ class CardV extends VComponent<SwingCardRef, CardProps>
 		var isPolynomialOfVars:Bool =  card.isPolynomial();  // required to factor out condition for reactivity!
 		
 		var cardIsVar:Bool = card.isVar;
-		return  ( Card.canOperate(card.operator) ?  Card.stringifyOp(card.operator) : "") + ( isPolynomialOfVars ?  "("+Polynomial.PrintOut(card.getPolynomial(), "n", true)+")" :  ( card.isVar ? "n" : card.value+"" )) ;
+		return  ( Card.canOperate(card.operator) ?  Card.stringifyOp(card.operator) : "") + ( isPolynomialOfVars ?  "("+Polynomial.PrintOut(card.getPolynomial(), "n", true)+")" :  ( card.operator == Card.OPERATOR_DERIVATIVE ? "" : cardIsVar ? "n" : card.value+"" )) ;
 	}
 
 	

@@ -395,9 +395,14 @@ class TestGame implements IRules
 					else {
 						// perform alternative for result  (deriative or divide-see-quotient-only)
 						// if no polynomail used for division, then it would be a divide see quotient only operation
-						result.operator = Card.OPERATOR_QUOTIENT;
-						result.setPolynomial(Polynomial.fromCoefs([0, result.value ]) );
-						// else use deriative operation
+						if (rng.getFloat() > .5) {
+							result.operator = Card.OPERATOR_QUOTIENT;
+							result.setPolynomial(Polynomial.fromCoefs([0, result.value ]) );
+						}
+						else {
+							result.operator = Card.OPERATOR_DERIVATIVE;
+						}
+						
 					}
 					return result;
 				}
@@ -414,7 +419,6 @@ class TestGame implements IRules
 					}
 					else {
 						// figure out best common factor cloest from..to...gcf, limit to MAX_ITER else use GCF
-						
 						result.value = cf;  // (NOTE: lazy..) for now, this would be fine
 						result.varValues = EMPTY_ARRAY;
 						return result; 
@@ -422,10 +426,14 @@ class TestGame implements IRules
 				}
 				else {
 					// perform alternative for result (deriative or divide-see-quotient-only)
-					result.operator = Card.OPERATOR_QUOTIENT;
-					result.value = cf;  // (NOTE: lazy..) for now, this would be fine
-					result.varValues = EMPTY_ARRAY;
-					// or consider derirative
+					if (rng.getFloat() >= .5) {
+						result.operator = Card.OPERATOR_QUOTIENT;
+						result.value = cf;  // (NOTE: lazy..) for now, this would be fine
+						result.varValues = EMPTY_ARRAY;
+					}
+					else {		// or consider derirative
+						result.operator = Card.OPERATOR_DERIVATIVE;
+					}
 					
 				}
 				return result;

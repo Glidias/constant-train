@@ -12,4 +12,5 @@ enum Operation
 	DIVIDE(val:Float, varSuffix:Bool);
 	DIVIDE_BY_POLYNOMIAL(coefs:Array<Float>);
 	EQUAL(val:Float, varSuffix:Bool);
+	DERIVATIVE; // keep it simple, just 1st deriative without degree.
 }

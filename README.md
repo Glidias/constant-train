@@ -41,5 +41,5 @@ Mathmatical operators are:
 - `/` Divide
 - `+` Plus
 - `-` Minus
-- `\` Divide but get quotient only (ie. ignore remainder)
-- `dy/dx()` Get deriative 
+- `\` Divide to get quotient only (ie. ignore remainder)
+- `(d?/dn)` Deriative 
