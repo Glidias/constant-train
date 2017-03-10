@@ -156,11 +156,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return card != null ?  card.isPolynomial() && card.varValues.length > 1 : null;
 	}
 	
-	function noMoreCardsToRegen():Bool {
-		
-		return totalCards - myData().respawnCount < BELT_AMOUNT;
-	}
-		
+
 	
 	var penaltyDesc(get, never):String;
 	function get_penaltyDesc():String 
@@ -178,7 +174,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	 function getProjectedIndexOffset(i:Int):Int {
 		//this.curCardIndex + i
 		var beltAmt:Int = this.beltAmount;
-		return i <= this.topCardIndex ? this.topCardIndex - i : beltAmt - i + this.topCardIndex; // -(this.topCardIndex - (this.beltAmount - i));
+		return i <= this.topCardIndex ? this.topCardIndex - i : beltAmt - i + this.topCardIndex; 
 	}
 	
 	 function getProjectedCardIndex(i:Int):Int {
