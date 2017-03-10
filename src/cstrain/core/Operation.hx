@@ -1,7 +1,6 @@
 package cstrain.core;
 
 /**
- * likely to be depciated, for much use for it atm
  * @author Glidias
  */
 enum Operation 
