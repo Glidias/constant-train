@@ -17,6 +17,15 @@ class VxBoot
 	 var STORE:Store<Dynamic>;
 	//public static var VUE:VComponent<Dynamic,Dynamic>;
 	
+	 public static inline function registerModuleWithStore(name:String, mod:Dynamic, store:Store<Dynamic>):Void {
+		mod._Init(name+"/");
+		untyped store[name] = mod; // Reflect.setField(store, name, mod);
+		store.registerModule(name, mod);
+		clearModuleInjStack(store);
+		
+	 }
+	
+	
 	public function startStore<T>(storeParams:Dynamic):Store<Dynamic>  {
 		if (STORE != null) {
 			throw "Vuex store already started! Only 1 store is allowed";
@@ -82,7 +91,16 @@ class VxBoot
 	}
 	
 	
-
+	 static function clearModuleInjStack(store:Store<Dynamic>):Void {
+		 var storeGetters = store.getters;
+		var stack = ModuleStack.stack;
+		var i:Int = stack.length;
+		while (--i > -1) {
+			stack[i]._InjNative(storeGetters);
+		
+		}
+		stack = [];
+	}
 	
 	public function startVueWithRootComponent<T>(el:String, rootComponent:VComponent<Dynamic, Dynamic>):Vue {
 		var bootVueParams:Dynamic = {};

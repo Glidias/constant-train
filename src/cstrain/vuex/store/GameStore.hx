@@ -3,6 +3,7 @@ import cstrain.core.IBGTrain;
 import cstrain.core.IRules;
 import cstrain.vuex.components.BasicTypes;
 import cstrain.vuex.game.GameActions;
+import cstrain.vuex.game.GameMenuActions;
 import cstrain.vuex.game.GameModule;
 import cstrain.vuex.game.GameMutator;
 import cstrain.vuex.game.GameState;
@@ -19,6 +20,7 @@ import haxevx.vuex.core.VxStore;
 class GameStore extends VxStore<GameStoreState>
 {
 
+	@:action static var menuActions:GameMenuActions;
 	
 	@:module @:manual public var game:GameModule;
 	public var getters(default,never):StoreGetters;
@@ -28,7 +30,7 @@ class GameStore extends VxStore<GameStoreState>
 		state = new GameStoreState();
 		
 		
-		game = new GameModule(rules, bgTrain);
+		//game = new GameModule(rules, bgTrain);
 		
 		
 	}
@@ -49,5 +51,6 @@ class GameStoreState {
 		
 	}
 	@:module public var game:GameState;
+	
 
 }

@@ -1,7 +1,10 @@
 package cstrain.vuex.components;
+import haxevx.vuex.native.Vuex.Store;
 
+import cstrain.core.GameSettings.GameOptions;
 import gajus.swing.Swing;
 import cstrain.core.Card;
+
 
 /**
  * Common typedefs
@@ -20,6 +23,16 @@ typedef SwingStackData = {
 typedef RefCard = {
 	@:optional  var card:Card;
 }
+
+typedef GameCreateOptions = {
+ var options:GameOptions;
+ var store:Store<Dynamic>;
+}
+typedef GameJoinOptions = {
+ var joinCode:String;
+ var store:Store<Dynamic>;
+}
+
 
 class TouchVUtil {
 	public static var IS_TOUCH_BASED:Bool = false;

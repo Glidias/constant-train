@@ -19,6 +19,14 @@ class GameActions implements IAction<GameState, NoneT>
 
 	//static inline var DELAY_TIME:Float = 2;
 	@:mutator static var mutator:GameMutator;
+	
+	static var TIMER:Timer;
+	public static function clearTimer():Void {
+		if (TIMER != null) {
+			TIMER.stop();
+			TIMER = null;
+		}
+	}
 
 	function swipe(context:IVxContext1<GameState>, isRight:Bool):Promise<CardResult> {
 
@@ -58,7 +66,8 @@ class GameActions implements IAction<GameState, NoneT>
 						mutator._setDelay(context,calcTime );
 						
 						if (penalty.delayNow > 0) {
-							Timer.delay( function() {
+							TIMER = Timer.delay( function() {
+								TIMER = null;
 								mutator._setDelay(context, 0);
 								mutator._resume(context);
 							}, Std.int(calcTime) );

@@ -2,6 +2,7 @@ package cstrain.vuex.components;
 import cstrain.core.Card;
 import cstrain.core.CardResult;
 import cstrain.vuex.components.BasicTypes.TouchVUtil;
+import cstrain.vuex.game.GameMenuActions;
 import cstrain.vuex.game.GameMutator;
 import cstrain.vuex.game.GameState;
 import cstrain.vuex.store.GameStore;
@@ -32,10 +33,13 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		];
 	}
 	
+	public static inline var TAG:String = "GameView";
+	
 	var currentCard(get, never):Card;
 	var cardResult(get, never):CardResult;
 	
 	@:mutator static var mutator:GameMutator;
+	@:action static var menuAction:GameMenuActions;
 	
 	override public function Created():Void {
 		mutator._resume(store);
@@ -71,6 +75,11 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		return store.game.gameGetters.cardsLeft <=0;
 	}
 	
+	function quitGame():Void {
+		menuAction._quitGame(store, _vStore);
+	}
+
+	
 	override public function Template():String {
 		#if !production
 		var cheatBtn:String = '<${TouchVUtil.TAG} tag="button" class="cheat" v-on:tap="toggleExpression()" style="position:absolute;top:10px;right:0">{{ toggleExprLabel }} expression</${TouchVUtil.TAG}>';
@@ -78,17 +87,23 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		var cheatBtn:String = '';
 		#end
 		
-		return '
-			<div class="gameview">
-				<div v-show="showInstructions">
+		/*
+		 * <div v-show="showInstructions">
 					The Constant Train :: Polynomial Express <span style="font-size:0.5em">{{ $$store.getters.isTouchBased ? "(T)" : "(D)" }}</span>
 					<hr/>
 					<p>Swipe right to infer result as constant to stop the train!<br/>Swipe left to infer result as variable to move along!</p>
 				</div>
-				<${TouchVUtil.TAG} tag="a" class="helpbtn" :class="${" {'active':!showInstructions} "}" :style="${" {'visibility':helpBtnShown ? 'visible' : 'hidden'} "}" v-on:tap="toggleInstructions()" >
-					[help]
+				*/
+		
+		return '
+			<div class="gameview">
+				
+				<${TouchVUtil.TAG} tag="a" class="quitbtn" style="cursor:pointer" v-on:tap="quitGame()" >
+					[quit]
 				</${TouchVUtil.TAG}>
-				<${Comp_CardView}></${Comp_CardView}>
+				<keep-alive>
+					<${Comp_CardView}></${Comp_CardView}>
+				</keep-alive>
 				<${Comp_PopupCardView}></${Comp_PopupCardView}>
 				<div class="blocker" v-show="showInstructions" :class="${" {showInstruct:showInstructions} "}"></div>
 				<div class="traceResult" v-if="cardResult">

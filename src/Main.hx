@@ -5,6 +5,8 @@ import cstrain.rules.SceneModel;
 import cstrain.rules.TestGame;
 import cstrain.vuex.components.BasicTypes.TouchVUtil;
 import cstrain.vuex.components.GameView;
+import cstrain.vuex.components.MainVue;
+import cstrain.vuex.game.GameMenuActions;
 import cstrain.vuex.store.GameStore;
 import haxevx.vuex.core.VxBoot;
 import haxevx.vuex.native.Vue;
@@ -26,20 +28,22 @@ class Main
 		Vue.use(VueTouch, {name:TouchVUtil.TAG});
 		
 		var sm = new SceneModel();
-		var gs = new GameStore(new TestGame(), sm) ;
+		var rules = new TestGame();
+		rules.restart();
+		var gs = new GameStore(rules, sm) ;
 		
 
-		
-		
 		var store = boot.startStore( gs) ;
 		
 		
-		boot.startVueWithRootComponent( "#app", new GameView());
+		boot.startVueWithRootComponent( "#app", new MainVue());
 		VxBoot.notifyStarted();
 		
 		// Background scene visual
 		//hxd.Res.initEmbed();
 		
+		// for now , this would suffice, a bit hackish..
+		GameMenuActions.BGTRAIN =  sm;
 		new TrainBGScene( sm);
 	
 		

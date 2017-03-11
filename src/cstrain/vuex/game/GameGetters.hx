@@ -56,7 +56,6 @@ class GameGetters implements IGetters<GameState, NoneT>
 		return state.cards  != null ? state.cards.length : 0;
 	}
 	public static inline function Get_curCardIndex(state:GameState):Int {
-
 		return state.curCardIndex;// : 0;
 	}
 	

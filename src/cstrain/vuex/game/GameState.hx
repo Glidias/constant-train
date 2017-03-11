@@ -24,7 +24,7 @@ class GameState
 	public var topCard:Card = null;
 	public var nextCardBelow:Card = null;
 
-	public var isPopup:Bool = false;
+	//public var isPopup:Bool = false;
 	public var cardResult:CardResult= null;
 	public var polynomial:Polynomial = null;
 	public var showExpression:Bool = false;
@@ -44,16 +44,20 @@ class GameState
 	
 	public var stopsEncountedSoFar:Int = 0;
 	public var beltSize:Int = 7;
-	
-	
+
 	public var showInstructions:Bool = false;
 	
 	public function new(rules:IRules) 
 	{
+		setupWithRules(rules);
+	}
+	
+	public function setupWithRules(rules:IRules):Void {
 		this.cards = rules.getAllCards();
 		this.settings = rules.getGameSettings();
 		this.playerStats = rules.getPlayerStats();
-		
+	
+	
 		
 	}
 	

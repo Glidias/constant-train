@@ -31,6 +31,13 @@ class Mountain extends Entity
 		
     }
 	
+	override public function reset():Void {
+		x = 0;
+		heightMap = new Vector<Float>();
+		generateHeightMap();
+        createShape();
+	}
+	
 	var width:Float;
     
     public override function update(dt:Float):Void

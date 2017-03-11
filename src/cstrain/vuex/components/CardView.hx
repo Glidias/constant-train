@@ -41,6 +41,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	function tickDown():Void 
 	{
 	//	trace("TICK");
+		if (myData()._timer == null) return;
 		myData().secondsLeft--;
 	}
 	
@@ -50,6 +51,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		var storeCards = store.state.game.cards;
 		
 		return {
+			swipedAlready:false,
 			topCardIndex:BELT_AMOUNT-1,
 			secondsLeft:0,
 			respawnCount:0,
@@ -65,6 +67,19 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 			*/
 	
 	static inline var BELT_AMOUNT:Int = 7;
+	
+	override function Deactivated():Void {
+
+		if (myData()._timer2 != null) {
+			myData()._timer2.stop();
+			myData()._timer2 = null;
+		
+		}
+		if (myData()._timer != null) {
+			myData()._timer.stop();
+			myData()._timer = null;
+		}
+	}
 
 
 	
@@ -83,13 +98,13 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	}
 	
 	function startTickDown():Void {
-		
+		myData()._timer2 = null;
 		tickDown();
 		startTickDownNow();
 	}
 	
 	@:watch function watch_delayTimeInSec(val:Float):Void {
-		
+			//if (myData()._timer == null) return;
 		myData().secondsLeft = Std.int( Math.floor(val) ) + 1;
 		
 		if (val > 0) {
@@ -97,15 +112,18 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 			var f:Float = val - Std.int(val);
 			if (f > 0) {
 			//	trace("TO START");
-				Timer.delay( startTickDown, Std.int( f * 1000) );
+				myData()._timer2 = Timer.delay( startTickDown, Std.int( f * 1000) );
 			}
 			else {
 				startTickDown();
 			}
 		}
 		else {
-		//	trace("Stopping VAL:" + val);
-			myData()._timer.stop();
+			//	trace("Stopping VAL:" + val);
+			if (myData()._timer != null) {
+				myData()._timer.stop();
+				myData()._timer = null;
+			}
 		}
 	}
 	
@@ -141,7 +159,11 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	}
 	
 
-	
+	override public function onThrowOut(e:SwingCardEvent):js.Promise<CardResult> {
+		
+		myData().swipedAlready = true;
+		return super.onThrowOut(e);
+	}
 				
 	function getCardForIndex(i:Int):Card {
 		var top = store.state.game.topCard;
@@ -192,6 +214,16 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	}
 
 	
+	var showUniqueID(get, never):Bool;
+	function get_showUniqueID():Bool {
+		//store.state.game.curCardIndex == 0 && !this.store.game.gameGetters.isMainDeckCard &&
+		return  !myData().swipedAlready;
+	}
+	
+	var uniqueID(get, never):String;
+	function get_uniqueID():String {
+		return store.state.game.settings.uniqueID;
+	}
 	
 	override public function Template():String {
 		return '
@@ -211,6 +243,13 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 						<div class="indicator">{{ secondsLeft }}   seconds left.</div>
 					</div>
 				</div>
+				
+				<div v-show="showUniqueID" class="delay-popup uniqueid">
+					<div class="content">
+						<h2 class="allowselect">{{ uniqueID }}</h2>
+						<p>Before your first swipe, challenge friend(s) to join you on the above ID to race them live!</p>
+					</div>
+				</div>
 			</div>
 		';
 	}
@@ -228,6 +267,8 @@ typedef CardViewState = {
 	var secondsLeft:Int;
 	var respawnCount:Int;
 	var nextBeltCardIndex:Int;
+	var swipedAlready:Bool;
 	@:optional var _timer:Timer;
+	@:optional var _timer2:Timer;
 }
 

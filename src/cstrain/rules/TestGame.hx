@@ -55,8 +55,8 @@ class TestGame implements IRules
 	
 	}
 	
-	function buildDeck():Void {
-		var baseMult:Int   = 1;
+	function buildDeck(baseMult:UInt):Void {
+	
 		deck.addCards( Deck.getCards(Deck.SET_NUMBERS, Deck.OP_ADD | Deck.OP_SUBTRACT, 0, 1*baseMult) );
 		deck.addCards( Deck.getCards(Deck.SET_NUMBERS, Deck.OP_MULTIPLY | Deck.OP_DIVIDE ,  Deck.NUM_2, 1*baseMult) );
 
@@ -210,10 +210,13 @@ class TestGame implements IRules
 	}
 	
 	var commenced:Bool = false;
+	var _startingSeed:Int;
 	/* INTERFACE cstrain.core.IRules */
 	
-	public function restart(?seed:Int):Void {
-		if (seed == null) seed = FastRNG.newSeed(); 
+	public function restart(?seed:Int, ?options:Array<Int>):Void {
+		trace(untyped [seed, options]);
+		if (seed == null) seed = GameSettings.getRandomSeed();  
+		_startingSeed = seed;
 		
 		// test cases
 		//367925706;
@@ -223,6 +226,11 @@ class TestGame implements IRules
 		#if !production
 		trace(seed);
 		#end
+		
+		
+		gameSettings.uniqueID = GameSettings.getUniqueID(seed, options);
+
+		_options = options;
 		
 		rng = new FastRNG(seed);
 		
@@ -237,7 +245,7 @@ class TestGame implements IRules
 		
 		commenced = false;
 		currentPlayerStats = new PlayerStats();
-		buildDeck();
+		buildDeck(options != null && options.length > 0 ? options[0] : 1);
 		
 	}
 	
@@ -444,6 +452,7 @@ class TestGame implements IRules
 	}
 	
 	static var EMPTY_ARRAY:Array<Int> = [];
+	var _options:Array<UInt>;
 	
 	public function getPolynomial():Polynomial 
 	{
@@ -453,4 +462,6 @@ class TestGame implements IRules
 	public inline function getDeckIndex():Int {
 		return curDeck.cards.length - curDeckIndex - 1;
 	}
+	
+	
 }

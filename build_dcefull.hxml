@@ -3,6 +3,7 @@
 -cp src
 -js bin/ConstantTrain.js
 -lib heaps
+-lib hashids
 -D vue_global
 -D dce full
 -main Main

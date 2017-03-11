@@ -36,6 +36,14 @@ class TrainBGScene extends AbstractBGScene
 		
 	}
 	
+	private function reset():Void {
+		_curLoc = 0;
+		_needToRender = true;
+		for ( entity in entities)
+		{
+			entity.reset();
+		}
+	}
 	var _curLoc:Float = 0;
 	var unitTimeLength:Float = GameSettings.SHARED_FPS  / 1;
 	var renderCount:Int = 0;
@@ -50,8 +58,19 @@ class TrainBGScene extends AbstractBGScene
 			model.travelTo( Std.int(model.targetDest + 1 ) );
 		
 		}
+
 	
 		model.update();
+		
+				
+		var tarLoc = model.currentPosition;
+		var diff = (tarLoc - _curLoc) * unitTimeLength;
+		if (diff < 0 && tarLoc ==0) {	// assume resetting
+				
+			reset();
+			return;
+		}
+		
 		if (renderCount < 60) {
 			_needToRender = true;
 			renderCount++;
@@ -61,9 +80,9 @@ class TrainBGScene extends AbstractBGScene
 			_needToRender = model.movingState != BGTrainState.STOPPED;
 			
 			
-			var tarLoc = model.currentPosition;
 			
-			var diff = (tarLoc - _curLoc)*unitTimeLength;
+			
+			
 			
 	
 			for ( entity in entities)
@@ -102,7 +121,7 @@ class TrainBGScene extends AbstractBGScene
 		super.init();
 	
 		
-		var g = new h2d.Graphics(scene);
+		new h2d.Graphics(scene);
 	
 		var fillGrad:Fill = new Fill(s2d);
 		//var grad:Gradient = { spread:SMPad, interpolate:IMLinearRGB, data:[GradRecord.GRRGB(0, {r:255, g:255, b:0} ), GradRecord.GRRGB(1, {r:255,g:0,b:0} ) ]   };

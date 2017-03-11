@@ -245,6 +245,19 @@ class SceneModel implements IBGTrain
 	
 	public function update() {
 		
+		if (_reseting) {
+			_curLoc = _targetDest;
+
+			_isStarted = false;
+			_curVelocity = 0;
+			//trace("END:" + tarLoc);
+			movingState = BGTrainState.STOPPED;
+			
+			_reseting = false;
+			return;
+		}
+		
+		
 		if (_isStarted) {
 			
 			//var dt:Float = (Timer.stamp() - _startTime) * GameSettings.SHARED_FPS;

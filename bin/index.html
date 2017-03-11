@@ -25,7 +25,8 @@
 		}
 		
 		
-		.gameview {
+		
+		.gameview, .game-menu {
 		
 			position:absolute;
 			top:0px;
@@ -42,6 +43,63 @@
 			-ms-user-select: none;
 			user-select:none;
 		}
+		
+		.allowselect {
+			moz-user-select:initial;
+			-webkit-user-select: initial; 
+			-ms-user-select: initial;
+			user-select:initial;
+			pointer-events:auto !important;
+		}
+		
+		.uniqueid {
+			pointer-events:none;
+			
+		}
+		.game-menu { text-align:center }
+		.game-menu input {
+			font-size:2em;
+			margin-bottom:30px;
+				padding:5px;
+				display:block;
+				width:100%;
+				box-sizing:border-box;
+				text-align:center;
+		}
+		.game-menu button {
+			font-size:2em;
+			padding:15px;
+			margin-bottom:30px;
+			
+		}
+		
+		.game-menu h2 {
+			text-decoration:underline;
+		}
+		.game-menu .btn-zone {
+			text-align:center;
+		}
+		.game-menu  .gametitle {
+			font-style:italic;
+			font-weight:bold;
+			font-size:1.2em;
+			
+			text-align:left;
+		}
+		
+		.game-menu .game-opts {
+			text-align:left;
+			font-size:1.2em;
+			margin-bottom:30px;
+		 }
+		 .game-menu .game-opts select {
+			font-size:1.2em;
+			min-width:3em;
+		 }
+		
+		
+		.game-menu label { margin-right:10px; }
+		
 	
 		@keyframes gameover {
 			from {
@@ -73,10 +131,12 @@
 			animation-fill-mode: backwards;
 		}
 		
-		.helpbtn {
+		.quitbtn {
 			display:inline-block;
 			cursor:pointer;
 			color:#222222;
+			position:relative;
+			z-index:20;
 		}
 		.helpbtn.active {
 			color:#666666;
@@ -130,6 +190,11 @@
 		
 		.popup-cardview .cardstack {
 			top:93px;
+		}
+		
+		.uniqueid .content {
+			
+			top:373px;
 		}
 		
 		.delay-popup {

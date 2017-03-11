@@ -12,14 +12,11 @@ import haxevx.vuex.core.IMutator;
 class GameMutator implements IMutator<GameState>
 {
 
-	public static function Restart(g:GameState):Void {
-		g._rules.restart();
-		
-		g.cards = g._rules.getAllCards();
-	}
+
 	
 	function restart(g:GameState):Void {
-		GameMutator.Restart(g);
+		g.setupWithRules(g._rules);
+	
 	}
 	
 	function notifySwipe(state:GameState, swipeState:Int ):Void {
