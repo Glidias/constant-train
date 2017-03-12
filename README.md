@@ -2,6 +2,8 @@
 
 HaxeVx+Vuex example train racing game prototype.
 
+For an online preview of web-app (which can be Added to Home Screen once fully loaded), go to: http://54.254.243.13:3000
+
 Leverages the following technologies under Haxe:
 	
 Cross-platform codebase:
