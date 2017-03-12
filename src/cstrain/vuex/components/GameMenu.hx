@@ -5,6 +5,9 @@ import cstrain.vuex.store.GameStore;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VxComponent;
 import cstrain.vuex.components.BasicTypes;
+import js.Browser;
+import js.Lib;
+import js.html.ScrollOptions;
 
 /**
  * ...
@@ -28,6 +31,11 @@ class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 		}
 	}
 	
+	function loseInputFocus():Void {
+	
+		Browser.window.scrollTo(0,0);
+	}
+	
 	function beginGame():Void {
 		action._newGame(store, { options:{options:this.gameOptions}, store:_vStore });
 	}
@@ -42,7 +50,7 @@ class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 			<div class="gametitle">TestGame</div>
 			<div class="game-opts">
 				<label for="gameoption_1">Length of Race:</label>
-				<select id="gameoption_1" v-model.number="gameOptions[0]" class="testgame-opt">
+				<select id="gameoption_1" v-model.number="gameOptions[0]" class="testgame-opt" v-on:blur="loseInputFocus()">
 					<option :value="n" v-for="n in 8">{{n}}</option>
 				</select>
 			</div>
@@ -52,7 +60,7 @@ class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 			</div>
 			<hr/>
 			<h2>Join Game</h2>
-			<input type="text" v-model="joinKey"></input>
+			<input type="text" v-model="joinKey" v-on:blur="loseInputFocus()"></input>
 			<div class="btn-zone">
 				<${TouchVUtil.TAG} tag="button" v-on:tap="joinGame()">Connect</${TouchVUtil.TAG}>
 			</div>
