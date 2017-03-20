@@ -41,7 +41,6 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	function tickDown():Void 
 	{
 	//	trace("TICK");
-		if (myData()._timer == null) return;
 		myData().secondsLeft--;
 	}
 	
