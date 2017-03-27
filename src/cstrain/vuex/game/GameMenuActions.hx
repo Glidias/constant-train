@@ -34,6 +34,7 @@ class GameMenuActions implements IAction<GameStoreState, NoneT>
 
 	function newGame(context:IVxContext1<GameStoreState>, create:GameCreateOptions):Void {
 		var rules:IRules = new TestGame();
+		rules.setScene(BGTRAIN);
 		rules.restart(create.options.seed, create.options.options);
 		
 		var mod =  new GameModule(rules, BGTRAIN);
@@ -44,6 +45,7 @@ class GameMenuActions implements IAction<GameStoreState, NoneT>
 	
 	function joinGame(context:IVxContext1<GameStoreState>, join:GameJoinOptions):Void {
 		var rules:IRules = new TestGame();
+		rules.setScene(BGTRAIN);
 		rules.restart( GameSettings.getSeedFromUniqueId(join.joinCode), GameSettings.getOptionsFromUniqueId(join.joinCode) );
 		
 		
@@ -68,6 +70,7 @@ class GameMenuActions implements IAction<GameStoreState, NoneT>
 		BGTRAIN.resetTo(0);
 		
 		var rules:IRules = new TestGame();
+		rules.setScene(BGTRAIN);
 		rules.restart(create.options.seed, create.options.options);
 	
 		var mod =  new GameModule(rules, BGTRAIN);

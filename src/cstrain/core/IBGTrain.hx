@@ -32,7 +32,8 @@ interface IBGTrain
 	// cruising speed => "comfortable" moving speed. Currently not used ingame or as part of gameplay.
 	function setCruisingSpeed(speed:Float):Void;
 	
-
+	function getTimeLeft():Float;
+	
 	
 	// Read (client side values)
 	var currentPosition(get, never):Float;

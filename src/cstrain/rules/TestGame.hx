@@ -3,6 +3,7 @@ import cstrain.core.Card;
 import cstrain.core.CardResult;
 import cstrain.core.Deck;
 import cstrain.core.GameSettings;
+import cstrain.core.IBGTrain;
 import cstrain.core.IRules;
 import cstrain.core.PenaltyDesc;
 import cstrain.core.PlayerStats;
@@ -309,7 +310,14 @@ class TestGame implements IRules
 		switch ( result) {
 			case CardResult.PENALIZE(penalty):
 				if (penalty.delayNow != null){
-					_penaltyTime = penalty.delayNow * gameSettings.penaltyDelayMs;
+					penalty.delayNow *= gameSettings.penaltyDelayMs;
+					_penaltyTime = penalty.delayNow;
+					if (penalty.desc == LOST_IN_TRANSIT || penalty.desc == MISSED_STOP) {
+						var addTime:Float =  (_scene != null ? _scene.getTimeLeft()  : 0);
+						trace("TIME ADDED:"+addTime);
+						_penaltyTime += addTime * 1000;
+						penalty.delayNow += (addTime * 1000);
+					}
 				}
 			default:
 				_penaltyTime  = 0;
@@ -453,6 +461,7 @@ class TestGame implements IRules
 	
 	static var EMPTY_ARRAY:Array<Int> = [];
 	var _options:Array<UInt>;
+	var _scene:IBGTrain;
 	
 	public function getPolynomial():Polynomial 
 	{
@@ -461,6 +470,14 @@ class TestGame implements IRules
 
 	public inline function getDeckIndex():Int {
 		return curDeck.cards.length - curDeckIndex - 1;
+	}
+	
+	
+	/* INTERFACE cstrain.core.IRules */
+	
+	public function setScene(scene:IBGTrain):Void 
+	{
+		_scene = scene;
 	}
 	
 	

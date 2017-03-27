@@ -25,6 +25,8 @@ interface IRules
 	
 	function getGameSettings():GameSettings;
 	
+	function setScene(scene:IBGTrain):Void;
+	
 
 	
 	

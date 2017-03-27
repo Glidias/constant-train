@@ -50,6 +50,7 @@ class GameActions implements IAction<GameState, NoneT>
 					// show popup mutation
 					//mutator._setPopupCard(context);  // guessCard already encapcsulted within IRules api topmost card
 					mutator._encounterStationStop(context);
+					mutator._updateProgress(context);
 					mutator._resume(context);
 					
 				case CardResult.PENALIZE(penalty):
@@ -62,7 +63,7 @@ class GameActions implements IAction<GameState, NoneT>
 						mutator._updateProgress(context);
 					}
 					if (penalty.delayNow != null  ) {
-						var calcTime:Float = penalty.delayNow * context.state.settings.penaltyDelayMs;
+						var calcTime:Float =  penalty.delayNow;
 						mutator._setDelay(context,calcTime );
 						
 						if (penalty.delayNow > 0) {

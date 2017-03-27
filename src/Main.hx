@@ -29,6 +29,7 @@ class Main
 		
 		var sm = new SceneModel();
 		var rules = new TestGame();
+		
 		rules.restart();
 		var gs = new GameStore(rules, sm) ;
 		
@@ -45,6 +46,7 @@ class Main
 		// for now , this would suffice, a bit hackish..
 		GameMenuActions.BGTRAIN =  sm;
 		new TrainBGScene( sm);
+		
 	
 		
 

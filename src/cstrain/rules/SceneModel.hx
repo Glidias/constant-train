@@ -18,7 +18,7 @@ class SceneModel implements IBGTrain
 	public function new() 
 	{
 		calcPickupTime();
-		setPickupTimespans(1, 1);
+		setPickupTimespans(5, 5);
 	
 	}
 	
@@ -37,11 +37,14 @@ class SceneModel implements IBGTrain
 	static inline var PUSH_FORWARD_ERROR:Float = .75;
 	
 	
-	var _maxSpeed:Float = 4;
+	var _maxSpeed:Float = 2;
 	var _isStarted:Bool = false;
 	var _startIndex:Float = -1;
 	var _tweenProgress:Float = 0;
 	var _tweenDuration:Float = 0;
+	public function getTimeLeft():Float {
+		return (_tweenDuration - _tweenProgress) / unitTimeLength;
+	}
 
 	
 	//  deriative engine
