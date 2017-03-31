@@ -210,13 +210,13 @@ class SceneModel implements IBGTrain
 
 	}
 	
-	public function stopAt(index:Int):Void // TODO
+	public function stopAt(index:Int):Void
 	{
 		_targetDest = index;
 		
 	}
 	
-	public function missStopAt(index:Int):Void 	// TODO
+	public function missStopAt(index:Int):Void 	
 	{
 		if ( _curLoc <= index + PUSH_FORWARD_ERROR) {
 			_targetDest =  index + PUSH_FORWARD_ERROR;

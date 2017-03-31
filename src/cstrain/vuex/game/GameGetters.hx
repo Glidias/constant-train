@@ -41,6 +41,14 @@ class GameGetters implements IGetters<GameState, NoneT>
 		return state.topCard == (state.curCardIndex <  state.cards.length ? state.cards[state.curCardIndex] : null);
 	}
 	
+	
+	public static function Get_progressUnit(state:GameState):Float {
+		return 1/Get_totalCards(state);
+	}
+	
+	
+	
+	
 	public static inline function Get_swipedCorrectly(state:GameState):Bool {
 
 		return state.curPenalty != null ? state.penaltySwipeCorrect : true;

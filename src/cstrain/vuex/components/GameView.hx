@@ -29,7 +29,8 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [
 			Comp_CardView => new CardView(),
-			Comp_PopupCardView => new PopupCardView()
+			Comp_PopupCardView => new PopupCardView(),
+			'$TrainProgressBarView.NAME' => new TrainProgressBarView()  // TODO: need to look into HAxeVX without having to use quotes
 		];
 	}
 	
@@ -81,6 +82,8 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 
 	
 	override public function Template():String {
+		
+		
 		#if !production
 		var cheatBtn:String = '<${TouchVUtil.TAG} tag="button" class="cheat" v-on:tap="toggleExpression()" style="position:absolute;top:10px;right:0">{{ toggleExprLabel }} expression</${TouchVUtil.TAG}>';
 		#else

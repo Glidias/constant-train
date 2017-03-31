@@ -47,6 +47,8 @@ class GameState
 
 	public var showInstructions:Bool = false;
 	
+	public var currentProgress:Float = 0; // reactive value
+	
 	public function new(rules:IRules) 
 	{
 		setupWithRules(rules);
