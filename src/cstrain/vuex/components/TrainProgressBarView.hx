@@ -20,8 +20,13 @@ import haxevx.vuex.core.VxComponent;
 		left:0;
 		width:100%;
 		height:100%;
+		transform:translate3d(0,0,0);
+		
 		.scrub {
 			height:100%;
+		}
+		.testStyle {
+			
 		}
 	}
 }
@@ -55,7 +60,7 @@ class TrainProgressBarView extends VxComponent<GameStore, NoneT, NoneT>
 			};
 	}
 	
-		public function new() 
+	public function new() 
 	{
 		super();
 	}
