@@ -1,14 +1,14 @@
 package cstrain.vuex.components;
 import cstrain.vuex.store.GameStore;
 import haxevx.vuex.core.NoneT;
+import haxevx.vuex.core.VCSS;
 import haxevx.vuex.core.VxComponent;
 
 /**
  * ...
  * @author Glidias
  */
-@:style('
-
+@:build(haxevx.vuex.core.VCSS.buildModuleStyle(' 
 .trainprogress-bar {
 	box-sizing:border-box;
 	padding-left:20px;	
@@ -24,19 +24,21 @@ import haxevx.vuex.core.VxComponent;
 			height:100%;
 		}
 	}
-
 }
-
-',  "scss")
+',  "scss"))
 class TrainProgressBarView extends VxComponent<GameStore, NoneT, NoneT>
 {
 	
-	public static inline var NAME:String = "TrainProgressBarView";
-
-	public function new() 
-	{
-		super();
+	override public function Template():String {
+		return '
+			<div class="trainprogress-bar">
+				<div class="${STYLE.scrubber}" v-bind:style="scrubberStyle">
+					<div class="${STYLE.scrub}" v-bind:style="scrubStyle"></div>
+				</div>
+			</div>
+		';
 	}
+	public static inline var NAME:String = "TrainProgressBarView";
 	
 	public function get_scrubberStyle():Dynamic {
 		var prog:Float = store.state.game.currentProgress;
@@ -53,15 +55,14 @@ class TrainProgressBarView extends VxComponent<GameStore, NoneT, NoneT>
 			};
 	}
 	
-	override public function Template():String {
-		return '
-			<div class="trainprogress-bar">
-				<div class="scrubber" v-bind:style="scrubberStyle">
-					<div class="scrub" v-bind:style="scrubStyle"></div>
-				</div>
-			</div>
-		';
+		public function new() 
+	{
+		super();
 	}
+	
+
+	
+	
 	
 	
 	
