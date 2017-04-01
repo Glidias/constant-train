@@ -31,7 +31,7 @@ class VCSS
 		return macro $v{json};
 	}
 	
-	public static macro function buildModuleStyle(writtenContents:String, fileExtension:String):Array<Field> {
+	public static macro function buildModuleStyle(writtenContents:String, fileExtension:String, varName:String="STYLE"):Array<Field> {
 		var fileName:String = Context.getLocalClass().get().module.split(".").join("_");
 		var workingDirectory:String = Sys.getCwd();
 		var cacheDir:String =  workingDirectory + CACHE_FOLDER_NAME+"/";
@@ -65,14 +65,12 @@ class VCSS
 
 
 		theFields.push( {
-			name:"STYLE",
-			access: [Access.AStatic],
+			name: varName,
+			access: [Access.AStatic, Access.APublic],
 			kind: FProp("default", "never", TypeTools.toComplexType( Context.typeof(expr) ), expr),
 			pos: Context.currentPos(),
 		});
 
-		
-		
 		return theFields;
 	}	
 }
