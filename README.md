@@ -25,7 +25,7 @@ Before compiling, run `npm install` at root working location folder to install a
 
 ## Compiling
 
-To compile, just use any of the relavant `build_????.hxml` files.  Or alternatively, if using some IDE to compile without hxml files, compile `Main.hx` and also remember to post-run `gulpcss.bat` (which simply executes `gulp css` task to compile the main index.scss stylesheet together with it's CSS modules. By default, the hxml files already executes the `gulp css` process after compiling! A reference/cache file dump of `processing-modules`  and `processing-styles` will be generated with the Haxe compiling/macro-building process. These cache files can be safely deleted away, if you wish, but they serve as a persitant cache reference to speed up later Haxe compiles by knowing which CSS module style files had changed or not.
+To compile, just use any of the relavant `build_????.hxml` files.  Or alternatively, if using some IDE to compile without hxml files, compile `Main.hx` and also remember to post-run `gulpcss.bat` (which simply executes `gulp css` task to compile the main `scss/index.scss` stylesheet together with it's CSS modules. By default, the hxml files already executes the `gulp css` process after compiling! A reference/cache file dump of `processing-modules`  and `processing-styles` will be generated with the Haxe compiling/macro-building process. These cache files can be safely deleted away, if you wish, but they serve as a persitant cache reference to speed up later Haxe compiles by knowing which CSS module style files had changed or not.
 
 ## Previewing
 
@@ -33,7 +33,7 @@ To start previewing the compiled `bin` contents on browser as a developer, ensur
 
 	"start": "webpack-dev-server --port 8080 --host localhost --entry ./ConstantTrain.js"`
 	
-Then, start webpack server on the  command line at the `bin` location with: `npm start`. 
+Then, start webpack server on the  command line at the `bin` location with: `npm start`.  In the example configuration above, you can  preview the app on your browser with the configured  address, which would be `http://localhost:8080` based on the example.
 	
 ## How to play?
 
