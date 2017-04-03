@@ -18,11 +18,22 @@ For HTML5-specific target (A view implementation for browser/webapps):
 - Vue-touch (`next` branch) (for Vue2 compatibility) https://github.com/vuejs/vue-touch/tree/next
 - Swing JS for card swiping feature `gajus.swing`  (<- NOTE: The externs in this package isn't complete/accruate.) https://github.com/gajus/swing 
 
-To start viewing on browser as a developer, configure `npm start` command at `bin/package.json` location to point to the relavant host/port. A host of `localhost"` would suffice if you need to view it offline. 
+
+## Installation
+
+Before compiling, run `npm install` at root working location folder to install any dev dependencies required for compiling. 
+
+## Compiling
+
+To compile, just use any of the relavant `build_????.hxml` files.  Or alternatively, if using some IDE to compile without hxml files, compile `Main.hx` and also remember to post-run `gulpcss.bat` (which simply executes `gulp css` task to compile the main index.scss stylesheet together with it's CSS modules. By default, the hxml files already executes the `gulp css` process after compiling! A reference/cache file dump of `processing-modules`  and `processing-styles` will be generated with the Haxe compiling/macro-building process. These cache files can be safely deleted away, if you wish, but they serve as a persitant cache reference to speed up later Haxe compiles by knowing which CSS module style files had changed or not.
+
+## Previewing
+
+To start previewing the compiled `bin` contents on browser as a developer, ensure NPM packages are installed at `\bin\` location via `npm install` at `bin` location. Configure `npm start` command at `bin/package.json` location to point to the relavant host/port. A host of `localhost"` would suffice if you just need to view it offline. 
 
 	"start": "webpack-dev-server --port 8080 --host localhost --entry ./ConstantTrain.js"`
 	
-Start webpack server on the  command line at the `bin` location with: `npm start`. Remember to also compile the Haxe codebase  using any one of the `.hxml` build files/settings in the repo. Then, jump to your configured host url on your browser to view the example.
+Then, start webpack server on the  command line at the `bin` location with: `npm start`. 
 	
 ## How to play?
 

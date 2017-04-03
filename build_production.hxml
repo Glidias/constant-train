@@ -8,3 +8,4 @@
 -D production
 -dce full
 -main Main
+-cmd gulp css

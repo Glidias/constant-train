@@ -1,0 +1,7 @@
+.card {
+	 width: 240px; height: 300px; list-style: none; background: #fff; border-radius: 5px; position: absolute; top: 0; left: 0; box-shadow: 0 0 2px rgba(0,0,0,.2), 1px 1px 1px rgba(0,0,0,.2); line-height: 300px; text-align: center; font-size: 2em; border: 10px solid #ECECEC; box-sizing: border-box; cursor: default; select:none; color:black;    white-space:nowrap;
+}
+
+.card.polynomial {
+	font-size:1.3em;
+}

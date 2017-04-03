@@ -224,28 +224,30 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return store.state.game.settings.uniqueID;
 	}
 	
+	public static var STYLE = BaseCardView.STYLE;
+	
 	override public function Template():String {
 		return '
-			<div class="cardview">
-				<div class="hud-indicators">
+			<div class="${STYLE.cardview}">
+				<div class="${STYLE.hudIndicators}">
 					<h3>{{ tickStr }} {{ penaltiedStr }} &nbsp; {{ curCardIndex}} / {{ totalCards}}</h3>
 				</div>
 				
 				<h4 v-show="${BuiltVUtil.isProductionStrNot()}">{{ topCardIndex}}</h4>
-				<ul class="cardstack">
-					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :style="${" {'visibility': isVisibleProjected(i) ? 'visible' : 'hidden' } "}" :class="${" {'polynomial':isPolynomialForIndex(i)} "}" :stack="$$data._stack" :index="i" :key="i">${#if !production"{{ getProjectedCardIndex(i) }}"#else""#end}</${CardV.CompName}>
+				<ul class="${STYLE.cardstack}">
+					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :style="${" {'visibility': isVisibleProjected(i) ? 'visible' : 'hidden' } "}" :class="{'+' ${CardV.STYLE.polynomial}:isPolynomialForIndex(i) '+'}" :stack="$$data._stack" :index="i" :key="i">${#if !production"{{ getProjectedCardIndex(i) }}"#else""#end}</${CardV.CompName}>
 				</ul>
 				
-				<div class="delay-popup" v-show="gotDelay">
-					<div class="content">
+				<div class="${STYLE.delayPopup}" v-show="gotDelay">
+					<div class="${STYLE.content}">
 						<h4 >{{ penaltyDesc }}!</h4>
-						<div class="indicator">{{ secondsLeft }}   seconds left.</div>
+						<div class="">{{ secondsLeft }}   seconds left.</div>
 					</div>
 				</div>
 				
-				<div v-show="showUniqueID" class="delay-popup uniqueid">
-					<div class="content">
-						<h2 class="allowselect">{{ uniqueID }}</h2>
+				<div v-show="showUniqueID" class="${STYLE.delayPopup} ${STYLE.uniqueid}">
+					<div class="${STYLE.content}">
+						<h2 class="">{{ uniqueID }}</h2>
 						<p>Before your first swipe, challenge friend(s) to join you on the above ID to race them live!</p>
 					</div>
 				</div>

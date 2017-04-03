@@ -1,0 +1,75 @@
+.cardview {
+	
+	position:relative;
+	width:100%;
+	height:100%;
+}
+
+.cardview h3 {
+	font-size:16px;
+}
+
+.cardstack {
+ width: 240px; height: 300px;  position: absolute; top: 44px; left: 50%; margin-left: -120px;
+}
+
+/* Popup */
+
+.popup-cardview {
+	width:100%;
+	background-color:rgba(165,42,42,.5);
+	height:57%;
+	top:0;left:0;
+	position:absolute;
+	visibility:hidden;
+}
+.popup-cardview.shown {
+	visibility:visible;
+}
+
+.popup-cardview .cardstack {
+	top:93px;
+}
+
+/* HUD indicators */
+
+.hud-indicators {
+	position:relative;z-index:4;
+}
+
+/*  Delay popup showing */
+
+
+.delay-popup {
+	z-index:10;
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	text-align:center;
+	
+}
+.delay-popup .content {
+	position:absolute;
+	bottom:230px;
+	width:100%;
+	text-align:center;
+	font-size:1.2em;
+}
+.delay-popup h4 {
+	font-size:1.0em;
+}
+
+/*  Unique ID */
+
+.uniqueid .content {
+	
+	top:373px;
+	
+}
+
+.uniqueid {
+	pointer-events:none;
+	
+}

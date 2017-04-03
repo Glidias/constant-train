@@ -13,6 +13,7 @@ import js.html.ScrollOptions;
  * ...
  * @author Glidias
  */
+@:build(haxevx.vuex.core.VCSS.buildModuleStyleFromFile(null, "scss") )
 class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 {
 
@@ -45,23 +46,23 @@ class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 	}
 	
 	override public function Template():String {
-		return '<div class="game-menu">
+		return '<div class="${STYLE.gameMenu}">
 			<h2>New Game</h2>
-			<div class="gametitle">TestGame</div>
-			<div class="game-opts">
+			<div class="${STYLE.gametitle}">TestGame</div>
+			<div class="${STYLE.gameOpts}">
 				<label for="gameoption_1">Length of Race:</label>
-				<select id="gameoption_1" v-model.number="gameOptions[0]" class="testgame-opt" v-on:blur="loseInputFocus()">
+				<select id="gameoption_1" v-model.number="gameOptions[0]" v-on:blur="loseInputFocus()">
 					<option :value="n" v-for="n in 8">{{n}}</option>
 				</select>
 			</div>
 			<br/>
-			<div class="btn-zone">
+			<div class="${STYLE.btnZone}">
 				<${TouchVUtil.TAG} tag="button" v-on:tap="beginGame()">Begin</${TouchVUtil.TAG}>
 			</div>
 			<hr/>
 			<h2>Join Game</h2>
 			<input type="text" v-model="joinKey" v-on:blur="loseInputFocus()"></input>
-			<div class="btn-zone">
+			<div class="${STYLE.btnZone}">
 				<${TouchVUtil.TAG} tag="button" v-on:tap="joinGame()">Connect</${TouchVUtil.TAG}>
 			</div>
 		</div>

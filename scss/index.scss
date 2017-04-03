@@ -1,0 +1,36 @@
+@import "../processing-modules/exports";
+ 
+html {
+	overflow:hidden;
+}
+body {
+	padding:0;
+	margin:0;
+	overflow:hidden;
+
+}
+#wrapper {
+	margin:0 auto;
+	position:relative;
+	width:414px;
+	height:736px;
+}
+
+
+
+#{$cstrain_vuex_components_GameView}gameview, #{$cstrain_vuex_components_GameMenu}game-menu {
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	overflow:hidden;
+	height:100%;
+	box-sizing:border-box;
+	color:#bbbbbb;
+	padding:15px;
+	
+	moz-user-select:none;
+	-webkit-user-select: none; 
+	-ms-user-select: none;
+	user-select:none;
+}

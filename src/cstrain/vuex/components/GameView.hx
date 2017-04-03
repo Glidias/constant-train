@@ -15,6 +15,7 @@ import haxevx.vuex.core.VxComponent;
  * ...
  * @author Glidias
  */
+@:build(haxevx.vuex.core.VCSS.buildModuleStyleFromFile(null, "scss") )
 class GameView extends VxComponent<GameStore, NoneT, NoneT>
 {
 
@@ -77,6 +78,7 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 	}
 	
 	function quitGame():Void {
+
 		menuAction._quitGame(store, _vStore);
 	}
 
@@ -85,7 +87,7 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		
 		
 		#if !production
-		var cheatBtn:String = '<${TouchVUtil.TAG} tag="button" class="cheat" v-on:tap="toggleExpression()" style="position:absolute;top:10px;right:0">{{ toggleExprLabel }} expression</${TouchVUtil.TAG}>';
+		var cheatBtn:String = '<${TouchVUtil.TAG} tag="button" v-on:tap="toggleExpression()" style="position:absolute;top:10px;right:0">{{ toggleExprLabel }} expression</${TouchVUtil.TAG}>';
 		#else
 		var cheatBtn:String = '';
 		#end
@@ -99,23 +101,22 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 				*/
 		
 		return '
-			<div class="gameview">
-				
-				<${TouchVUtil.TAG} tag="a" class="quitbtn" style="cursor:pointer" v-on:tap="quitGame()" >
+			<div class="${STYLE.gameview}">
+				<${TouchVUtil.TAG} tag="a" class="${STYLE.quitbtn}" style="cursor:pointer" v-on:tap="quitGame()" >
 					[quit]
 				</${TouchVUtil.TAG}>
 				<keep-alive>
 					<${Comp_CardView}></${Comp_CardView}>
 				</keep-alive>
 				<${Comp_PopupCardView}></${Comp_PopupCardView}>
-				<div class="blocker" v-show="showInstructions" :class="${" {showInstruct:showInstructions} "}"></div>
-				<div class="traceResult" v-if="cardResult">
+				<div class="${STYLE.blocker}" v-show="showInstructions" :class="{'+' ${STYLE.showInstruct}:showInstructions '+'}"></div>
+				<div v-if="cardResult">
 					<p>{{ cardResult }}</p>
 				</div>
-				<div class="xpression" style="font-style:italic" v-html="polyexpression"></div>
+				<div class="${STYLE.xpression}" style="font-style:italic" v-html="polyexpression"></div>
 				<br/>
 				${cheatBtn}
-				<div class="gameover" v-show="showGameOver">
+				<div class="${STYLE.gameover}" v-show="showGameOver">
 					<h1>Congratulations!</h1>
 					<h2>${"You've finished the race!"}</h2>
 				</div>

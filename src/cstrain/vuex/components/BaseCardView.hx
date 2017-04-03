@@ -15,10 +15,10 @@ import js.html.HtmlElement;
  * ...
  * @author Glidias
  */
+@:build(haxevx.vuex.core.VCSS.buildModuleStyleFromFile(null, "scss") )
 class BaseCardView extends VxComponent<GameStore, SwingStackData, NoneT>
 {
 
-	
 	public function new() 
 	{
 		super();

@@ -1,0 +1,7 @@
+.allowselect {
+	moz-user-select:initial;
+	-webkit-user-select: initial; 
+	-ms-user-select: initial;
+	user-select:initial;
+	pointer-events:auto !important;
+}

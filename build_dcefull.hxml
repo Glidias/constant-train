@@ -7,3 +7,4 @@
 -D vue_global
 -D dce full
 -main Main
+-cmd gulp css

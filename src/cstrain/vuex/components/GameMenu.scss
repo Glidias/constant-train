@@ -1,0 +1,42 @@
+.game-menu { text-align:center }
+.game-menu input {
+	font-size:2em;
+	margin-bottom:30px;
+		padding:5px;
+		display:block;
+		width:100%;
+		box-sizing:border-box;
+		text-align:center;
+}
+.game-menu button {
+	font-size:2em;
+	padding:15px;
+	margin-bottom:30px;
+}
+
+.game-menu h2 {
+	text-decoration:underline;
+}
+.game-menu .btn-zone {
+	text-align:center;
+}
+.game-menu  .gametitle {
+	font-style:italic;
+	font-weight:bold;
+	font-size:1.2em;
+	
+	text-align:left;
+}
+
+.game-menu .game-opts {
+	text-align:left;
+	font-size:1.2em;
+	margin-bottom:30px;
+ }
+ .game-menu .game-opts select {
+	font-size:1.2em;
+	min-width:3em;
+ }
+
+
+.game-menu label { margin-right:10px; }

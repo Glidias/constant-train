@@ -48,11 +48,13 @@ class PopupCardView extends BaseCardView
 	}
 	
 
+	public static var STYLE = BaseCardView.STYLE;
+	
 	override public function Template():String {
 		return '
-			<div class="popup-cardview" :class="{shown:isPopupChoicing}">
+			<div class="${STYLE.popupCardview}" :class="{'+'${STYLE.shown}:isPopupChoicing'+'}">
 				<h4 v-show="${BuiltVUtil.isProductionStrNot()}" style="position:absolute;bottom:5px;right:5px">{{ topCardIndex}}</h4>
-				<ul class="cardstack">
+				<ul class="${STYLE.cardstack}">
 					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i"></${CardV.CompName}>
 				</ul>
 			</div>
