@@ -1,9 +1,5 @@
 package haxevx.vuex.core;
 
-
-
-
-
 #if macro
 import haxe.macro.TypeTools;
 import haxe.macro.Expr.Field;
@@ -16,7 +12,7 @@ import haxe.io.Bytes;
 import sys.io.Process;
 
 /**
- * ...
+ * note: this shouldn't be in Core actually. The implementation is particularly specific.
  * @author Glidias
  */
 class VCSS
