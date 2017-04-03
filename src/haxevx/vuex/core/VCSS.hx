@@ -27,13 +27,7 @@ class VCSS
 		EXPORTS.set(fileName,  "."+json._ns);
 		return macro $v{json};
 	}
-	
-	public static function jsonModuleObj(path : String, fileName:String):Dynamic {
-		var value = sys.io.File.getContent(path);
-		var json = haxe.Json.parse(value);
-		EXPORTS.set(fileName,  json._ns);
-		return json;
-	}
+
 	
 	static var EXPORTS:StringMap<String>  = {
 		#if !skipSASSExports
