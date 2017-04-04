@@ -31,9 +31,7 @@ class GameMutator implements IMutator<GameState>
 		if (gotBGTrain) curProgress =  state._bgTrain.currentPosition;
 		return  curProgress;
 	}
-	function update_currentProgress(state:GameState):Void {
-		state.currentProgress = Get_currentProgress(state);
-	}
+	
 	
 	
 	function toggleInstructions(state:GameState):Void {

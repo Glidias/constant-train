@@ -4,6 +4,7 @@
 -js bin/ConstantTrain.js
 -lib heaps
 -lib hashids
+-lib msignal
 -D vue_global
 -main Main
 -cmd gulp css

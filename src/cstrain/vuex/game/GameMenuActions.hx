@@ -57,7 +57,9 @@ class GameMenuActions implements IAction<GameStoreState, NoneT>
 	
 	function quitGame(context:IVxContext1<GameStoreState>, store:Store<Dynamic>):Void {
 		GameActions.clearTimer();
+		context.state.game._signalUpdate.removeAll();	// need to refactor this to lifecycle..
 		store.unregisterModule("game");
+		
 		BGTRAIN.resetTo(0);
 	}
 	
@@ -66,6 +68,7 @@ class GameMenuActions implements IAction<GameStoreState, NoneT>
 	function restartNewGame(context:IVxContext1<GameStoreState>, create:GameCreateOptions):Void {
 		
 		GameActions.clearTimer();
+		context.state.game._signalUpdate.removeAll();    // need to refactor this to lifecycle..
 		create.store.unregisterModule("game");
 		BGTRAIN.resetTo(0);
 		

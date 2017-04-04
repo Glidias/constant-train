@@ -43,9 +43,18 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 	@:mutator static var mutator:GameMutator;
 	@:action static var menuAction:GameMenuActions;
 	
+	
+
 	override public function Created():Void {
 		mutator._resume(store);
+		//trace("CREATED");
+		store.state.game._signalUpdate.add( handleUpdate );
 
+	}
+	
+	// This should be factored out to some other controller implementation..but where?
+	function handleUpdate(dt:Float) {
+		store.state.game.vueData.currentProgress = store.state.game._bgTrain.currentPosition;
 	}
 	
 	function toggleExpression() {
@@ -102,6 +111,7 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		
 		return '
 			<div class="${STYLE.gameview}">
+				<${TrainProgressBarView.NAME} />
 				<${TouchVUtil.TAG} tag="a" class="${STYLE.quitbtn}" style="cursor:pointer" v-on:tap="quitGame()" >
 					[quit]
 				</${TouchVUtil.TAG}>

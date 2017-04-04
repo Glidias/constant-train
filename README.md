@@ -11,6 +11,7 @@ Cross-platform codebase:
 - Plain Haxe cross-platform/framework-agnostic codes (Model/server) `cstrain.core`,  `cstrain.rules`,  `cstrain.util` 
 - Heaps (for background scenery View)  `cstrain.h2d` https://github.com/HeapsIO/heaps
 - HashIDs (for generating unique ids of play decks) https://libraries.io/haxelib/hashids
+- MSignals (basic Signals implementation) https://lib.haxe.org/p/msignal/
 
 For HTML5-specific target (A view implementation for browser/webapps):
 	
@@ -21,7 +22,7 @@ For HTML5-specific target (A view implementation for browser/webapps):
 
 ## Installation
 
-Before compiling, run `npm install` at root working location folder to install any dev dependencies required for compiling. 
+Before compiling, run `haxelib install all` (to ensure all you install all necessary haxe library packages), and  `npm install` (for node JS packages) at root working location folder to install any dev dependencies required for compiling. 
 
 ## Compiling
 

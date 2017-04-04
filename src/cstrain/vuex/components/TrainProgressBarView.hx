@@ -16,15 +16,9 @@ class TrainProgressBarView extends VxComponent<GameStore, NoneT, NoneT>
 
 	public static inline var NAME:String = "TrainProgressBarView";
 	
-	@:computed function get_classes_test():Dynamic {
-		VHTMacros.return_stringMapToObj( [
-			STYLE.scrubber => true,
-		]);
-	}
-	
 	
 	@:computed function get_scrubberStyle():Dynamic {
-		var prog:Float = store.state.game.currentProgress;
+		var prog:Float = store.state.game.vueData.currentProgress;
 		return {
 			transform: 'translateX(${prog}%)'
 		};

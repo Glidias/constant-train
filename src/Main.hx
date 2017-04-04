@@ -45,6 +45,8 @@ class Main
 		
 		// for now , this would suffice, a bit hackish..
 		GameMenuActions.BGTRAIN =  sm;
+
+		// this is the main looper driver
 		new TrainBGScene( sm);
 		
 	

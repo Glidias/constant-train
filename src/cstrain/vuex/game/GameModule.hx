@@ -3,6 +3,10 @@ import cstrain.core.IBGTrain;
 import cstrain.core.IRules;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VModule;
+import haxevx.vuex.native.Vue;
+import cstrain.vuex.game.GameState.GameVueData;
+import cstrain.h2d.AbstractBGScene;
+
 
 /**
  * ...
@@ -29,7 +33,11 @@ class GameModule extends VModule<GameState, NoneT>
 		super._InjNative(g);
 		this.state._rules = rules;
 		this.state._bgTrain = bgTrain;
-		
+		this.state._signalUpdate = AbstractBGScene.signalUpdate;
+		var plainVueData = new GameVueData();
+		new Vue({data:plainVueData});  // make it reactive
+		this.state.vueData = plainVueData;
 	}
 	
 }
+

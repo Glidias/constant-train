@@ -61,6 +61,7 @@ class TrainBGScene extends AbstractBGScene
 
 	
 		model.update();
+		AbstractBGScene.signalUpdate.dispatch(dt);
 		
 				
 		var tarLoc = model.currentPosition;

@@ -7,6 +7,7 @@ import cstrain.core.IRules;
 import cstrain.core.Penalty;
 import cstrain.core.PlayerStats;
 import cstrain.core.Polynomial;
+import msignal.Signal;
 
 /**
  * Vue model
@@ -38,16 +39,22 @@ class GameState
 	public static inline var SWIPE_NONE:Int = 0;
 	public static inline var SWIPE_LEFT:Int = 1;
 	public static inline var SWIPE_RIGHT:Int = 2;
-	public var _chosenCard:Card;
-	public var _rules:IRules;
-	public var _bgTrain:IBGTrain;
-	
+
 	public var stopsEncountedSoFar:Int = 0;
 	public var beltSize:Int = 7;
 
 	public var showInstructions:Bool = false;
-	
-	public var currentProgress:Float = 0; // reactive value
+
+
+	// Post initialization
+	public var _chosenCard:Card;
+	public var _rules:IRules;
+	public var _bgTrain:IBGTrain;
+	public var _signalUpdate:Signal1<Float>;
+	public var vueData:GameVueData;  // none-vueX BUT reactive vue data 
+
+
+
 	
 	public function new(rules:IRules) 
 	{
@@ -58,10 +65,14 @@ class GameState
 		this.cards = rules.getAllCards();
 		this.settings = rules.getGameSettings();
 		this.playerStats = rules.getPlayerStats();
-	
-	
 		
 	}
-	
 }
 
+
+class GameVueData {
+	public var currentProgress:Float = 0;
+	public function new() {
+
+	}
+}
