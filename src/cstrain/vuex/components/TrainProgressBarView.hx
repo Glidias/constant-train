@@ -18,7 +18,7 @@ class TrainProgressBarView extends VxComponent<GameStore, NoneT, NoneT>
 	
 	
 	@:computed function get_scrubberStyle():Dynamic {
-		var prog:Float = store.state.game.vueData.currentProgress;
+		var prog:Float = store.game.gameGetters.progress * 100; // factor this out to store getter
 		return {
 			transform: 'translateX(${prog}%)'
 		};

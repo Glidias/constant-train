@@ -45,6 +45,9 @@ class GameGetters implements IGetters<GameState, NoneT>
 	public static function Get_progressUnit(state:GameState):Float {
 		return 1/Get_totalCards(state);
 	}
+	public static function Get_progress(state:GameState):Float {
+		return state.vueData.currentProgress / state.cards.length;
+	}
 	
 	
 	
