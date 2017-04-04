@@ -31,7 +31,7 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		return [
 			Comp_CardView => new CardView(),
 			Comp_PopupCardView => new PopupCardView(),
-			'$TrainProgressBarView.NAME' => new TrainProgressBarView()  // TODO: need to look into HAxeVX without having to use quotes
+			TrainProgressBarView.NAME => new TrainProgressBarView() 
 		];
 	}
 	
@@ -109,7 +109,7 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 					<${Comp_CardView}></${Comp_CardView}>
 				</keep-alive>
 				<${Comp_PopupCardView}></${Comp_PopupCardView}>
-				<div class="${STYLE.blocker}" v-show="showInstructions" :class="{'+' ${STYLE.showInstruct}:showInstructions '+'}"></div>
+				<div class="${STYLE.blocker}" v-show="showInstructions" :class="{\'${STYLE.showInstruct}\':showInstructions}"></div>
 				<div v-if="cardResult">
 					<p>{{ cardResult }}</p>
 				</div>

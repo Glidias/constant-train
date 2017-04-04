@@ -60,7 +60,7 @@ class BaseCardView extends VxComponent<GameStore, SwingStackData, NoneT>
 	
 	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [
-			'${CardV.CompName}' => new CardV()
+			CardV.CompName => new CardV()
 		];
 	}
 	

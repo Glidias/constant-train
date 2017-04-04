@@ -18,8 +18,8 @@ class MainVue extends VxComponent<GameStore, NoneT, NoneT>
 	
 	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [
-			'${GameView.TAG}' => new GameView(),
-			'${GameMenu.TAG}'=> new GameMenu()
+			GameView.TAG => new GameView(),
+			GameMenu.TAG => new GameMenu()
 		];
 	}
 	
@@ -28,6 +28,7 @@ class MainVue extends VxComponent<GameStore, NoneT, NoneT>
 	function get_gameInProgress():Bool {
 		return store.state.game != null;
 	}
+	
 	
 	override public function Template():String {
 		return '
@@ -40,3 +41,4 @@ class MainVue extends VxComponent<GameStore, NoneT, NoneT>
 	
 	
 }
+

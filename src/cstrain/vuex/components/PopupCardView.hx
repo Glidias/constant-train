@@ -18,8 +18,6 @@ import js.Promise;
  */
 class PopupCardView extends BaseCardView
 {
-
-	
 	@:action static var actions:GameActions;
 	
 	public function new() 
@@ -52,7 +50,7 @@ class PopupCardView extends BaseCardView
 	
 	override public function Template():String {
 		return '
-			<div class="${STYLE.popupCardview}" :class="{'+'${STYLE.shown}:isPopupChoicing'+'}">
+			<div class="${STYLE.popupCardview}" :class="{\'${STYLE.shown}\':isPopupChoicing}">
 				<h4 v-show="${BuiltVUtil.isProductionStrNot()}" style="position:absolute;bottom:5px;right:5px">{{ topCardIndex}}</h4>
 				<ul class="${STYLE.cardstack}">
 					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :stack="$$data._stack" :index="i" :key="i"></${CardV.CompName}>

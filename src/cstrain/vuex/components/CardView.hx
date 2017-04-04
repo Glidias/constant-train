@@ -235,7 +235,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 				
 				<h4 v-show="${BuiltVUtil.isProductionStrNot()}">{{ topCardIndex}}</h4>
 				<ul class="${STYLE.cardstack}">
-					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :style="${" {'visibility': isVisibleProjected(i) ? 'visible' : 'hidden' } "}" :class="{'+' ${CardV.STYLE.polynomial}:isPolynomialForIndex(i) '+'}" :stack="$$data._stack" :index="i" :key="i">${#if !production"{{ getProjectedCardIndex(i) }}"#else""#end}</${CardV.CompName}>
+					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :style="${" {'visibility': isVisibleProjected(i) ? 'visible' : 'hidden' } "}" :class="{\'${CardV.STYLE.polynomial}\':isPolynomialForIndex(i)}" :stack="$$data._stack" :index="i" :key="i">${#if !production"{{ getProjectedCardIndex(i) }}"#else""#end}</${CardV.CompName}>
 				</ul>
 				
 				<div class="${STYLE.delayPopup}" v-show="gotDelay">
