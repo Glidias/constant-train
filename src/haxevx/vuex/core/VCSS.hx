@@ -1,7 +1,4 @@
 package haxevx.vuex.core;
-import haxe.ds.StringMap;
-import haxe.macro.ComplexTypeTools;
-import haxe.macro.MacroStringTools;
 
 #if macro
 import haxe.macro.TypeTools;
@@ -13,6 +10,10 @@ import sys.io.File;
 import haxe.macro.Expr;
 import haxe.io.Bytes;
 import sys.io.Process;
+import haxe.ds.StringMap;
+import haxe.macro.ComplexTypeTools;
+import haxe.macro.MacroStringTools;
+
 
 /**
  * note: this shouldn't be in .core package actually. The implementation here is particularly specific with gulp task dependency.
