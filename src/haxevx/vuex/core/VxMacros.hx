@@ -374,7 +374,7 @@ class VxMacros
 						var fName:String = field.name.substr(4);
 				
 						funcLookup.set( fName, f);
-						if (hasMetaTag(field.meta, ":getter")) {
+						if (hasMetaTag(field.meta, ":computed")) {
 							
 							fields.push( {
 								name:fName,
