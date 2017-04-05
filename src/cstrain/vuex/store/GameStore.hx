@@ -2,15 +2,10 @@ package cstrain.vuex.store;
 import cstrain.core.IBGTrain;
 import cstrain.core.IRules;
 import cstrain.vuex.components.BasicTypes;
-import cstrain.vuex.game.GameActions;
 import cstrain.vuex.game.GameMenuActions;
 import cstrain.vuex.game.GameModule;
-import cstrain.vuex.game.GameMutator;
 import cstrain.vuex.game.GameState;
-import cstrain.vuex.store.GameStore.GameStoreState;
-import haxevx.vuex.core.IGetters;
 import haxevx.vuex.core.IStoreGetters;
-import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VxStore;
 
 /**
@@ -29,9 +24,7 @@ class GameStore extends VxStore<GameStoreState>
 	{
 		state = new GameStoreState();
 		
-		
 		//game = new GameModule(rules, bgTrain);
-		
 		
 	}
 	

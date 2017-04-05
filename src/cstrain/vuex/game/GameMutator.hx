@@ -2,6 +2,7 @@ package cstrain.vuex.game;
 import cstrain.core.Card;
 import cstrain.core.CardResult;
 import cstrain.core.Penalty;
+import cstrain.core.PenaltyDesc;
 import cstrain.core.Polynomial;
 import haxevx.vuex.core.IMutator;
 
@@ -70,6 +71,8 @@ class GameMutator implements IMutator<GameState>
 		
 		state.penaltySwipeCorrect = true;
 		state.delayTimeLeft  = 0;
+		
+	
 		
 
 		state.topCard = state._rules.getTopmostCard();

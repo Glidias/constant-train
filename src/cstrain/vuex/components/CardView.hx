@@ -24,6 +24,7 @@ import js.html.HtmlElement;
  * ...
  * @author Glidias
  */
+@:build(haxevx.vuex.core.VCSS.buildModuleStyleFromFile(null, "scss", "mySTYLE") )
 class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 {
 	
@@ -136,9 +137,15 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return store.game.gameGetters.swipedCorrectly ? "✓" : "✗";
 	}
 	
+	
 	var penaltiedStr(get, never):String;
 	function get_penaltiedStr():String {
 		return store.game.gameGetters.isPenalized ? "!" : "...";
+	}
+	@:computed function get_penaltiedStrStyle():Dynamic {
+		return {
+			"color":  store.game.gameGetters.isPenalized ? "#ff0000" : "inherit"
+		}
 	}
 	
 	var curCardIndex(get, never):Int;
@@ -223,6 +230,16 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 	function get_uniqueID():String {
 		return store.state.game.settings.uniqueID;
 	}
+
+	@:computed function get_isAtStop():Bool {
+		return store.game.gameGetters.isAtStop;
+	}
+	
+	@:computed function get_isAtStopReady():Bool {
+		return store.game.gameGetters.isAtStopReadyToGo;
+	}
+	
+
 	
 	public static var STYLE = BaseCardView.STYLE;
 	
@@ -230,15 +247,15 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return '
 			<div class="${STYLE.cardview}">
 				<div class="${STYLE.hudIndicators}">
-					<h3>{{ tickStr }} {{ penaltiedStr }} &nbsp; {{ curCardIndex}} / {{ totalCards}}</h3>
+					<h3>{{ tickStr }} <span :style="penaltiedStrStyle">{{ penaltiedStr }}</span> &nbsp; {{ curCardIndex}} / {{ totalCards}}<span v-show="isAtStop" class="fa fa-train ${mySTYLE.icon} ${mySTYLE.stopIcon}" :class="{ \'${mySTYLE.ready}\':isAtStopReady }"></span></h3>
 				</div>
 				
-				<h4 v-show="${BuiltVUtil.isProductionStrNot()}">{{ topCardIndex}}</h4>
+				<h4 style="font-size:9px" v-show="${BuiltVUtil.isProductionStrNot()}">{{ topCardIndex}}</h4>
 				<ul class="${STYLE.cardstack}">
-					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :style="${" {'visibility': isVisibleProjected(i) ? 'visible' : 'hidden' } "}" :class="{\'${CardV.STYLE.polynomial}\':isPolynomialForIndex(i)}" :stack="$$data._stack" :index="i" :key="i">${#if !production"{{ getProjectedCardIndex(i) }}"#else""#end}</${CardV.CompName}>
+					<${CardV.CompName} v-for="(ref, i) in refCards" :card="getCardForIndex(i)" :style="{\'visibility\': isVisibleProjected(i) ? \'visible\' : \'hidden\' }" :class="{\'${CardV.STYLE.polynomial}\':isPolynomialForIndex(i)}" :stack="$$data._stack" :index="i" :key="i">${#if !production"{{ getProjectedCardIndex(i) }}"#else""#end}</${CardV.CompName}>
 				</ul>
 				
-				<div class="${STYLE.delayPopup}" v-show="gotDelay">
+				<div class="${STYLE.delayPopup}" v-show="gotDelay ">
 					<div class="${STYLE.content}">
 						<h4 >{{ penaltyDesc }}!</h4>
 						<div class="">{{ secondsLeft }}   seconds left.</div>

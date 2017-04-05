@@ -1305,16 +1305,14 @@ typedef PropBinding = {
 }
 
 
+
+#end
+
 typedef VuexActionOrMutator = {
 	var isAction:Bool;
 	var type:ComplexType;
 	var clsType:ClassType;
 }
-
-
-#end
-
-
 
 class VxMacroUtil {
 	public static inline function dynamicSet<T>(dyn:Dynamic<T>, key:String, value:T):Void {

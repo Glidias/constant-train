@@ -1,10 +1,7 @@
 package cstrain.vuex.components;
 import cstrain.vuex.store.GameStore;
-import haxe.ds.StringMap;
 import haxevx.vuex.core.NoneT;
-import haxevx.vuex.core.VCSS;
 import haxevx.vuex.core.VxComponent;
-import haxevx.vuex.util.VHTMacros;
 
 /**
  * ...
@@ -38,7 +35,10 @@ class TrainProgressBarView extends VxComponent<GameStore, NoneT, NoneT>
 		return '
 		<div class="${STYLE.trainprogressBar}">
 			<div class="${STYLE.scrubber} ${SharedCSS.allowselect}" v-bind:style="scrubberStyle">
-				<div class="${STYLE.scrub}" v-bind:style="scrubStyle"></div>
+				
+				<div class="${STYLE.scrub}" v-bind:style="scrubStyle">
+					<div class="fa fa-angle-up ${STYLE.marker}"></div>
+				</div>
 			</div>
 		</div>';
 	}

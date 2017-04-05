@@ -4,9 +4,7 @@ import cstrain.core.CardResult;
 import cstrain.vuex.components.BasicTypes.TouchVUtil;
 import cstrain.vuex.game.GameMenuActions;
 import cstrain.vuex.game.GameMutator;
-import cstrain.vuex.game.GameState;
 import cstrain.vuex.store.GameStore;
-import haxe.Json;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.core.VxComponent;
@@ -96,7 +94,7 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 		
 		
 		#if !production
-		var cheatBtn:String = '<${TouchVUtil.TAG} tag="button" v-on:tap="toggleExpression()" style="position:absolute;top:10px;right:0">{{ toggleExprLabel }} expression</${TouchVUtil.TAG}>';
+		var cheatBtn:String = '<${TouchVUtil.TAG} tag="button" class="cheatingbtn" v-on:tap="toggleExpression()" style="position:absolute;top:100vh;transform:translateY(-40px);left:0;font-size:9px">{{ toggleExprLabel }} expression</${TouchVUtil.TAG}>';
 		#else
 		var cheatBtn:String = '';
 		#end

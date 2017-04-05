@@ -70,6 +70,9 @@ class GameActions implements IAction<GameState, NoneT>
 							TIMER = Timer.delay( function() {
 								TIMER = null;
 								mutator._setDelay(context, 0);
+								
+									// exceptional case to always clear peanlty after wrong_constant...
+		if (context.state.curPenalty != null && context.state.curPenalty.desc == PenaltyDesc.WRONG_CONSTANT) mutator._setPenalty(context, null);
 								mutator._resume(context);
 							}, Std.int(calcTime) );
 						}

@@ -8,11 +8,11 @@
 
 	/* specific */
 	position:absolute;
-	top:0;
+	top:8px;
 	left:0;
 	width:100%;
 	height:5px;	
-	
+	z-index:1;
 }
 .scrubber {
 	position:absolute;
@@ -25,5 +25,28 @@
 } 
 .scrub {
 	height:100%;
-	background-color:red;
+	background-color:#00ff00;
+	position:relative;
+	.marker {
+		color:#00ff00;
+		transform:translateX(-50%);
+		left:50%;
+		position:absolute;
+	}
 }
+
+.enemy-scrub {
+	height:1px;
+	background-color:#ff0000;
+	position:relative;
+	
+	.marker {
+		color:#00ff00;
+		transform:translateX(-50%);
+		left:50%;
+		position:absolute;
+	}
+	
+}
+
+

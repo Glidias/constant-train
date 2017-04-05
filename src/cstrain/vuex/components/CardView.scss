@@ -1,0 +1,15 @@
+.icon {
+	margin-left:6px;
+}
+
+.stop-icon {
+	background-color:#ffa500;
+	padding:3px;
+	color:black;
+
+	border-radius:4px;
+	display:inline-block;
+	&.ready {
+		background-color:#00ff00;
+	}
+}

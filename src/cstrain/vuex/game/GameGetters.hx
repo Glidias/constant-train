@@ -30,13 +30,30 @@ class GameGetters implements IGetters<GameState, NoneT>
 	public static inline function Get_isPenalized(state:GameState):Bool {
 		return state.curPenalty != null;
 	}
-		public static inline function Get_cardsLeft(state:GameState):Int {
+	public static inline function Get_cardsLeft(state:GameState):Int {
 		return Get_totalCards(state) - state.curCardIndex;
 	}
+	
+
 	
 	public static inline function Get_isPopupChoicing(state:GameState):Bool {
 		return state.topCard != null && state.topCard.operator == Card.OPERATION_EQUAL;
 	}
+	
+	public static function Get_isAtStop(state:GameState):Bool {
+		var caseNorm:Bool = state.topCard != null && state.topCard != state.cards[state.curCardIndex];
+		var casePenalized:Bool = state.topCard.operator == Card.OPERATION_EQUAL;
+		return Get_isPenalized(state) ? casePenalized :  caseNorm;
+	}
+	
+	
+	public static inline function Get_isAtStopReadyToGo(state:GameState):Bool {
+		return Get_isAtStop(state) && !Get_isPopupChoicing(state) && !Get_isPenalized(state);
+	}
+	
+
+	
+	
 	public static  function Get_isMainDeckCard(state:GameState):Bool {
 		return state.topCard == (state.curCardIndex <  state.cards.length ? state.cards[state.curCardIndex] : null);
 	}
@@ -48,6 +65,10 @@ class GameGetters implements IGetters<GameState, NoneT>
 	public static function Get_progress(state:GameState):Float {
 		return state.vueData.currentProgress / state.cards.length;
 	}
+	public static function Get_monsterProgress(state:GameState):Float {
+		return state.vueData != null && state.vueData.monster != null ?   state.vueData.monster.position / state.cards.length : 0;
+	}
+
 	
 	
 	
