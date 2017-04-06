@@ -81,7 +81,7 @@ class GameVueData {
 	
 	
 	public function changeMonster(monster:MonsterModel):Void {
-		monster = {
+		this.monster = {
 			position:monster.currentPosition,
 			specs:monster.specs
 		};
@@ -91,7 +91,7 @@ class GameVueData {
 		if (monster == null) {
 			changeMonster(monster);
 		}
-		monster.currentPosition = monster.currentPosition;
+		this.monster.position = monster.currentPosition;
 	}
 	
 	public function new() {
