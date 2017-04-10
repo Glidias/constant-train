@@ -1,4 +1,6 @@
 package cstrain.rules.monster;
+import cstrain.h2d.SceneSettings;
+
 
 /**
  * ...
@@ -13,7 +15,10 @@ class StartMonsterSpecs extends MonsterSpecs
 		this.baseAttackRange = 150;
 		
 		this.baseDamage = 1;
-		// TODO:
+		this.startSleepTime = 10;
+		this.baseFireRate = .3;
+		this.baseSpeed = .35;
+		this.baseAttackRange = .5;
 	}
 	
 }

@@ -1,5 +1,6 @@
 package;
 import cstrain.core.Polynomial;
+import cstrain.h2d.AbstractBGScene;
 import cstrain.h2d.TrainBGScene;
 import cstrain.rules.SceneModel;
 import cstrain.rules.TestGame;
@@ -19,37 +20,42 @@ import js.Browser;
  */
 class Main
 {
+	var boot:VxBoot;
 
 	public static function main() 
 	{
 		// Main App
-		var boot:VxBoot = new VxBoot();
+		new Main();
+
+	}
+	
+	function new() {
+		boot = new VxBoot();
 		TouchVUtil.IS_TOUCH_BASED =  Reflect.hasField( Browser.window, "ontouchstart");
 		
 		Vue.use(VueTouch, {name:TouchVUtil.TAG});
 		
 		var sm = new SceneModel();
-		var rules = new TestGame();
-		
-		rules.restart();
-		var gs = new GameStore(rules, sm) ;
 		
 
+		var gs = new GameStore() ;
+
 		var store = boot.startStore( gs) ;
-		
-		
-		boot.startVueWithRootComponent( "#app", new MainVue());
-		VxBoot.notifyStarted();
-		
+
 		// Background scene visual
 		//hxd.Res.initEmbed();
 		
 		// for now , this would suffice, a bit hackish..
 		GameMenuActions.BGTRAIN =  sm;
 
-		// this is the main looper driver (for now...may refactor)
+		// this is the main looper driver (for now...may refactor);
+		AbstractBGScene.signalInited.addOnce( onInited);
 		new TrainBGScene( sm);
-
+	}
+	
+	private function onInited():Void {
+		boot.startVueWithRootComponent( "#app", new MainVue());
+		VxBoot.notifyStarted();
 	}
 	
 }

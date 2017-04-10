@@ -8,6 +8,7 @@ import cstrain.rules.world.GameWorld.IBGTrainComp;
 import ecx.Family;
 import ecx.System;
 import ecx.Wire;
+import ecx.common.systems.TimeSystem;
 
 
 // Edge may be a temporary engine to use for now..
@@ -18,11 +19,16 @@ import ecx.Wire;
  */
 class MonsterChasePlayerSystem extends System
 {
-	var timeDelta : Float;
+	
 	var player:Family<HealthComp, IBGTrainComp>;
+	var monsterF:Family<MonsterModelComp>;
 
 	var _health:Wire<HealthComp>;
 	var _train:Wire<IBGTrainComp>;
+	var _monster:Wire<MonsterModelComp>;
+	
+	var _timeSystem:Wire<TimeSystem>;
+	
 	
 	public function new() 
 	{
@@ -33,13 +39,21 @@ class MonsterChasePlayerSystem extends System
 	
 	override public function update():Void {
 
-		/*
+		var monster;
+		var monsterI = monsterF.iterator();
+		if (monsterI.hasNext()) {
+			monster = _monster.get( monsterI.next() );
+		}
+		else return;
+		
+		
 		var pit = player.iterator();
 		if (pit.hasNext()) {
+			var timeDelta:Float = _timeSystem.deltaTime;
 			
 			var p = pit.next();
 			
-			var pPos:Float = p.data.train.currentPosition  + .5; // assumption half of screen offset for player
+			var pPos:Float = _train.get(p).currentPosition  + .5; // assumption half of screen offset for player
 			var vm = pPos - monster.currentPosition;  // displacement from monster to player position
 			
 			if (monster.asleepTime > 0) {
@@ -49,6 +63,7 @@ class MonsterChasePlayerSystem extends System
 			if (monster.asleepTime > 0) {
 				monster.angry = false;
 				monster.state = MonsterModel.STATE_NOT_MOVING;
+				///trace("Monster asleep...");
 				return;
 			}
 			
@@ -63,9 +78,10 @@ class MonsterChasePlayerSystem extends System
 			}
 			else {	// perform monster attack
 				monster.angry = true;
-				
+				var health  = _health.get(p);
 				if ( monster.weaponCooldownTime  <= 0) {  // fire weapon to inflict damage on player
-					p.data.health.damage(monster.specs.baseDamage);
+					health.damage(monster.specs.baseDamage);
+					trace("Hit:"+health.value);
 					monster.weaponCooldownTime = monster.specs.baseFireRate;
 				}
 				// can move about while firing weapon...
@@ -73,7 +89,7 @@ class MonsterChasePlayerSystem extends System
 				var START_SCREEN_X:Float =  (pPos  - monster.specs.baseAttackRange);
 				var BASE_SCREEN_RANGE:Float = monster.specs.baseAttackRange * 2;
 				var x:Float = (monster.currentPosition - START_SCREEN_X) / BASE_SCREEN_RANGE;
-				if(monster.timer == 0)
+				if(monster.timer <= 0)
 				{
 					if(monster.state == MonsterModel.STATE_NOT_MOVING)
 					{
@@ -98,8 +114,9 @@ class MonsterChasePlayerSystem extends System
 				}
 				
 				
-				if(monster.state == MonsterModel.STATE_LEFT) {x -= 2/BASE_SCREEN_RANGE;}
-				if(monster.state == MonsterModel.STATE_RIGHT) {x += 2/BASE_SCREEN_RANGE;}
+				// this doesn't seemto work..
+		//		if(monster.state == MonsterModel.STATE_LEFT) {x -= 2/BASE_SCREEN_RANGE*timeDelta*MONS_FRAMER;}
+			//	if(monster.state == MonsterModel.STATE_RIGHT) {x += 2/BASE_SCREEN_RANGE*timeDelta*MONS_FRAMER;}
 				
 			
 				if(monster.dance > 0)
@@ -113,12 +130,17 @@ class MonsterChasePlayerSystem extends System
 				
 				
 				// re-map new x position (if any) for monster
-				monster.currentPosition = START_SCREEN_X + x * BASE_SCREEN_RANGE;
+				monster.currentPosition = START_SCREEN_X +  x*BASE_SCREEN_RANGE;
 
 			}
 			
+			//trace("GOT MONSTER:"+monster.state + " :"+monster.angry);
 		}
-		*/
+		else {
+			monster.angry = false;
+			monster.state = MonsterModel.STATE_NOT_MOVING;
+		}
+		
 	}
 	
 	static inline var MONS_FRAMER:Float = 30;

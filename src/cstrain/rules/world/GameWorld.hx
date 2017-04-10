@@ -1,5 +1,6 @@
 package cstrain.rules.world;
 import cstrain.core.IBGTrain;
+import cstrain.rules.monster.StartMonsterSpecs;
 import cstrain.rules.systems.MonsterChasePlayerSystem;
 import cstrain.rules.world.GameWorld.UpdateService;
 import cstrain.rules.components.*;
@@ -56,7 +57,7 @@ class GameWorld
 	}
 	
 	
-	var monsterSpecs:MonsterSpecs = new MonsterSpecs();
+	var monsterSpecs:MonsterSpecs = new StartMonsterSpecs();
 	var vueSystem:GameVueDataSystem;
 	var world:ecx.World;
 	var _health:HealthComp;
@@ -75,17 +76,17 @@ class GameWorld
 		e = world.create();
 		_monster.set(e, new  MonsterModel(monsterSpecs));
 		
-		// sync view ref
+		
+		// link system dependencies
 		vueSystem.gameVue = vueData;
-		
-		
 	}
 	
 	public function end():Void {
-		
-		for ( i in 0...world.capacity ){
+
+		for ( i in 1...world.capacity ){  // somehow, re-creating new entities after this doesn't work?
 			world.destroy( world.getEntity(i));
 		}
+		world.invalidate();  // this is needed?
 	}
 
 	

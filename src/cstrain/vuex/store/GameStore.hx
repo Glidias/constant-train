@@ -20,7 +20,7 @@ class GameStore extends VxStore<GameStoreState>
 	@:module @:manual public var game:GameModule;
 	public var getters(default,never):StoreGetters;
 	
-	public function new(rules:IRules, bgTrain:IBGTrain=null) 		
+	public function new() 		 //rules:IRules, bgTrain:IBGTrain=null
 	{
 		state = new GameStoreState();
 		

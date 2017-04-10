@@ -35,7 +35,6 @@ class GameVueDataSystem extends System
 		
 		for (p in playerF) {
 			//p.data.health;
-		
 			gameVue.health = _health.get(p).value;
 			
 			var train = _train.get(p);
