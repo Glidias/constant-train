@@ -42,7 +42,7 @@ class GameGetters implements IGetters<GameState, NoneT>
 	
 	public static function Get_isAtStop(state:GameState):Bool {
 		var caseNorm:Bool = state.topCard != null && state.topCard != state.cards[state.curCardIndex];
-		var casePenalized:Bool = state.topCard.operator == Card.OPERATION_EQUAL;
+		var casePenalized:Bool = state.topCard != null ? state.topCard.operator == Card.OPERATION_EQUAL : false;
 		return Get_isPenalized(state) ? casePenalized :  caseNorm;
 	}
 	
