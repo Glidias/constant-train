@@ -53,7 +53,8 @@ class MonsterChasePlayerSystem extends System
 			
 			var p = pit.next();
 			
-			var pPos:Float = _train.get(p).currentPosition  + .5; // assumption half of screen offset for player
+			// +.5
+			var pPos:Float = _train.get(p).currentPosition ; // assumption half of screen offset for player
 			var vm = pPos - monster.currentPosition;  // displacement from monster to player position
 			
 			if (monster.asleepTime > 0) {
@@ -86,7 +87,7 @@ class MonsterChasePlayerSystem extends System
 				}
 				// can move about while firing weapon...
 				// determine monster movement hover  around player state.
-				var START_SCREEN_X:Float =  (pPos  - monster.specs.baseAttackRange);
+				var START_SCREEN_X:Float =  pPos  - monster.specs.baseAttackRange;
 				var BASE_SCREEN_RANGE:Float = monster.specs.baseAttackRange * 2;
 				var x:Float = (monster.currentPosition - START_SCREEN_X) / BASE_SCREEN_RANGE;
 				if(monster.timer <= 0)
@@ -115,8 +116,8 @@ class MonsterChasePlayerSystem extends System
 				
 				
 				// this doesn't seemto work..
-		//		if(monster.state == MonsterModel.STATE_LEFT) {x -= 2/BASE_SCREEN_RANGE*timeDelta*MONS_FRAMER;}
-			//	if(monster.state == MonsterModel.STATE_RIGHT) {x += 2/BASE_SCREEN_RANGE*timeDelta*MONS_FRAMER;}
+				if(monster.state == MonsterModel.STATE_LEFT) {x -= 2/BASE_SCREEN_RANGE*timeDelta/MONS_FRAMER;}
+				if(monster.state == MonsterModel.STATE_RIGHT) {x += 2/BASE_SCREEN_RANGE*timeDelta/MONS_FRAMER;}
 				
 			
 				if(monster.dance > 0)
@@ -134,7 +135,7 @@ class MonsterChasePlayerSystem extends System
 
 			}
 			
-			//trace("GOT MONSTER:"+monster.state + " :"+monster.angry);
+			trace("GOT MONSTER:"+monster.state + " :"+monster.angry);
 		}
 		else {
 			monster.angry = false;
