@@ -10,7 +10,7 @@ interface IMonsterSpecs
   
   var baseDamage(get, null):Float;
   
-  var baseAttackRate(get, null):Float;
+  var baseFireRate(get, null):Float;
   
   var baseSpeed(get, null):Float;
   

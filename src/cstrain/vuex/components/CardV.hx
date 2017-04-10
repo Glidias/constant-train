@@ -22,6 +22,8 @@ class CardV extends VComponent<SwingCardRef, CardProps>
 	public function new() 
 	{
 		super();
+	
+
 	}
 	
 	override public function Data():SwingCardRef {
@@ -36,7 +38,6 @@ class CardV extends VComponent<SwingCardRef, CardProps>
 	}
 	
 
-	
 
 	function testReturn(event:Event):Bool {
 		

@@ -42,7 +42,7 @@ class GameMutator implements IMutator<GameState>
 	function updateProgress(state:GameState):Void {
 		
 		state.curCardIndex = state._rules.getDeckIndex();
-
+	//trace("UPDATING PROGRESS");
 		if (state._bgTrain != null) state._bgTrain.travelTo(state.curCardIndex);
 	}
 	

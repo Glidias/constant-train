@@ -10,6 +10,7 @@ import cstrain.core.Polynomial;
 import cstrain.rules.components.Health;
 import cstrain.rules.monster.MonsterModel;
 import cstrain.rules.monster.MonsterSpecs;
+import cstrain.rules.world.GameWorld;
 import msignal.Signal;
 import cstrain.rules.monster.IMonsterSpecs;
 
@@ -53,6 +54,7 @@ class GameState
 	public var _chosenCard:Card;
 	public var _rules:IRules;
 	public var _bgTrain:IBGTrain;
+	public var _gameWorld:GameWorld;
 	public var _signalUpdate:Signal1<Float>;
 	public var vueData:GameVueData;  // none-vueX BUT reactive vue data 
 
@@ -74,7 +76,7 @@ class GameVueData {
 	// player progress
 	public var currentProgress:Float = 0;
 	// player health
-	public var health:Health = null;
+	public var health:Float = 100;
 	
 	// monster
 	public var monster:GameMonster = null;
@@ -83,12 +85,12 @@ class GameVueData {
 	public function changeMonster(monster:MonsterModel):Void {
 		this.monster = {
 			position:monster.currentPosition,
-			specs:monster.specs
+		//	specs: monster.specs
 		};
 	}
 	
 	public function updateMonsterPosition(monster:MonsterModel):Void {
-		if (monster == null) {
+		if (this.monster == null) {
 			changeMonster(monster);
 		}
 		this.monster.position = monster.currentPosition;
@@ -101,5 +103,5 @@ class GameVueData {
 
 typedef GameMonster =  {
 	var position:Float;
-	var specs:IMonsterSpecs;
+//	var specs:IMonsterSpecs;
 }

@@ -10,7 +10,6 @@ class AbstractBGScene extends hxd.App
 	private var _needToRender:Bool = true;	// to track need to re-render scene
 	public static var signalUpdate(default, never):Signal1<Float> = new Signal1<Float>();
 
-
 	
 	override function init() {
 		super.init();

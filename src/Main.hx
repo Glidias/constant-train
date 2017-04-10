@@ -3,6 +3,7 @@ import cstrain.core.Polynomial;
 import cstrain.h2d.TrainBGScene;
 import cstrain.rules.SceneModel;
 import cstrain.rules.TestGame;
+import cstrain.rules.systems.MonsterChasePlayerSystem;
 import cstrain.vuex.components.BasicTypes.TouchVUtil;
 import cstrain.vuex.components.GameView;
 import cstrain.vuex.components.MainVue;
@@ -46,11 +47,8 @@ class Main
 		// for now , this would suffice, a bit hackish..
 		GameMenuActions.BGTRAIN =  sm;
 
-		// this is the main looper driver
+		// this is the main looper driver (for now...may refactor)
 		new TrainBGScene( sm);
-		
-	
-		
 
 	}
 	

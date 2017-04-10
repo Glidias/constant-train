@@ -46,14 +46,15 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 	override public function Created():Void {
 		mutator._resume(store);
 		//trace("CREATED");
-		store.state.game._signalUpdate.add( handleUpdate );
-
+		//store.state.game._gameWorld.update
+		store.state.game._signalUpdate.add(store.state.game._gameWorld.update  );
 	}
 	
-	// This should be factored out to some other controller implementation..but where?
-	function handleUpdate(dt:Float) {
-		store.state.game.vueData.currentProgress = store.state.game._bgTrain.currentPosition;
+
+	private function myUpdate(dt:Float):Void {
+	//	store.state.game.vueData.currentProgress = store.state.game._bgTrain.currentPosition;
 	}
+	
 	
 	function toggleExpression() {
 		

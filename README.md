@@ -12,6 +12,7 @@ Cross-platform codebase:
 - Heaps (for background scenery View)  `cstrain.h2d` https://github.com/HeapsIO/heaps
 - HashIDs (for generating unique ids of play decks) https://libraries.io/haxelib/hashids
 - MSignals (basic Signals implementation) https://lib.haxe.org/p/msignal/
+- ECX (entity-component-system) framework https://github.com/Glidias/ecx
 
 For HTML5-specific target (A view implementation for browser/webapps):
 	

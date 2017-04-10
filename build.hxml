@@ -5,6 +5,7 @@
 -lib heaps
 -lib hashids
 -lib msignal
+-lib power-of-two
 -D vue_global
 -main Main
 -cmd gulp css

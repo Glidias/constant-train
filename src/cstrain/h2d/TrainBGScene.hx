@@ -28,6 +28,8 @@ class TrainBGScene extends AbstractBGScene
 	var scene:Sprite;
 	private var debug:Bool = false;
 	var model:IBGTrain;
+	
+	
 
 	public function new(model:IBGTrain) 
 	{
@@ -52,15 +54,14 @@ class TrainBGScene extends AbstractBGScene
 	
 	override function update(dt:Float) {
 	
-	
 		if (Key.isPressed(Key.G)) {	// to depreciate when no longer testing
 
 			model.travelTo( Std.int(model.targetDest + 1 ) );
 		
 		}
 
-	
 		model.update();
+		
 		AbstractBGScene.signalUpdate.dispatch(dt);
 		
 				
