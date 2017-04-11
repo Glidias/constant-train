@@ -1,6 +1,8 @@
 package cstrain.vuex.game;
 import cstrain.core.CardResult;
+import cstrain.core.OkFlags;
 import cstrain.core.PenaltyDesc;
+import cstrain.vuex.store.GameStoreMutator;
 import format.abc.Data.Function;
 import haxe.Timer;
 import haxevx.vuex.core.IAction;
@@ -19,6 +21,8 @@ class GameActions implements IAction<GameState, NoneT>
 
 	//static inline var DELAY_TIME:Float = 2;
 	@:mutator static var mutator:GameMutator;
+	
+	@:mutator static var storeMutator:GameStoreMutator;
 	
 	static var TIMER:Timer;
 	public static function clearTimer():Void {
@@ -88,11 +92,20 @@ class GameActions implements IAction<GameState, NoneT>
 							mutator._setPenaltySwipeCorrect(context, false);
 					}
 			
-				case CardResult.OK(_):
+				case CardResult.OK(flags):
 						// play OK sound, close any popups, etc.
 						//mutator._setPopupCard(context,false);
 						mutator._setPenalty(context, null);
 						mutator._updateProgress(context);
+						
+						// for now, we assume this is gameover already..
+						if (flags.has(OkFlags.GAME_OVER)) {
+							context.state.cardsOutDetected = true;
+							storeMutator._saveGameForNextLevel( context, {
+								LAST_MONSTER_SPECS: context.state._monsterSpecs,
+								LAST_PLAYER_SPECS: context.state._playerSpecs
+							});
+						}
 						
 						mutator._resume(context);
 						
@@ -103,6 +116,8 @@ class GameActions implements IAction<GameState, NoneT>
 				case CardResult.GAMEOVER_OUTTA_CARDS:
 					mutator._traceCardResult(context, result);
 					
+					
+				
 				default:
 					trace("Uncaught case: " + result);
 			}

@@ -1,4 +1,7 @@
 package cstrain.rules.systems;
+import cstrain.core.CardResult;
+import cstrain.core.IRules;
+import cstrain.core.OkFlags;
 import cstrain.rules.world.GameWorld;
 import cstrain.core.IBGTrain;
 import cstrain.rules.components.Health;
@@ -43,9 +46,20 @@ class MonsterChasePlayerSystem extends System
 		var monsterI = monsterF.iterator();
 		if (monsterI.hasNext()) {
 			monster = _monster.get( monsterI.next() );
+			
+			if (_listenFreeze) {
+				monster.frozen = true;
+				monster.angry = false;
+				monster.state = MonsterModel.STATE_NOT_MOVING;
+				//trace("Frozen...");
+				return;
+			}
+			else {
+				monster.frozen = false;
+			}
 		}
 		else return;
-		
+
 		
 		var pit = player.iterator();
 		if (pit.hasNext()) {
@@ -69,20 +83,24 @@ class MonsterChasePlayerSystem extends System
 			}
 			
 			// chage weapons
+
 			if (monster.weaponCooldownTime > 0)  monster.weaponCooldownTime -= timeDelta;
 			
-			if ( abs( vm ) > monster.specs.baseAttackRange) {
+			var maxClamp:Float = abs(vm);
+			if ( maxClamp > monster.specs.baseAttackRange) {
 				// monster chases player
 				monster.angry = false;
 				monster.state =  vm > 0 ? MonsterModel.STATE_RIGHT : MonsterModel.STATE_LEFT;
-				monster.currentPosition += (vm > 0 ? 1 : -1) * monster.specs.baseSpeed*timeDelta;
+				
+			
+				monster.currentPosition +=  (vm > 0 ? 1 : -1) * clampMax( monster.specs.baseSpeed * timeDelta, maxClamp);
 			}
 			else {	// perform monster attack
 				monster.angry = true;
 				var health  = _health.get(p);
 				if ( monster.weaponCooldownTime  <= 0) {  // fire weapon to inflict damage on player
-					health.damage(monster.specs.baseDamage);
-					trace("Hit:"+health.value);
+					health.damage(monster.specs.baseDamage + Math.floor(-monster.weaponCooldownTime)*monster.specs.baseFireRate );
+					//trace("Hit:"+health.value);
 					monster.weaponCooldownTime = monster.specs.baseFireRate;
 				}
 				// can move about while firing weapon...
@@ -115,9 +133,8 @@ class MonsterChasePlayerSystem extends System
 				}
 				
 				
-				// this doesn't seemto work..
-				if(monster.state == MonsterModel.STATE_LEFT) {x -= 2/BASE_SCREEN_RANGE*timeDelta/MONS_FRAMER;}
-				if(monster.state == MonsterModel.STATE_RIGHT) {x += 2/BASE_SCREEN_RANGE*timeDelta/MONS_FRAMER;}
+				if(monster.state == MonsterModel.STATE_LEFT) {x -= clampMax(2/BASE_SCREEN_RANGE*timeDelta/MONS_FRAMER, abs(pPos - monster.specs.baseAttackRange - monster.currentPosition)  );}
+				if(monster.state == MonsterModel.STATE_RIGHT) {x += clampMax(2/BASE_SCREEN_RANGE*timeDelta/MONS_FRAMER, abs(pPos + monster.specs.baseAttackRange  - monster.currentPosition) );}
 				
 			
 				if(monster.dance > 0)
@@ -135,7 +152,7 @@ class MonsterChasePlayerSystem extends System
 
 			}
 			
-			trace("GOT MONSTER:"+monster.state + " :"+monster.angry);
+			//trace("GOT MONSTER:"+monster.state + " :"+monster.angry);
 		}
 		else {
 			monster.angry = false;
@@ -150,4 +167,62 @@ class MonsterChasePlayerSystem extends System
 	static inline function abs(a:Float):Float {
 		return a < 0 ? -a : a;
 	}
+	
+	static inline function clampMax(val:Float, max:Float):Float {
+		return val >= max ? max : val;
+	}
+	
+	
+	// IRules processing...
+	// This may be refactored elsewhere if required
+	var _rules:IRules;
+	var _listenFreeze:Bool = false;
+	public function setRules(rules:IRules) 
+	{
+		if (rules == null) {
+		
+			if (_rules != null) {
+				_rules.onCardResult.remove(onCardResultReceived);
+				_rules = null;
+			}
+			
+			return;
+		}
+		
+		if (_rules!= null && _rules != rules) {
+			_rules.onCardResult.remove(onCardResultReceived);
+		}
+		
+		_rules = rules;
+		_rules.onCardResult.add(onCardResultReceived);
+		_listenFreeze = true;
+		
+	}
+	
+	function onCardResultReceived(cardResult:CardResult):Void {
+		var isFreeze:Bool = false;
+		switch( cardResult) {
+			case CardResult.NOTHING: return;
+		
+			case CardResult.OK(flags):
+				if ( flags.hasBits( OkFlags.GUESSED_CONSTANT.value|OkFlags.GAME_OVER.value)  ) {
+					isFreeze = true;
+				}
+			default:
+
+		}
+		_listenFreeze = isFreeze;
+		
+		/*
+		if (_listenFreeze != isFreeze) {
+			
+			
+			_listenFreeze = isFreeze;
+		}
+		*/
+		
+	}
+		
+	
+
 }

@@ -5,7 +5,7 @@ package cstrain.core;
  */
 enum CardResult 
 {
-	OK(progress:Int);
+	OK(okFlags:OkFlags);
 	PENALIZE(penalty:Penalty);
 	GUESS_CONSTANT(card:Card, wildGuess:Bool);
 	NOTHING;

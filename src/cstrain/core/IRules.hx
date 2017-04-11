@@ -1,6 +1,7 @@
 package cstrain.core;
 import cstrain.core.Card;
 import cstrain.core.GameSettings;
+import msignal.Signal.Signal1;
 
 /**
  * Standard ruleset game model interface for The Constant Train 
@@ -9,6 +10,7 @@ import cstrain.core.GameSettings;
 interface IRules 
 {
 	//public function isConstant():Bool;
+	public var onCardResult(default,never):Signal1<CardResult>;
 	
 	public function playCard(isSwipeRight:Bool):CardResult;    // executes card play (assumed the topmost card)
 	

@@ -14,24 +14,55 @@
 	}
 
 }
+.health-bar {
+	height:400px;
+	width:5px;
+	position:absolute;
+	top:115px;
+	left:0;
+	font-size:11px;
+	background-color:brown;
+	.meter {
+		background-color:#00ff00;
+		position:absolute;
+		top:0;
+		left:0;
+		height:100%;
+		width:100%;
+		transform-origin:center bottom;
+		
+	}
+}
+.health-label {
+	position:absolute;
+	top:-20px;
+	color:white;
+}
 .gameover {
 	position: absolute;
 	z-index: 1;
 	top: 0;
 	width: 70%;
+	/*
 	margin-left: -142px;
-	left: 55%;
+	*/
+	left: 50%;
 	top: 50%;
+	text-align:center;
+	
 	margin-top: -81px;
 	color: antiquewhite;
-	transform:translate(0,0);
+	transform:translate(-50%,-50%);
 	
-	animation-name: gameover;
-	animation-delay:.4s;
-	animation-timing-function: ease-out;
-	animation-duration: .8s;
-	animation-iteration-count: 1;
-	animation-fill-mode: backwards;
+	.anim {
+		animation-name: gameover;
+		animation-delay:.4s;
+		animation-timing-function: ease-out;
+		animation-duration: .8s;
+		animation-iteration-count: 1;
+		animation-fill-mode: backwards;
+		position:relative;
+	}
 }
 
 .quitbtn {

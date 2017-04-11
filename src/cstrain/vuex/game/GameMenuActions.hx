@@ -4,6 +4,9 @@ import cstrain.core.GameSettings.GameOptions;
 import cstrain.core.IBGTrain;
 import cstrain.core.IRules;
 import cstrain.rules.TestGame;
+import cstrain.rules.monster.MonsterSpecs;
+import cstrain.rules.monster.StartMonsterSpecs;
+import cstrain.rules.player.PlayerSpecs;
 import cstrain.vuex.components.BasicTypes.GameCreateOptions;
 import cstrain.vuex.components.BasicTypes.GameJoinOptions;
 import cstrain.vuex.store.GameStore.GameStoreState;
@@ -30,15 +33,15 @@ class GameMenuActions implements IAction<GameStoreState, NoneT>
 	public static var BGTRAIN:IBGTrain;
 	
 	@:mutator static var mutator:GameMutator;
-	
 
 	function newGame(context:IVxContext1<GameStoreState>, create:GameCreateOptions):Void {
 		var rules:IRules = new TestGame();
 		rules.setScene(BGTRAIN);
 		rules.restart(create.options.seed, create.options.options);
 		
-		var mod =  new GameModule(rules, BGTRAIN);
+		var mod =  new GameModule(rules, BGTRAIN, context.state._savedLevelStats);
 		VxBoot.registerModuleWithStore("game", mod, create.store);
+		
 		mutator._restart(context);
 		
 	}
@@ -49,10 +52,10 @@ class GameMenuActions implements IAction<GameStoreState, NoneT>
 		rules.restart( GameSettings.getSeedFromUniqueId(join.joinCode), GameSettings.getOptionsFromUniqueId(join.joinCode) );
 		
 		
-		var mod =  new GameModule(rules, BGTRAIN);
+		var mod =  new GameModule(rules, BGTRAIN, context.state._savedLevelStats);
 		VxBoot.registerModuleWithStore("game", mod, join.store);
 		mutator._restart(context);
-	
+
 	}
 	
 	function quitGame(context:IVxContext1<GameStoreState>, store:Store<Dynamic>):Void {
@@ -78,7 +81,7 @@ class GameMenuActions implements IAction<GameStoreState, NoneT>
 		rules.setScene(BGTRAIN);
 		rules.restart(create.options.seed, create.options.options);
 	
-		var mod =  new GameModule(rules, BGTRAIN);
+		var mod =  new GameModule(rules, BGTRAIN, context.state._savedLevelStats);
 		VxBoot.registerModuleWithStore("game", mod, create.store);
 		mutator._restart(context);
 		

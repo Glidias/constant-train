@@ -82,14 +82,32 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 	
 	var showGameOver(get, never):Bool;
 	function get_showGameOver():Bool {
-		return store.game.gameGetters.cardsLeft <=0;
+		return store.game.gameGetters.cardsLeft <=0 && store.state.game.cardsOutDetected;  // todo: put this in getter convention.
 	}
 	
 	function quitGame():Void {
 
 		menuAction._quitGame(store, _vStore);
 	}
+	
+	@:computed function get_gotHealth():Bool {
+		return store.state.game.vueData != null;
+	}
 
+	
+	@:computed function get_HPStyle():Dynamic {
+		return {
+			transform:"scaleY("+(store.game.gameGetters.healthRatio)+")"
+		}
+	}
+	
+	@:computed function get_healthAmt():Int {
+		return store.game.gameGetters.healthInt;
+	}
+	
+	@:computed function get_isAlive():Bool {
+		return store.game.gameGetters.isAliveHP;
+	}
 	
 	override public function Template():String {
 		
@@ -115,9 +133,13 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 					[quit]
 				</${TouchVUtil.TAG}>
 				<keep-alive>
-					<${Comp_CardView}></${Comp_CardView}>
+					<${Comp_CardView} v-show="isAlive"></${Comp_CardView}>
 				</keep-alive>
-				<${Comp_PopupCardView}></${Comp_PopupCardView}>
+				<${Comp_PopupCardView} v-show="isAlive"></${Comp_PopupCardView}>
+				<div class="${STYLE.healthBar}" v-if="gotHealth">
+					<div class="${STYLE.healthLabel}">{{  healthAmt }}</div>
+					<div class="${STYLE.meter}" v-bind:style="HPStyle"></div>
+				</div>
 				<div class="${STYLE.blocker}" v-show="showInstructions" :class="{\'${STYLE.showInstruct}\':showInstructions}"></div>
 				<div v-if="cardResult">
 					<p>{{ cardResult }}</p>
@@ -125,9 +147,17 @@ class GameView extends VxComponent<GameStore, NoneT, NoneT>
 				<div class="${STYLE.xpression}" style="font-style:italic" v-html="polyexpression"></div>
 				<br/>
 				${cheatBtn}
-				<div class="${STYLE.gameover}" v-show="showGameOver">
-					<h1>Congratulations!</h1>
-					<h2>${"You've finished the race!"}</h2>
+				<div class="${STYLE.gameover}" v-show="showGameOver && isAlive">
+					<div class="${STYLE.anim}">
+						<h1>Congratulations!</h1>
+						<h2>You\'ve finished the race!</h2>
+					</div>
+				</div>
+				<div class="${STYLE.gameover}" v-show="!isAlive">
+					<div class="${STYLE.anim}">
+						<h1>Game Over!</h1>
+						<h2>You died!</h2>
+					</div>
 				</div>
 			</div>
 		';

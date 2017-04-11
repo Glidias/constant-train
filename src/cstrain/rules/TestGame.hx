@@ -5,11 +5,13 @@ import cstrain.core.Deck;
 import cstrain.core.GameSettings;
 import cstrain.core.IBGTrain;
 import cstrain.core.IRules;
+import cstrain.core.OkFlags;
 import cstrain.core.PenaltyDesc;
 import cstrain.core.PlayerStats;
 import cstrain.core.Polynomial;
 import cstrain.util.FastRNG;
 import haxe.Timer;
+import msignal.Signal.Signal1;
 
 /**
  * Example game setup
@@ -34,6 +36,8 @@ class TestGame implements IRules
 	var secretVarValue:Int;
 	var polynomialValue:Int;
 	var polynomialValueCached:Bool = false;
+	
+	public var onCardResult(default,never):Signal1<CardResult> = new Signal1<CardResult>();
 	
 	var gameSettings:GameSettings = new GameSettings();
 	
@@ -115,7 +119,7 @@ class TestGame implements IRules
 		}
 		
 		thePopupCard = null;	// assume for this set of rules, popup card is always cleared
-		
+		var addGameOverFlag:OkFlags = curDeckIndex < 0 ? OkFlags.GAME_OVER : new OkFlags(0);
 		
 		if (Card.canOperate(curCard.operator)) {  // handle regular operator stuffz
 			
@@ -146,7 +150,7 @@ class TestGame implements IRules
 				}
 				else {
 					// ok , continue as per normal
-					return CardResult.OK(hadPopupCard  ? 0 :1);
+					return CardResult.OK( new OkFlags(hadPopupCard  ? OkFlags.NONE.value :  OkFlags.PROGRESSED.value  | addGameOverFlag.value  ) );
 				}
 			}
 			trace("UNaccounted operation");
@@ -170,7 +174,7 @@ class TestGame implements IRules
 						// Got the answer correct, now, moving out train again!
 						thePopupCard = Card.getRegularStartingVarCard();
 						recreateSecret();
-						return CardResult.OK(0);
+						return CardResult.OK( new OkFlags( OkFlags.GUESSED_CONSTANT.value | addGameOverFlag.value) );
 					}
 				}
 				else {	// gave not so good answer...
@@ -302,7 +306,7 @@ class TestGame implements IRules
 					secondChoice = getFakeValueOfCloserValue(firstChoice);  // whateer, need to look into this latter to further improve guessability
 				}
 				thePopupCard = Card.getRegularGuessConstantCard(firstChoice, secondChoice); 
-				
+			
 			default:
 		}
 		
@@ -324,6 +328,9 @@ class TestGame implements IRules
 		}
 		
 		_lastReceivedTime = currentTime;
+		
+		
+		onCardResult.dispatch(result);
 		return result;
 	}
 	
@@ -378,7 +385,7 @@ class TestGame implements IRules
 		var result:Card = thePopupCard != null ?  getTopCard() : getBelowCardCard();
 		if (result == null) return null;
 		if ( thePopupCard == null && result.operator == Card.OPERATOR_DIVIDE && result.varValues == null ) {  
-			trace("To process card to polynomial");
+			//trace("To process card to polynomial");
 			// check if division is possible and modify card if necessary
 			var topCard:Card = getTopCard();
 			var simulateTopResult:Polynomial;
@@ -390,7 +397,7 @@ class TestGame implements IRules
 				trace("Unforeseen card expected operatable for getNextCardBelow()");
 				simulateTopResult = polynomial.clone();
 			}
-			trace("Considering simulated result:" + simulateTopResult);
+		//	trace("Considering simulated result:" + simulateTopResult);
 			
 			if ( result.isVar ) {	// variable x division case
 				// check factorisable

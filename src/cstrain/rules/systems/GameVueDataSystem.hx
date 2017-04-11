@@ -34,9 +34,12 @@ class GameVueDataSystem extends System
 	override public function update():Void {
 		
 		for (p in playerF) {
-			//p.data.health;
-			gameVue.health = _health.get(p).value;
 			
+			// Not needed, already tracked by listener elsewhere
+			//p.data.health;
+			//gameVue.health = _health.get(p).value;
+			
+			// Train
 			var train = _train.get(p);
 			gameVue.currentProgress = train.currentPosition;
 		}

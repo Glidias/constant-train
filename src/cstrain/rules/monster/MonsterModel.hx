@@ -14,6 +14,7 @@ class MonsterModel
 	public static inline var STATE_RIGHT:Int = 2;
 
 	// situation
+	public var frozen:Bool = false;
 	public var headOffset:Float = 0;
 	public var dance:Float = 0;
 	public var timer:Float = 0;

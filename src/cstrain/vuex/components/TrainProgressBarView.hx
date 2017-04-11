@@ -38,6 +38,16 @@ class TrainProgressBarView extends VxComponent<GameStore, NoneT, NoneT>
 			};
 	}
 	
+		@:computed function get_scrubStyleMonster():Dynamic {
+			var division:Float  = store.game.gameGetters.progressUnit;
+			
+			return {
+				width: (division*100*store.game.gameGetters.monsterRangeScale)+"%"
+				
+				//transform: 
+			};
+	}
+	
 	override public function Template():String {
 		return '
 		<div class="${STYLE.trainprogressBar}">
@@ -47,7 +57,7 @@ class TrainProgressBarView extends VxComponent<GameStore, NoneT, NoneT>
 				</div>
 			</div>
 			<div class="${STYLE.scrubber}" v-bind:style="scrubberStyleMonster">
-				<div class="${STYLE.enemyScrub}" v-bind:style="scrubStyle">
+				<div class="${STYLE.enemyScrub}" v-bind:style="scrubStyleMonster">
 					<div class="fa fa-angle-down ${STYLE.marker}"></div>
 				</div>
 			</div>

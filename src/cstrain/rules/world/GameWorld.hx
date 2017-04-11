@@ -1,6 +1,10 @@
 package cstrain.rules.world;
+import cstrain.core.CardResult;
 import cstrain.core.IBGTrain;
+import cstrain.core.IRules;
+import cstrain.core.OkFlags;
 import cstrain.rules.monster.StartMonsterSpecs;
+import cstrain.rules.player.PlayerSpecs;
 import cstrain.rules.systems.MonsterChasePlayerSystem;
 import cstrain.rules.world.GameWorld.UpdateService;
 import cstrain.rules.components.*;
@@ -22,20 +26,22 @@ import ecx.common.EcxCommon;
 import ecx.common.systems.SystemRunner;
 
 /**
- * ...
+ * A basic gameworld/campaign setup.
  * @author  Glidias
  */
 class GameWorld 
 {
 
-	public function new() 
+	public function new(playerSpecs:PlayerSpecs=null, monsterSpecs:StartMonsterSpecs=null) 
 	{
+		 this.monsterSpecs = monsterSpecs != null ? monsterSpecs :  new StartMonsterSpecs();
+		 this.playerSpecs =  playerSpecs != null ? playerSpecs : new PlayerSpecs();
+		
 		var config = new WorldConfig();
 		
 		var update:Int = 1;
 	
 		var render:Int = 2;
-		
 		
 		// services
 		config.include(new EcxCommon());
@@ -44,20 +50,20 @@ class GameWorld
 		// components
 		config.add(_health = new HealthComp());
 		config.add(_train = new IBGTrainComp());
-		
 		config.add(_monster = new MonsterModelComp());
 		
 		// systems
-		config.add( new MonsterChasePlayerSystem(), update );
+		config.add( monsterChase= new MonsterChasePlayerSystem(), update );
 		config.add( vueSystem = new GameVueDataSystem(null), render );
 		
 		//world
 		world = Engine.createWorld(config, 2);
-		
 	}
 	
 	
-	var monsterSpecs:MonsterSpecs = new StartMonsterSpecs();
+	public var monsterSpecs:StartMonsterSpecs;
+	public var playerSpecs:PlayerSpecs;
+	
 	var vueSystem:GameVueDataSystem;
 	var world:ecx.World;
 	var _health:HealthComp;
@@ -65,24 +71,59 @@ class GameWorld
 	var _monster:MonsterModelComp;
 	var _updateService:UpdateService;
 	
-	public function commence(train:IBGTrain, vueData:GameVueData):Void {
+	
+	private var playerE:Entity;
+	private var health:Health;
+	var monsterChase:MonsterChasePlayerSystem;
+	
+	public function commence(train:IBGTrain, vueData:GameVueData, rules:IRules):Void {
+		
+
 		// create entities and link components
 		var e:Entity;
 		
 		e = world.create();
-		_health.create(e);
+		playerE = e;
+		var h = health = _health.create(e);
+		h.signalDamaged.add( onPlayerDamaged);
+		//h.signalDamaged.add(onTrainDamaged);
 		_train.set(e, train);
 		
 		e = world.create();
 		_monster.set(e, new  MonsterModel(monsterSpecs));
+		monsterChase.setRules(rules);
 		
 		
 		// link system dependencies
 		vueSystem.gameVue = vueData;
+		vueData.maxHealth = playerSpecs.maxHealth;
 	}
 	
-	public function end():Void {
+	// for now, GameWorld partially processes some conventions/rules related to Monster vs Player..
+	// these might be refactored elsewhere later
+	function onPlayerDamaged(amount:Float, healthLeft:Float) 
+	{
+		if (healthLeft <= 0) {
+			_health.destroy(playerE);
+			world.commit(playerE);
+			health.signalDamaged.remove(onPlayerDamaged);
+			health = null;
+		}
+		vueSystem.gameVue.health = healthLeft;
+	}
+	
+	
 
+	
+	
+	public function end():Void {
+		if (health != null) {
+			health.signalDamaged.remove(onPlayerDamaged);
+			health = null;
+		}
+		
+
+		
 		for ( i in 1...world.capacity ){  // somehow, re-creating new entities after this doesn't work?
 			world.destroy( world.getEntity(i));
 		}
@@ -115,7 +156,7 @@ class UpdateService extends Service {
 	}
 	
 	
-	public function update(dt:Float):Void {
+	public inline function update(dt:Float):Void {
 		_runner.updateFrame();
 	}
 }

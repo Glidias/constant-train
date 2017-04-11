@@ -34,7 +34,20 @@ class GameGetters implements IGetters<GameState, NoneT>
 		return Get_totalCards(state) - state.curCardIndex;
 	}
 	
-
+	// assumption made state.vueData != null, remmber to use v-if if necessary
+	public static inline function Get_healthInt(state:GameState):Int {
+		return  state.vueData.health >= 1 ? Std.int(state.vueData.health) : state.vueData.health > 0 ?  1 : 0;
+	}
+	
+	public static inline function Get_healthRatio(state:GameState):Float {
+		return Get_healthInt(state) / state.vueData.maxHealth;
+	}
+	
+	
+	public static inline function Get_isAliveHP(state:GameState):Bool {
+		return Get_healthInt(state) > 0;
+	}
+	
 	
 	public static inline function Get_isPopupChoicing(state:GameState):Bool {
 		return state.topCard != null && state.topCard.operator == Card.OPERATION_EQUAL;
@@ -50,6 +63,8 @@ class GameGetters implements IGetters<GameState, NoneT>
 	public static inline function Get_isAtStopReadyToGo(state:GameState):Bool {
 		return Get_isAtStop(state) && !Get_isPopupChoicing(state) && !Get_isPenalized(state);
 	}
+	
+	
 	
 
 	
@@ -67,6 +82,9 @@ class GameGetters implements IGetters<GameState, NoneT>
 	}
 	public static function Get_monsterProgress(state:GameState):Float {
 		return state.vueData != null && state.vueData.monster != null ?   state.vueData.monster.position / state.cards.length : 0;
+	}
+	public static function Get_monsterRangeScale(state:GameState):Float {
+		return state.vueData != null && state.vueData.monster != null ?   state.vueData.monster.range : 1;
 	}
 
 	

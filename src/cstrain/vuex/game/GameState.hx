@@ -10,6 +10,8 @@ import cstrain.core.Polynomial;
 import cstrain.rules.components.Health;
 import cstrain.rules.monster.MonsterModel;
 import cstrain.rules.monster.MonsterSpecs;
+import cstrain.rules.monster.StartMonsterSpecs;
+import cstrain.rules.player.PlayerSpecs;
 import cstrain.rules.world.GameWorld;
 import msignal.Signal;
 import cstrain.rules.monster.IMonsterSpecs;
@@ -48,14 +50,18 @@ class GameState
 	public var stopsEncountedSoFar:Int = 0;
 
 	public var showInstructions:Bool = false;
+	
+	public var cardsOutDetected:Bool = false;  // imperative from server..
 
 
-	// Post initialization
+	// Post initialization  (non-reactive)
 	public var _chosenCard:Card;
 	public var _rules:IRules;
 	public var _bgTrain:IBGTrain;
 	public var _gameWorld:GameWorld;
 	public var _signalUpdate:Signal1<Float>;
+	public var _monsterSpecs:StartMonsterSpecs;
+	public var _playerSpecs:PlayerSpecs;
 	public var vueData:GameVueData;  // none-vueX BUT reactive vue data 
 
 	public function new(rules:IRules) 
@@ -77,14 +83,19 @@ class GameVueData {
 	public var currentProgress:Float = 0;
 	// player health
 	public var health:Float = 100;
+	public var maxHealth:Float = 100;
+	
 	
 	// monster
 	public var monster:GameMonster = null;
 	
 	
 	public function changeMonster(monster:MonsterModel):Void {
+		
+		
 		this.monster = {
 			position:monster.currentPosition,
+			range:monster.specs.baseAttackRange
 		//	specs: monster.specs
 		};
 	}
@@ -103,5 +114,6 @@ class GameVueData {
 
 typedef GameMonster =  {
 	var position:Float;
+	var range:Float;
 //	var specs:IMonsterSpecs;
 }
