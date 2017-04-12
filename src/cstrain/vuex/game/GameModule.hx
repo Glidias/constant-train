@@ -21,7 +21,7 @@ class GameModule extends VModule<GameState, NoneT>
 	@:mutator static var mutator:GameMutator;
 	@:action static var action:GameActions;
 	var bgTrain:IBGTrain;
-	 var gameWorld:GameWorld;  // static persistant doesn't seem to work for some strange reason..
+	static var gameWorld:GameWorld;  // static persistant doesn't seem to work for some strange reason..
 	
 	@:getter public var gameGetters(default,null):GameGetters;
 
@@ -33,8 +33,11 @@ class GameModule extends VModule<GameState, NoneT>
 				gameWorld = new GameWorld();
 			}
 			else {
-					gameWorld = new GameWorld(lastSaveGame.LAST_PLAYER_SPECS, lastSaveGame.LAST_MONSTER_SPECS);
+				gameWorld = new GameWorld(lastSaveGame.LAST_PLAYER_SPECS, lastSaveGame.LAST_MONSTER_SPECS);
 			}
+		}
+		else {
+			if (lastSaveGame != null) gameWorld.setup( lastSaveGame.LAST_PLAYER_SPECS, lastSaveGame.LAST_MONSTER_SPECS);
 		}
 		
 		

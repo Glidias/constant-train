@@ -34,8 +34,7 @@ class GameWorld
 
 	public function new(playerSpecs:PlayerSpecs=null, monsterSpecs:StartMonsterSpecs=null) 
 	{
-		 this.monsterSpecs = monsterSpecs != null ? monsterSpecs :  new StartMonsterSpecs();
-		 this.playerSpecs =  playerSpecs != null ? playerSpecs : new PlayerSpecs();
+		setup(playerSpecs, monsterSpecs);
 		
 		var config = new WorldConfig();
 		
@@ -60,6 +59,12 @@ class GameWorld
 		world = Engine.createWorld(config, 2);
 	}
 	
+	public inline function setup(playerSpecs:PlayerSpecs, monsterSpecs:StartMonsterSpecs) 
+	{
+		this.monsterSpecs = monsterSpecs != null ? monsterSpecs :  new StartMonsterSpecs();
+		this.playerSpecs =  playerSpecs != null ? playerSpecs : new PlayerSpecs();
+	}
+	
 	
 	public var monsterSpecs:StartMonsterSpecs;
 	public var playerSpecs:PlayerSpecs;
@@ -78,9 +83,10 @@ class GameWorld
 	
 	public function commence(train:IBGTrain, vueData:GameVueData, rules:IRules):Void {
 		
-
+		//trace("COmmencing..."+world.available + ", "+world.capacity);
 		// create entities and link components
 		var e:Entity;
+		
 		
 		e = world.create();
 		playerE = e;
@@ -128,6 +134,7 @@ class GameWorld
 			world.destroy( world.getEntity(i));
 		}
 		world.invalidate();  // this is needed?
+		trace("ENDING:" + world.available);
 	}
 
 	

@@ -66,26 +66,4 @@ class GameMenuActions implements IAction<GameStoreState, NoneT>
 		
 		BGTRAIN.resetTo(0);
 	}
-	
-	
-	
-	function restartNewGame(context:IVxContext1<GameStoreState>, create:GameCreateOptions):Void {
-		
-		GameActions.clearTimer();
-		context.state.game._signalUpdate.removeAll();    // need to refactor this to lifecycle..
-		context.state.game._gameWorld.end();
-		create.store.unregisterModule("game");
-		BGTRAIN.resetTo(0);
-		
-		var rules:IRules = new TestGame();
-		rules.setScene(BGTRAIN);
-		rules.restart(create.options.seed, create.options.options);
-	
-		var mod =  new GameModule(rules, BGTRAIN, context.state._savedLevelStats);
-		VxBoot.registerModuleWithStore("game", mod, create.store);
-		mutator._restart(context);
-		
-		
-	}
-	
 }
