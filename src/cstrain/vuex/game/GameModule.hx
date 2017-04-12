@@ -21,7 +21,7 @@ class GameModule extends VModule<GameState, NoneT>
 	@:mutator static var mutator:GameMutator;
 	@:action static var action:GameActions;
 	var bgTrain:IBGTrain;
-	static var gameWorld:GameWorld;  // static persistant doesn't seem to work for some strange reason..
+	static var gameWorld:GameWorld;
 	
 	@:getter public var gameGetters(default,null):GameGetters;
 
