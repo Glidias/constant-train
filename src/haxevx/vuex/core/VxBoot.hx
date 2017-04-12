@@ -99,7 +99,7 @@ class VxBoot
 			stack[i]._InjNative(storeGetters);
 		
 		}
-		stack = [];
+		ModuleStack.stack = [];
 	}
 	
 	public function startVueWithRootComponent<T>(el:String, rootComponent:VComponent<Dynamic, Dynamic>):Vue {
