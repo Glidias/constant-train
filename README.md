@@ -2,7 +2,7 @@
 
 HaxeVx+Vuex example train racing game prototype.
 
-For an online preview of web-app (which can be Added to Home Screen once fully loaded), go to: http://54.254.243.13:3000
+For an online preview of web-app (which can be Added to Home Screen once fully loaded), go to: http:://54.169.111.68:3000
 
 Leverages the following technologies under Haxe:
 	
@@ -27,7 +27,7 @@ Before compiling, run `haxelib install all` (to ensure all you install all neces
 
 ## Compiling
 
-To compile, just use any of the relavant `build_????.hxml` files.  Or alternatively, if using some IDE to compile without hxml files, compile `Main.hx` and also remember to post-run `gulpcss.bat` (which simply executes `gulp css` task to compile the main `scss/index.scss` stylesheet together with it's CSS modules. By default, the hxml files already executes the `gulp css` process after compiling! A reference/cache file dump of `processing-modules`  and `processing-styles` will be generated with the Haxe compiling/macro-building process. These cache files can be safely deleted away, if you wish, but they serve as a persitant cache reference to speed up later Haxe compiles by knowing which CSS module style files had changed or not.
+To compile, just use any of the relavant `build_????.hxml` files.  Or alternatively, if using some IDE to compile without hxml files, compile `Main.hx` and also remember to post-run `gulpcss.bat` (which simply executes `gulp css` task to compile the main `scss/index.scss` stylesheet together with it's CSS modules. By default, the hxml files already executes the `gulp css` process after compiling! A reference/cache file dump of `processing-modules`  and `processing-styles` will be generated withthe Haxe compiling/macro-building process. These cache files can be safely deleted away, if you wish, but they serve as a persitant cache reference to speed up later Haxe compiles by knowing which CSS module style files had changed or not.
 
 ## Previewing
 
