@@ -2,7 +2,7 @@
 
 HaxeVx+Vuex example train racing game prototype.
 
-For an online preview of web-app (which can be Added to Home Screen once fully loaded), go to: http:://54.169.111.68:3000
+For an online preview of web-app (which can be Added to Home Screen once fully loaded), go to: http://54.169.111.68:3000
 
 Leverages the following technologies under Haxe:
 	
