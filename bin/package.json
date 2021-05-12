@@ -1,17 +1,16 @@
 {
   "dependencies": {
     "swing": "^4.0.1",
-	"vue-touch": "git://github.com/vuejs/vue-touch.git#next"
+    "vue-touch": "git://github.com/vuejs/vue-touch.git#next"
   },
   "devDependencies": {
     "webpack": "^1.14.0",
     "webpack-dev-server": "^1.16.2",
-	"appcache-webpack-plugin": "^1.3.0"
+    "appcache-webpack-plugin": "^1.3.0"
   },
   "private": true,
   "scripts": {
-    "start": "webpack-dev-server --port 8080 --host localhost --entry ./ConstantTrain.js",
-	"serve": "webpack-dev-server --port 8080 --host 192.168.1.19 --entry ./ConstantTrain.js",
-	"build": "webpack"
+    "serve": "webpack-dev-server --port 8080 --host localhost --entry ./ConstantTrain.js",
+    "build": "webpack ./ConstantTrain.js ./bundle.js -p"
   }
 }

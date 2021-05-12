@@ -5,4 +5,5 @@
 /processing-styles
 /node_modules
 /bin/css/index.css
+/bin/bundle.js
 npm-shrinkwrap.json
