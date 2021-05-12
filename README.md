@@ -2,7 +2,7 @@
 
 HaxeVx+Vuex example train racing game prototype. 
 
-For an online preview of web-app (which can be Added to Home Screen once fully loaded), go to: 
+For an online preview of web-app, go to: https://glidias.github.io/constant-train/
 
 Leverages the following technologies under Haxe:
 	
