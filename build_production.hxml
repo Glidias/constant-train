@@ -2,7 +2,7 @@
 
 -cp src
 -js bin/ConstantTrain.js
--lib heaps
+-lib heaps:1.0.0
 -lib hashids
 -lib msignal
 -lib power-of-two
