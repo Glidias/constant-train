@@ -31,14 +31,15 @@ class Mountain extends Entity
 		createShape();
 	}
 
+
 	override public function reset():Void {
 		x = 0;
-
 		heightMap = new Vector<Float>();
-
+		graphics.clear();
 		lastScreenHeight = SceneSettings.HEIGHT;
 		generateHeightMap();
 		createShape();
+		onResize();
 	}
 
 	var width:Float;
@@ -46,7 +47,6 @@ class Mountain extends Entity
 	public override function update(dt:Float):Void
 	{
 		x += speed * dt;
-		//trace(x);
 
 		if (x < -(width - SceneSettings.WIDTH)) {
 
@@ -88,10 +88,16 @@ class Mountain extends Entity
 		//baseHeight = SceneSettings.HEIGHT * 0.55 + i * 25;
 		//y =  SceneSettings.HEIGHT*0.55 - SceneSettings.HEIGHT*0.55;
 		y = SceneSettings.HEIGHT - lastScreenHeight;
-		if (SceneSettings.WIDTH > width) {
+
+		while (x < -(width - SceneSettings.WIDTH)) {
+			var removeSegmentNumber:Int = Std.int(  (width - SceneSettings.WIDTH) / SEGMENT_LENGTH );
+			heightMap.splice(0, removeSegmentNumber);
+
+			x += removeSegmentNumber * SEGMENT_LENGTH;
 			generateHeightMap();
 			createShape();
 		}
+
 
 	}
 

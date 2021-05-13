@@ -85,13 +85,11 @@ class TrainBGScene extends AbstractBGScene
 
 
 
-
-
-
-
-			for ( entity in entities)
-			{
-				entity.update(diff);
+			if (model.movingState != BGTrainState.STOPPED) {
+				for ( entity in entities)
+				{
+					entity.update(diff);
+				}
 			}
 
 			//emitter.step();
@@ -174,6 +172,7 @@ class TrainBGScene extends AbstractBGScene
 			scene.addChild(mountain);
 			entities.push(mountain);
 			mountains.push(mountain);
+			mountain.onResize();
 		}
 
 		  restoreFilters(debug);
