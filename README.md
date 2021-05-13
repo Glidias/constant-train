@@ -63,7 +63,3 @@ Mathmatical operators are:
 - `-` Minus
 - `\` Divide to get quotient only (ie. ignore remainder)
 - `(d?/dn)` Deriative 
-
-### Current gameplay state:
-
-Admittingly, the game as of now is rather boring, since there's little risk/reward mechanic contrast that goes along with it. As of now (until some possible gameplay enhancements are done to make the game more fun with more player-agency, management, and danger), the current way to play the game is to simply challenge your friend with the same main deck of platform cards, and see who finishes the race first with the background scene train moving forward to it's end destination (however, that it still pretty boring and only adds a competition aspect to the game). Some memory, speed,  guessing work and calculated-risk taking is done to minimise missing stops and also determine when it's deemed "safe" to speed ahead (ie. keep swiping left) if you know the  polynomial expression is bound to be complex and unlikely to be reduced down to a constant.
