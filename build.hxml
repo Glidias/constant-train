@@ -1,11 +1,12 @@
-# development build 
+# development build
 
--cp src
--js bin/ConstantTrain.js
 -lib heaps:1.0.0
 -lib hashids
 -lib msignal
 -lib power-of-two
+-lib haxevx
 -D vue_global
+-cp src
+-js bin/ConstantTrain.js
 -main Main
 -cmd gulp css

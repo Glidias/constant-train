@@ -1,6 +1,8 @@
 package haxevx.vuex.core;
-import haxe.macro.ComplexTypeTools;
 import haxe.ds.StringMap;
+
+#if macro
+import haxe.macro.ComplexTypeTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Expr.Field;
@@ -11,6 +13,27 @@ import haxe.macro.ExprTools;
 import haxe.macro.MacroStringTools;
 import haxe.macro.Type;
 import haxe.macro.TypeTools;
+#end
+
+#if macro
+typedef FieldExprPair = {
+	var field:String;
+	var expr:Expr;
+}
+
+typedef PropBinding = {
+	var field:Field;
+	var ret:ComplexType;
+	var methodPos:Position;
+}
+
+
+typedef VuexActionOrMutator = {
+	var isAction:Bool;
+	var type:ComplexType;
+	var clsType:ClassType;
+}
+#end
 
 #if macro
 /**
@@ -19,7 +42,6 @@ import haxe.macro.TypeTools;
  */
 class VxMacros
 {
-	
 	static inline var FLAG_PROP_DEFAULTVAL_CUSTOM:Int = 1;
 	static inline var FLAG_PROPSETTING_CUSTOM:Int = 2;
 	
@@ -223,6 +245,7 @@ class VxMacros
 		"haxevx.vuex.core.VxComponent" => true,
 		"haxevx.vuex.core.VComponent" => true,
 	];
+	
 	
 	macro public static function buildComponent():Array<Field>  {
 		var fields = Context.getBuildFields();
@@ -1289,30 +1312,9 @@ class VxMacros
 	}
 	
 	
-	
-	
 }
-
-typedef FieldExprPair = {
-	var field:String;
-	var expr:Expr;
-}
-
-typedef PropBinding = {
-	var field:Field;
-	var ret:ComplexType;
-	var methodPos:Position;
-}
-
-
-
 #end
 
-typedef VuexActionOrMutator = {
-	var isAction:Bool;
-	var type:ComplexType;
-	var clsType:ClassType;
-}
 
 class VxMacroUtil {
 	public static inline function dynamicSet<T>(dyn:Dynamic<T>, key:String, value:T):Void {
