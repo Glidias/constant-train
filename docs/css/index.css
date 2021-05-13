@@ -2587,17 +2587,14 @@
 
 .BaseCardView_linyx_delay-popup .BaseCardView_linyx_content {
   position: absolute;
-  bottom: 230px;
+  top: 340px;
+  margin-top: 15px;
   width: 100%;
   text-align: center;
   font-size: 1.2em; }
 
 .BaseCardView_linyx_delay-popup h4 {
   font-size: 1.0em; }
-
-/*  Unique ID */
-.BaseCardView_linyx_uniqueid .BaseCardView_linyx_content {
-  top: 373px; }
 
 .BaseCardView_linyx_uniqueid {
   pointer-events: none; }
@@ -2613,8 +2610,8 @@ body {
 #wrapper {
   margin: 0 auto;
   position: relative;
-  width: 414px;
-  height: 736px; }
+  width: 100%;
+  height: 100vh; }
 
 .GameView_4wc11_gameview, .GameMenu_1hijr_game-menu {
   position: absolute;
