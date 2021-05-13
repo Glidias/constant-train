@@ -16,35 +16,35 @@ import js.html.Event;
 class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 {
 
-	public function new() 
+	public function new()
 	{
 		super();
 	}
-	
+
 	public static inline var TAG:String = "GameMenu";
 	@:action static var action:GameMenuActions;
-	
+
 	override public function Data():GameMenuData {
-		return { 
+		return {
 			joinKey:"",
 			gameOptions:[1],
 		}
 	}
-	
+
 	function loseInputFocus():Void {
-	
+
 		Browser.window.scrollTo(0,0);
 	}
-	
+
 	function beginGame():Void {
 		action._newGame(store, { options:{options:this.gameOptions}, store:_vStore });
 		Browser.window.scrollTo(0,0);
 	}
-	
+
 	@:computed inline function get_joinEnabled():Bool {
 		return this.joinKey != null && this.joinKey != "";
 	}
-	
+
 	function joinGame(event:Event=null):Void {
 		if ( this.joinEnabled ) {
 			action._joinGame(store, { joinCode:this.joinKey, store:_vStore });
@@ -56,7 +56,7 @@ class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 		}
 	}
 
-	
+
 	override public function Template():String {
 		return '<div class="${STYLE.gameMenu}">
 			<h2>New Game</h2>
@@ -80,7 +80,7 @@ class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 		</div>
 		';
 	}
-	
+
 }
 
 typedef GameMenuData = {

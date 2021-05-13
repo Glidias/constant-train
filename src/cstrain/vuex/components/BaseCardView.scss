@@ -1,5 +1,5 @@
 .cardview {
-	
+
 	position:relative;
 	width:100%;
 	height:100%;
@@ -48,11 +48,12 @@
 	width:100%;
 	height:100%;
 	text-align:center;
-	
+
 }
 .delay-popup .content {
 	position:absolute;
-	bottom:230px;
+	top:340px;
+	margin-top:15px;
 	width:100%;
 	text-align:center;
 	font-size:1.2em;
@@ -61,15 +62,7 @@
 	font-size:1.0em;
 }
 
-/*  Unique ID */
-
-.uniqueid .content {
-	
-	top:373px;
-	
-}
-
 .uniqueid {
 	pointer-events:none;
-	
+
 }
