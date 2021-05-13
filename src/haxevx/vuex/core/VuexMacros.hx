@@ -1,27 +1,30 @@
 package haxevx.vuex.core;
 import haxe.ds.StringMap;
-import haxe.macro.Expr.Field;
+
+
+#if macro
+import haxevx.vuex.native.CommitOptions;
+import haxevx.vuex.native.DispatchOptions;
+import haxevx.vuex.core.VxMacros.VuexActionOrMutator;
+
 import haxe.macro.ComplexTypeTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Expr.Field;
 import haxe.macro.Expr.Metadata;
-import haxe.macro.Expr.MetadataEntry;
 import haxe.macro.Expr.Position;
 import haxe.macro.ExprTools;
 import haxe.macro.MacroStringTools;
 import haxe.macro.Type;
 import haxe.macro.TypeTools;
-
-import haxevx.vuex.native.CommitOptions;
-import haxevx.vuex.native.DispatchOptions;
+#end
 
 /**
  * Haxe Macros for Vuex
  * @author Glidias
  */
 
-import haxevx.vuex.core.VxMacros.VuexActionOrMutator;
+
 
 class VuexMacros
 {
@@ -878,6 +881,7 @@ class VuexMacros
 	
 	public static function getClassTypeFromType(complexType:ComplexType):ClassType {
 		var type:Type = ComplexTypeTools.toType(complexType);
+		
 		switch(type) {
 			case TInst(t, params):
 				return t.get();
