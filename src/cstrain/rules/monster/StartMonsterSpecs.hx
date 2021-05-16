@@ -9,7 +9,7 @@ import cstrain.h2d.SceneSettings;
 class StartMonsterSpecs extends MonsterSpecs
 {
 
-	public function new() 
+	public function new()
 	{
 		super();
 
@@ -19,10 +19,11 @@ class StartMonsterSpecs extends MonsterSpecs
 		this.baseSpeed = .50;
 		this.baseAttackRange = .5;
 	}
-	
+
 	public function dummyAddDifficulty():Void {
-		this.baseSpeed += 0.5;
+		this.baseSpeed += 0.2;
+		this.difficultyLevel++;
 	}
 
-	
+
 }

@@ -2,8 +2,10 @@ package cstrain.vuex.components;
 import cstrain.vuex.game.GameMenuActions;
 import cstrain.vuex.store.GameStore;
 import haxevx.vuex.core.NoneT;
+import haxevx.vuex.core.VComponent;
 import haxevx.vuex.core.VxComponent;
 import cstrain.vuex.components.BasicTypes;
+import cstrain.vuex.components.GameInstruction;
 import js.Browser;
 import js.html.Event;
 
@@ -28,7 +30,14 @@ class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 		return {
 			joinKey:"",
 			gameOptions:[1],
+			showInstructions: false,
 		}
+	}
+
+	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
+		return [
+			'GameInstruction' => new GameInstruction()
+		];
 	}
 
 	function loseInputFocus():Void {
@@ -59,24 +68,28 @@ class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 
 	override public function Template():String {
 		return '<div class="${STYLE.gameMenu}">
-			<h2>New Game</h2>
-			<div class="${STYLE.gametitle}">TestGame</div>
-			<div class="${STYLE.gameOpts}">
-				<label for="gameoption_1">Length of Race:</label>
-				<select id="gameoption_1" v-model.number="gameOptions[0]" v-on:blur="loseInputFocus()">
-					<option :value="n" v-for="n in 8">{{n}}</option>
-				</select>
+			<div v-show="!showInstructions">
+				<h2>New Game</h2>
+				<div class="${STYLE.gametitle}">TestGame</div>
+				<div class="${STYLE.gameOpts}">
+					<label for="gameoption_1">Length of Race:</label>
+					<select id="gameoption_1" v-model.number="gameOptions[0]" v-on:blur="loseInputFocus()">
+						<option :value="n" v-for="n in 8">{{n}}</option>
+					</select>
+					<a class="${STYLE.showInstructBtn}" @click="showInstructions = true">How to play?</a>
+				</div>
+				<br/>
+				<div class="${STYLE.btnZone}">
+					<${TouchVUtil.TAG} tag="button"  v-on:tap="beginGame()">Begin</${TouchVUtil.TAG}>
+				</div>
+				<hr/>
+				<h2>Join Game</h2>
+				<input type="text" v-model="joinKey" v-on:blur="loseInputFocus()"></input>
+				<div class="${STYLE.btnZone}">
+					<${TouchVUtil.TAG} tag="button" v-on:tap="joinGame($$event)">Connect</${TouchVUtil.TAG}>
+				</div>
 			</div>
-			<br/>
-			<div class="${STYLE.btnZone}">
-				<${TouchVUtil.TAG} tag="button"  v-on:tap="beginGame()">Begin</${TouchVUtil.TAG}>
-			</div>
-			<hr/>
-			<h2>Join Game</h2>
-			<input type="text" v-model="joinKey" v-on:blur="loseInputFocus()"></input>
-			<div class="${STYLE.btnZone}">
-				<${TouchVUtil.TAG} tag="button" v-on:tap="joinGame($$event)">Connect</${TouchVUtil.TAG}>
-			</div>
+			<GameInstruction @close="showInstructions = false" v-show="showInstructions" />
 		</div>
 		';
 	}
@@ -86,4 +99,5 @@ class GameMenu extends VxComponent<GameStore, GameMenuData, NoneT>
 typedef GameMenuData = {
 	var joinKey:String;
 	var gameOptions:Array<Int>;
+	var showInstructions:Bool;
 }

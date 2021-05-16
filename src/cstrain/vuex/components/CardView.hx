@@ -239,7 +239,9 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return store.game.gameGetters.isAtStopReadyToGo;
 	}
 
-
+	@:computed function get_difficultyLevel():Int {
+		return store.game.gameGetters.difficultyLevel;
+	}
 
 	public static var STYLE = BaseCardView.STYLE;
 
@@ -247,7 +249,7 @@ class CardView extends BaseCardView //<GameStore, CardViewState, CardViewProps>
 		return '
 			<div class="${STYLE.cardview}">
 				<div class="${STYLE.hudIndicators}">
-					<h3>{{ tickStr }} <span :style="penaltiedStrStyle">{{ penaltiedStr }}</span> &nbsp; {{ curCardIndex}} / {{ totalCards}}<span v-show="isAtStop" class="fa fa-train ${mySTYLE.icon} ${mySTYLE.stopIcon}" :class="{ \'${mySTYLE.ready}\':isAtStopReady }"></span></h3>
+					<h3>{{ tickStr }} <span :style="penaltiedStrStyle">{{ penaltiedStr }}</span> &nbsp; [Level {{difficultyLevel}}] {{ curCardIndex}} / {{ totalCards}}<span v-show="isAtStop" class="fa fa-train ${mySTYLE.icon} ${mySTYLE.stopIcon}" :class="{ \'${mySTYLE.ready}\':isAtStopReady }"></span></h3>
 				</div>
 
 				<h4 style="font-size:9px" v-show="${BuiltVUtil.isProductionStrNot()}">{{ topCardIndex}}</h4>
