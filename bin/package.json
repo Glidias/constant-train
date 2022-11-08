@@ -4,7 +4,7 @@
     "vue-touch": "git://github.com/vuejs/vue-touch.git#next"
   },
   "devDependencies": {
-    "webpack": "^1.14.0",
+    "webpack": "^5.74.0",
     "webpack-dev-server": "^1.16.2",
     "appcache-webpack-plugin": "^1.3.0"
   },
